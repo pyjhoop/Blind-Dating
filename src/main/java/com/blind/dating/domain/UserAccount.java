@@ -67,9 +67,9 @@ public class UserAccount extends BaseEntity {
 
 
 
-    public UserAccount(){}
+    protected UserAccount(){}
 
-    public UserAccount(String userId, String userPassword, String nickname, String region, int score, String mbti, String gender, boolean deleted) {
+    private UserAccount(String userId, String userPassword, String nickname, String region, int score, String mbti, String gender, boolean deleted) {
         this.userId = userId;
         this.userPassword = userPassword;
         this.nickname = nickname;
@@ -79,6 +79,10 @@ public class UserAccount extends BaseEntity {
         this.gender = gender;
         this.deleted = deleted;
     }
+    public static UserAccount of(String userId, String userPassword, String nickname, String region, int score, String mbti, String gender, boolean deleted) {
+        return new UserAccount(userId, userPassword, nickname, region, score, mbti, gender, deleted);
+    }
+
 
     @Override
     public boolean equals(Object o) {

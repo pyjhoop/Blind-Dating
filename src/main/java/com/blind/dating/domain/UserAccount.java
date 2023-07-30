@@ -56,11 +56,11 @@ public class UserAccount extends BaseEntity {
     private Boolean deleted;
 
     @OrderBy("createdAt DESC")
-    @OneToMany(mappedBy = "sender", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "sender", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @ToString.Exclude
     private final Set<Message> messages = new LinkedHashSet<>();
 
-    @OneToMany(mappedBy = "userAccount", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "userAccount", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @ToString.Exclude
     private final Set<Interest> interests = new LinkedHashSet<>();
 

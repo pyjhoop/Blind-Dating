@@ -16,7 +16,7 @@ public class Message extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(optional = false)
+    @ManyToOne()
     private UserAccount sender;
 
     @Column(nullable = false)

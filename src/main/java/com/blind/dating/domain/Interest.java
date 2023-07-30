@@ -15,7 +15,7 @@ public class Interest {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(optional = false)
+    @ManyToOne()
     private UserAccount userAccount;
 
     @Setter

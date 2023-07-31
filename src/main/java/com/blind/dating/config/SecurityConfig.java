@@ -15,11 +15,10 @@ public class SecurityConfig {
                 .csrf().disable()
                 .cors().and()
                 .authorizeRequests(auth->auth
-                        .antMatchers("/h2-console/**", "/swagger-ui/**").permitAll()
+                        .antMatchers("/h2-console/**", "/swagger-ui/**","/v3/api-docs/**").permitAll()
                         .antMatchers("/api/login","/api/signup").permitAll()
                         .anyRequest().authenticated())
                 .headers().frameOptions().sameOrigin()
                 .and().build();
-
     }
 }

@@ -26,16 +26,21 @@ public class Message extends BaseEntity {
     @Column(nullable = false)
     private String messageContent;
 
+    @Setter
+    @Column(nullable = false)
+    private String status;
+
     protected Message(){}
 
-    private Message(UserAccount sender, Long receiver, String messageContent) {
+    private Message(UserAccount sender, Long receiver, String messageContent, String status) {
         this.sender = sender;
         this.receiver = receiver;
         this.messageContent = messageContent;
+        this.status = status;
     }
 
-    public static Message of(UserAccount sender, Long receiver, String messageContent){
-        return new Message(sender, receiver, messageContent);
+    public static Message of(UserAccount sender, Long receiver, String messageContent, String status){
+        return new Message(sender, receiver, messageContent, status);
     }
 
     @Override

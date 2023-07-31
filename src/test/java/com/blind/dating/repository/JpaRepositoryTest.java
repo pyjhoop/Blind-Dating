@@ -39,7 +39,7 @@ class JpaRepositoryTest {
         UserAccount savedUser1 = userAccountRepository.save(user1);
         UserAccount savedUser2 = userAccountRepository.save(user2);
 
-        Message message = Message.of(savedUser1,Long.valueOf(2),"안녕하세요");
+        Message message = Message.of(savedUser1,Long.valueOf(2),"안녕하세요","read");
         Interest interest = Interest.of(savedUser1,"코딩");
 
         //When
@@ -62,7 +62,7 @@ class JpaRepositoryTest {
         UserAccount savedUser1 = userAccountRepository.save(user1);
         UserAccount savedUser2 = userAccountRepository.save(user2);
 
-        Message message = Message.of(savedUser1,Long.valueOf(2),"안녕하세요");
+        Message message = Message.of(savedUser1,Long.valueOf(2),"안녕하세요", "read");
         Interest interest = Interest.of(savedUser1,"코딩");
 
         Message savedMessage = messageRepository.save(message);
@@ -90,7 +90,7 @@ class JpaRepositoryTest {
         UserAccount savedUser1 = userAccountRepository.save(user1);
         UserAccount savedUser2 = userAccountRepository.save(user2);
 
-        Message message = Message.of(savedUser1,Long.valueOf(2),"안녕하세요");
+        Message message = Message.of(savedUser1,Long.valueOf(2),"안녕하세요", "read");
         Interest interest = Interest.of(savedUser1,"코딩");
 
         Message savedMessage = messageRepository.save(message);
@@ -122,7 +122,7 @@ class JpaRepositoryTest {
         UserAccount savedUser1 = userAccountRepository.save(user1);
         UserAccount savedUser2 = userAccountRepository.save(user2);
 
-        Message message = Message.of(savedUser1,Long.valueOf(2),"안녕하세요");
+        Message message = Message.of(savedUser1,Long.valueOf(2),"안녕하세요", "read");
         Interest interest = Interest.of(savedUser1,"코딩");
 
         Message savedMessage = messageRepository.save(message);

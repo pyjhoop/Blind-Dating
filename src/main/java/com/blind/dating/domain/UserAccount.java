@@ -63,7 +63,7 @@ public class UserAccount extends BaseEntity implements UserDetails {
     @ToString.Exclude
     private final Set<Message> messages = new LinkedHashSet<>();
 
-    @OneToMany(mappedBy = "userAccount", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "userAccount", fetch = FetchType.EAGER)
     @ToString.Exclude
     private final Set<Interest> interests = new LinkedHashSet<>();
 

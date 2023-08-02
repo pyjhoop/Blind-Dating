@@ -6,6 +6,7 @@ import com.blind.dating.dto.MessageDto;
 import com.blind.dating.repository.MessageRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -28,8 +29,11 @@ public class MessageService {
 
     }
 
-    public Optional<Message> getMessage(Long id){
-        return messageRepository.findById(id);
+    @Transactional
+    public Message getMessage(Long id){
+         Message message = messageRepository.findById(id).get();
+         message.setStatus("READ");
+         return message;
     }
 
     public Message createMessage(MessageDto dto){

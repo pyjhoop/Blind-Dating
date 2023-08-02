@@ -34,7 +34,7 @@ public class MessageController {
     private final MessageService messageService;
 
     //나에게 할당된 메세지들 가져오기
-    @Operation(summary = "messages GET", description = "내가 보내진 메세지 가져오기")
+    @Operation(summary = "messages GET", description = "나에게 보내진 메세지 가져오기")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "400", description = "BAD REQUEST",content = @Content(schema = @Schema(implementation = ResponseDto.class))),
@@ -80,6 +80,7 @@ public class MessageController {
     }
 
 
+    // 메세지 단건 조회 - 조회시 읽음으로 표시
     @Operation(summary = "message GET", description = "메세지 단건 조회")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK"),
@@ -91,7 +92,7 @@ public class MessageController {
     public ResponseDto<MessageResponse> getMessage(
             @PathVariable Long id
     ){
-        Message message = messageService.getMessage(id).orElseThrow(RuntimeException::new);
+        Message message = messageService.getMessage(id);
 
         return ResponseDto.<MessageResponse>builder()
                 .status("OK")
@@ -125,7 +126,6 @@ public class MessageController {
                 .status("OK")
                 .message("성공적으로 메세지를 보냈습니다.")
                 .data(MessageResponse.from(message)).build();
-
     }
 
 

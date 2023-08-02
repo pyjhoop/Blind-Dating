@@ -8,6 +8,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Slf4j
 @RequiredArgsConstructor
 @Service
@@ -46,5 +48,17 @@ public class UserAccountService {
         }else{
             return null;
         }
+    }
+
+    public boolean checkUserId(String userId){
+        UserAccount user = userAccountRepository.findByUserId(userId);
+
+        return user != null;
+
+    }
+
+    public boolean checkNickname(String nickname){
+        UserAccount user = userAccountRepository.findByNickname(nickname);
+        return user != null;
     }
 }

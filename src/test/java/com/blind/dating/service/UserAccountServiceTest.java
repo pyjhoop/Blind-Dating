@@ -69,4 +69,71 @@ class UserAccountServiceTest {
 
     }
 
+    @DisplayName("유저아이디 중복 체크 - 아이디 존재하지 않는 경우")
+    @Test
+    void givenNonExistingUserId_whenCheckUserId_thenReturnBoolean(){
+        // Given
+        String nonExistingUserId = "nonExistingUser";
+        given(userAccountRepository.findByUserId(nonExistingUserId)).willReturn(null);
+
+        // When
+        boolean result = userAccountService.checkUserId(nonExistingUserId);
+
+        // Then
+        then(userAccountRepository).should().findByUserId(nonExistingUserId);
+        assertThat(result).isFalse();
+    }
+
+    @DisplayName("유저아이디 중복 체크 - 이미 존재하는 아이디인 경우")
+    @Test
+    void givenExistingUserId_whenCheckUserId_thenReturnTrue(){
+        // Given
+        String existingUserId = "existingUser";
+        UserAccount existingUser = UserAccount.of("user01","pass01","user1","서울",12,"INFP","M",false);
+        existingUser.setUserId(existingUserId);
+        given(userAccountRepository.findByUserId(existingUserId)).willReturn(existingUser);
+
+        // When
+        boolean result = userAccountService.checkUserId(existingUserId);
+
+        // Then
+        then(userAccountRepository).should().findByUserId(existingUserId);
+        assertThat(result).isTrue();
+    }
+
+    @DisplayName("닉네임 중복 체크 - 이미 존재하는 닉네임일 경우")
+    @Test
+    void givenExistingNickname_whenCheckNickname_thenReturnBoolean(){
+        //Given
+        String nickname = "user1";
+        UserAccount existingUser = UserAccount.of("user01","pass01","user1","서울",12,"INFP","M",false);
+        given(userAccountRepository.findByNickname(nickname)).willReturn(existingUser);
+
+        //When
+        boolean result = userAccountService.checkNickname(nickname);
+
+        //Then
+        then(userAccountRepository).should().findByNickname(nickname);
+        assertThat(result).isTrue();
+    }
+
+    @DisplayName("닉네임 중복 체크 - 닉네임이 없는 경우")
+    @Test
+    void givenNonExistingNickname_whenCheckNickname_thenReturnBoolean(){
+        //Given
+        String nickname = "nick1";
+        given(userAccountRepository.findByNickname(nickname)).willReturn(null);
+
+        //When
+        boolean result = userAccountService.checkNickname(nickname);
+
+        //then
+        then(userAccountRepository).should().findByNickname(nickname);
+        assertThat(result).isFalse();
+    }
+
+
+
+
+
 }

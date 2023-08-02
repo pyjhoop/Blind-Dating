@@ -93,6 +93,61 @@ public class UserAccountController {
                     .data(UserResponse.from(user, token))
                     .build();
         }
+
+
+    }
+
+
+    @GetMapping("/check-userId/{userId}")
+    @Operation(summary = "check UserId", description = "아이디 중복 체크 API")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "400", description = "BAD REQUEST",content = @Content(schema = @Schema(implementation = ResponseDto.class))),
+            @ApiResponse(responseCode = "404", description = "NOT FOUND", content = @Content(schema = @Schema(implementation = ResponseDto.class))),
+            @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR", content = @Content(schema = @Schema(implementation = ResponseDto.class)))
+    })
+    @Parameter(name = "userId", description = "유저 아이디", example = "user01")
+    public ResponseDto<Boolean> checkUserId(@PathVariable String userId){
+
+        boolean check = userAccountService.checkUserId(userId);
+
+        if(check){
+            return ResponseDto.<Boolean>builder()
+                    .status("OK")
+                    .message("아이디가 존재합니다.")
+                    .data(false).build();
+        }else{
+            return ResponseDto.<Boolean>builder()
+                    .status("OK")
+                    .message("아이디가 존재하지 않습니다.")
+                    .data(true).build();
+        }
+    }
+
+    @GetMapping("/check-nickname/{nickname}")
+    @Operation(summary = "check nickname", description = "닉네임 중복 체크")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "400", description = "BAD REQUEST",content = @Content(schema = @Schema(implementation = ResponseDto.class))),
+            @ApiResponse(responseCode = "404", description = "NOT FOUND", content = @Content(schema = @Schema(implementation = ResponseDto.class))),
+            @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR", content = @Content(schema = @Schema(implementation = ResponseDto.class)))
+    })
+    @Parameter(name = "nickname", description = "닉네임", example = "nick01")
+    public ResponseDto<Boolean> checkNickname(@PathVariable String nickname){
+        boolean check = userAccountService.checkNickname(nickname);
+
+        if(check){
+            return ResponseDto.<Boolean>builder()
+                    .status("OK")
+                    .message("닉네임이 존재합니다.")
+                    .data(false).build();
+        }else{
+            return ResponseDto.<Boolean>builder()
+                    .status("OK")
+                    .message("닉네임이 존재하지 않습니다.")
+                    .data(true).build();
+        }
+
     }
 
 }

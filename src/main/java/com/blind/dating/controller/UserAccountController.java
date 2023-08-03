@@ -3,6 +3,8 @@ package com.blind.dating.controller;
 import com.blind.dating.domain.UserAccount;
 import com.blind.dating.dto.LoginUserDto;
 import com.blind.dating.dto.UserAccountDto;
+import com.blind.dating.dto.request.UserAccountRequestDto;
+import com.blind.dating.dto.request.UserIdRequestDto;
 import com.blind.dating.dto.response.UserResponse;
 import com.blind.dating.dto.response.ResponseDto;
 import com.blind.dating.security.TokenProvider;
@@ -18,7 +20,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "UserAccount Api", description = "인증 관련 API")
+@Tag(name = "UserAccount Info", description = "인증 관련 서비스")
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api")
@@ -27,7 +29,7 @@ public class UserAccountController {
     private final UserAccountService userAccountService;
     private final TokenProvider tokenProvider;
 
-    @Operation(summary = "Register Post", description = "유저정보를 받아서 회원가입을 진행한다.")
+    @Operation(summary = "회원가입", description = "유저정보를 받아서 회원가입을 진행합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "400", description = "BAD REQUEST",content = @Content(schema = @Schema(implementation = ResponseDto.class))),
@@ -43,16 +45,16 @@ public class UserAccountController {
             @Parameter(name = "score", description = "가중치 점수", example = "5"),
             @Parameter(name = "mbti", description = "MBTI", example = "INFP"),
             @Parameter(name = "gender", description = "성별", example = "M"),
-            @Parameter(name = "deleted", description = "회원 탈퇴 여부", example = "false")
     })
     @PostMapping("/signup")
     public ResponseDto<UserResponse> registerUser(
-            @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "유저정보") @RequestBody UserAccountDto dto
-    ){
+            @RequestBody UserAccountRequestDto dto
+            ){
+
         //TODO 필수데이터가 부족할때 통합 예외처리해주기
         UserAccount user = userAccountService.create(dto);
-        ResponseDto<UserAccountDto> response = new ResponseDto<>();
         String token = tokenProvider.create(user);
+
         return ResponseDto.<UserResponse>builder()
                 .status("success")
                 .message("회원가입이 성공적으로 완료되었습니다.")
@@ -61,7 +63,7 @@ public class UserAccountController {
     }
 
     @PostMapping("/login")
-    @Operation(summary = "Login POST", description = "아이디와 비밀번호를 받아서 로그인을 한다.")
+    @Operation(summary = "로그인", description = "아이디와 비밀번호를 받아서 로그인을 합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "400", description = "BAD REQUEST",content = @Content(schema = @Schema(implementation = ResponseDto.class))),
@@ -98,8 +100,8 @@ public class UserAccountController {
     }
 
 
-    @GetMapping("/check-userId/{userId}")
-    @Operation(summary = "check UserId", description = "아이디 중복 체크 API")
+    @PostMapping("/check-userId")
+    @Operation(summary = "아이디 중복 체크", description = "아이디 중복을 체크합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "400", description = "BAD REQUEST",content = @Content(schema = @Schema(implementation = ResponseDto.class))),
@@ -107,9 +109,9 @@ public class UserAccountController {
             @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR", content = @Content(schema = @Schema(implementation = ResponseDto.class)))
     })
     @Parameter(name = "userId", description = "유저 아이디", example = "user01")
-    public ResponseDto<Boolean> checkUserId(@PathVariable String userId){
+    public ResponseDto<Boolean> checkUserId(@RequestBody UserIdRequestDto dto){
 
-        boolean check = userAccountService.checkUserId(userId);
+        boolean check = userAccountService.checkUserId(dto.getUserId());
 
         if(check){
             return ResponseDto.<Boolean>builder()
@@ -125,7 +127,7 @@ public class UserAccountController {
     }
 
     @GetMapping("/check-nickname/{nickname}")
-    @Operation(summary = "check nickname", description = "닉네임 중복 체크")
+    @Operation(summary = "닉네임 중복 체크", description = "닉네임 중복 체크")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "400", description = "BAD REQUEST",content = @Content(schema = @Schema(implementation = ResponseDto.class))),

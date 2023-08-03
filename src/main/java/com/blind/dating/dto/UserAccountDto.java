@@ -31,8 +31,22 @@ public class UserAccountDto {
     private Boolean deleted;
 
 
+    private UserAccountDto(String userId, String userPassword, String nickname, String region, int score, String mbti, String gender) {
+        this.userId = userId;
+        this.userPassword = userPassword;
+        this.nickname = nickname;
+        this.region = region;
+        this.score = score;
+        this.mbti = mbti;
+        this.gender = gender;
+    }
+
     public static UserAccountDto of(String userId, String userPassword, String nickname, String region, int score, String mbti, String gender, Boolean deleted) {
         return new UserAccountDto(userId,userPassword, nickname, region, score, mbti, gender, deleted);
+    }
+
+    public static UserAccountDto of(String userId, String userPassword, String nickname, String region, int score, String mbti, String gender) {
+        return new UserAccountDto(userId,userPassword, nickname, region, score, mbti, gender);
     }
 
     public static UserAccountDto from(UserAccount entity){

@@ -2,6 +2,7 @@ package com.blind.dating.service;
 
 import com.blind.dating.domain.UserAccount;
 import com.blind.dating.dto.UserAccountDto;
+import com.blind.dating.dto.request.UserAccountRequestDto;
 import com.blind.dating.repository.UserAccountRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,24 +17,27 @@ import java.util.Optional;
 public class UserAccountService {
 
     private final UserAccountRepository userAccountRepository;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
 
-    public UserAccount create(UserAccountDto dto){
+    public UserAccount create(UserAccountRequestDto dto){
+
         if(dto == null || dto.getUserId() == null){
             throw new RuntimeException("Invalid arguments");
         }
+
+        // 아이디 존재하는지 체크
         String userId = dto.getUserId();
         if(userAccountRepository.existsByUserId(userId)){
             log.warn("UserId already exists {}", userId);
             throw new RuntimeException("UserId already exists");
         }
 
-        BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
+        UserAccountDto userAccountDto = dto.toUserAccountDto();
+        userAccountDto.setDeleted(false);
+        userAccountDto.setUserPassword(bCryptPasswordEncoder.encode(dto.getUserPassword()));
 
-        dto.setDeleted(false);
-        dto.setUserPassword(bCryptPasswordEncoder.encode(dto.getUserPassword()));
-        userAccountRepository.save(dto.toEntity());
-        return userAccountRepository.findByUserId(dto.getUserId());
+        return userAccountRepository.save(userAccountDto.toEntity());
     }
 
     public UserAccount getByCredentials(String userId, String userPassword){

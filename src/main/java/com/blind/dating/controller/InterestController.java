@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Tag(name = "Interest API", description = "관심사 관련 API")
+@Tag(name = "Interest Info", description = "관심사 관련 서비스")
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/interest")
@@ -30,7 +30,7 @@ public class InterestController {
 
     // 내 관심사들 조회하기.
     @GetMapping
-    @Operation(summary = "My Interests Get", description = "내 관심사 조회하기")
+    @Operation(summary = "내 관심사 조회", description = "내 관심사를 조회한다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "400", description = "BAD REQUEST",content = @Content(schema = @Schema(implementation = ResponseDto.class))),
@@ -46,13 +46,13 @@ public class InterestController {
 
         return ResponseDto.<List<InterestResponse>>builder()
                 .status("OK")
-                .message("나의 관심사가 성공적으로 조회되었습니다.")
+                .message("내 관심사가 성공적으로 조회되었습니다.")
                 .data(interests).build();
     }
 
     // 관심사들 저장하기.
     @PostMapping
-    @Operation(summary = "My Interests Post", description = "내 관심사 저장하기.")
+    @Operation(summary = "내 관심사 저장", description = "내 관심사를 저장합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "400", description = "BAD REQUEST",content = @Content(schema = @Schema(implementation = ResponseDto.class))),
@@ -74,7 +74,7 @@ public class InterestController {
 
     // 내 관심사 수정하기
     @PutMapping
-    @Operation(summary = "My Interest Put", description = "내 관심사 수정하기")
+    @Operation(summary = "내 관심사 수정", description = "내 관심사를 수정합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "400", description = "BAD REQUEST",content = @Content(schema = @Schema(implementation = ResponseDto.class))),

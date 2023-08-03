@@ -2,6 +2,7 @@ package com.blind.dating.service;
 
 import com.blind.dating.domain.UserAccount;
 import com.blind.dating.dto.UserAccountDto;
+import com.blind.dating.dto.request.UserAccountRequestDto;
 import com.blind.dating.repository.UserAccountRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -25,13 +26,17 @@ class UserAccountServiceTest {
 
     @Mock private UserAccountRepository userAccountRepository;
 
+    @Mock private BCryptPasswordEncoder bCryptPasswordEncoder;
+
     @DisplayName("회원 가입 테스트")
     @Test
     void givenUserAccountDto_whenCreateUser_thenReturnUserAccount(){
         //Given
-        UserAccountDto dto = UserAccountDto.of("user01","pqss01","user1","서울",12,"INFP","M",false);
+        UserAccountRequestDto dto = UserAccountRequestDto.of("user01","pqss01","user1","서울",12,"INFP","M");
+        UserAccountDto userAccountDto = dto.toUserAccountDto();
+        userAccountDto.setDeleted(false);
 
-        given(userAccountRepository.save(dto.toEntity())).willReturn(any(UserAccount.class));
+        given(userAccountRepository.save(userAccountDto.toEntity())).willReturn(any(UserAccount.class));
 
         //When
         UserAccount user = userAccountService.create(dto);

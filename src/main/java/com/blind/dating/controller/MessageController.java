@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Tag(name = "message API", description = "메세지 관련 API")
+@Tag(name = "Message Info", description = "메세지 관련 서비스")
 @Slf4j
 @RequiredArgsConstructor
 @RestController
@@ -34,7 +34,7 @@ public class MessageController {
     private final MessageService messageService;
 
     //나에게 할당된 메세지들 가져오기
-    @Operation(summary = "messages GET", description = "나에게 보내진 메세지 가져오기")
+    @Operation(summary = "메세지 조회", description = "나에게 보내진 메세지 가져옵니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "400", description = "BAD REQUEST",content = @Content(schema = @Schema(implementation = ResponseDto.class))),
@@ -52,12 +52,12 @@ public class MessageController {
 
         return ResponseDto.<List<MessageResponse>>builder()
                 .status("OK")
-                .message("내게온 메세지가 성공적으로 조회되었습니다.")
+                .message("내게 보내진 메세지가 성공적으로 조회되었습니다.")
                 .data(messageList).build();
     }
 
     // 내가 보낸 메세지 조회하기.
-    @Operation(summary = "messages GET", description = "내가 보낸 메세지 가져오기")
+    @Operation(summary = "내가 보낸 메세지 조회", description = "내가 보낸 메세지 가져옵니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "400", description = "BAD REQUEST",content = @Content(schema = @Schema(implementation = ResponseDto.class))),
@@ -81,7 +81,7 @@ public class MessageController {
 
 
     // 메세지 단건 조회 - 조회시 읽음으로 표시
-    @Operation(summary = "message GET", description = "메세지 단건 조회")
+    @Operation(summary = "단건 메세지 조회", description = "메세지 단건 조회합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "400", description = "BAD REQUEST",content = @Content(schema = @Schema(implementation = ResponseDto.class))),
@@ -101,7 +101,7 @@ public class MessageController {
     }
 
     // 메세지 작성하기
-    @Operation(summary = "message POST", description = "메세지 작성하기")
+    @Operation(summary = "메세지 작성", description = "메세지를 작성합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "400", description = "BAD REQUEST",content = @Content(schema = @Schema(implementation = ResponseDto.class))),

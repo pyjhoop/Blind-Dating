@@ -17,30 +17,22 @@ import java.util.stream.Collectors;
 public class UserResponse {
 
     private TokenDto token;
-    private Long id;
     private String nickname;
-    private String mbti;
-    private String gender;
 
-    protected UserResponse(TokenDto token, Long id, String nickname, String mbti, String gender) {
+
+    protected UserResponse(TokenDto token, String nickname) {
         this.token = token;
-        this.id = id;
         this.nickname = nickname;
-        this.mbti = mbti;
-        this.gender = gender;
     }
 
-    public static UserResponse of(TokenDto token, Long id, String nickname, String mbti, String gender) {
-        return new UserResponse(token, id, nickname, mbti, gender);
+    public static UserResponse of(TokenDto token, String nickname) {
+        return new UserResponse(token, nickname);
     }
 
     public static UserResponse from(UserAccount user, String token){
         return new UserResponse(
                 new TokenDto(token),
-                user.getId(),
-                user.getNickname(),
-                user.getMbti(),
-                user.getGender()
+                user.getNickname()
         );
     }
 }

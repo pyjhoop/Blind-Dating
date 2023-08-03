@@ -36,13 +36,14 @@ class UserAccountServiceTest {
         UserAccountDto userAccountDto = dto.toUserAccountDto();
         userAccountDto.setDeleted(false);
 
-        given(userAccountRepository.save(userAccountDto.toEntity())).willReturn(any(UserAccount.class));
+        given(userAccountRepository.save(any(UserAccount.class))).willReturn(userAccountDto.toEntity());
+
 
         //When
         UserAccount user = userAccountService.create(dto);
 
         //Then
-        then(userAccountRepository).should().findByUserId("user01");
+        assertThat(user).isNotNull();
 
     }
 

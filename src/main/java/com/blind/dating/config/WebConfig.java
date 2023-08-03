@@ -9,8 +9,10 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/api/check-userId/pyjhoop1")
+        registry.addMapping("/**")
                 .allowedOrigins("http://127.0.0.1:5500") // 허용할 Origin(도메인)을 설정
-                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS"); // 허용할 HTTP 메서드 설정
+                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS") // 허용할 HTTP 메서드 설정
+                .allowCredentials(true)
+                .maxAge(3000);
     }
 }

@@ -1,4 +1,4 @@
-package com.blind.dating.dto.response;
+package com.blind.dating.dto.interest;
 
 import com.blind.dating.domain.Interest;
 import lombok.AllArgsConstructor;

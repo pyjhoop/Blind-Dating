@@ -1,7 +1,6 @@
-package com.blind.dating.dto;
+package com.blind.dating.dto.user;
 
 import com.blind.dating.domain.UserAccount;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
@@ -70,8 +69,7 @@ public class UserAccountDto {
                 region,
                 score,
                 mbti,
-                gender,
-                deleted
+                gender
         );
     }
 }

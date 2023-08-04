@@ -2,7 +2,7 @@ package com.blind.dating.service;
 
 import com.blind.dating.domain.Interest;
 import com.blind.dating.domain.UserAccount;
-import com.blind.dating.dto.InterestDto;
+import com.blind.dating.dto.interest.InterestDto;
 import com.blind.dating.repository.InterestRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -25,30 +25,28 @@ public class InterestService {
         return interestRepository.findAllByUserAccount(user);
     }
 
-    public List<Interest> saveInterest(Authentication authentication, List<InterestDto> dtos){
+    @Transactional
+    public List<Interest> saveInterest(Authentication authentication, List<String> interestName){
 
         UserAccount user =(UserAccount)authentication.getPrincipal();
         List<Interest> list = new ArrayList<>();
 
-        for(InterestDto dto: dtos){
-            dto.setUserAccount(user);
-            list.add(dto.toEntity());
+        for(String s: interestName){
+            list.add(Interest.of(user,s));
         }
 
         return interestRepository.saveAll(list);
-
     }
 
     @Transactional
-    public List<Interest> updateInterest(Authentication authentication, List<InterestDto> dtos){
+    public List<Interest> updateInterest(Authentication authentication, List<String> interestName){
         UserAccount user =(UserAccount)authentication.getPrincipal();
         List<Interest> list = new ArrayList<>();
 
         interestRepository.deleteAllByUserAccount(user);
 
-        for(InterestDto dto: dtos){
-            dto.setUserAccount(user);
-            list.add(dto.toEntity());
+        for(String s: interestName){
+            list.add(Interest.of(user,s));
         }
 
         return interestRepository.saveAll(list);

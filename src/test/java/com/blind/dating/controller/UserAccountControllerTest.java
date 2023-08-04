@@ -1,8 +1,7 @@
 package com.blind.dating.controller;
 
 import com.blind.dating.config.SecurityConfig;
-import com.blind.dating.domain.UserAccount;
-import com.blind.dating.dto.UserAccountDto;
+import com.blind.dating.dto.user.UserAccountDto;
 import com.blind.dating.security.TokenProvider;
 import com.blind.dating.service.CustomUserDetailsService;
 import com.blind.dating.service.UserAccountService;

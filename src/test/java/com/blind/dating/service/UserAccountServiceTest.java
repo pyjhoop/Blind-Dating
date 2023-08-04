@@ -1,8 +1,8 @@
 package com.blind.dating.service;
 
 import com.blind.dating.domain.UserAccount;
-import com.blind.dating.dto.UserAccountDto;
-import com.blind.dating.dto.request.UserAccountRequestDto;
+import com.blind.dating.dto.user.UserAccountDto;
+import com.blind.dating.dto.user.UserRequestDto;
 import com.blind.dating.repository.UserAccountRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -32,15 +32,15 @@ class UserAccountServiceTest {
     @Test
     void givenUserAccountDto_whenCreateUser_thenReturnUserAccount(){
         //Given
-        UserAccountRequestDto dto = UserAccountRequestDto.of("user01","pqss01","user1","서울",12,"INFP","M");
-        UserAccountDto userAccountDto = dto.toUserAccountDto();
-        userAccountDto.setDeleted(false);
+        UserRequestDto dto = UserRequestDto.of("user01","pqss01","user1","서울",12,"INFP","M");
+        UserAccount user = dto.toEntity();
+        user.setDeleted(false);
 
-        given(userAccountRepository.save(any(UserAccount.class))).willReturn(userAccountDto.toEntity());
+        given(userAccountRepository.save(any(UserAccount.class))).willReturn(user);
 
 
         //When
-        UserAccount user = userAccountService.create(dto);
+        UserAccount user1 = userAccountService.create(dto);
 
         //Then
         assertThat(user).isNotNull();
@@ -95,7 +95,7 @@ class UserAccountServiceTest {
     void givenExistingUserId_whenCheckUserId_thenReturnTrue(){
         // Given
         String existingUserId = "existingUser";
-        UserAccount existingUser = UserAccount.of("user01","pass01","user1","서울",12,"INFP","M",false);
+        UserAccount existingUser = UserAccount.of("user01","pass01","user1","서울",12,"INFP","M");
         existingUser.setUserId(existingUserId);
         given(userAccountRepository.findByUserId(existingUserId)).willReturn(existingUser);
 
@@ -112,7 +112,7 @@ class UserAccountServiceTest {
     void givenExistingNickname_whenCheckNickname_thenReturnBoolean(){
         //Given
         String nickname = "user1";
-        UserAccount existingUser = UserAccount.of("user01","pass01","user1","서울",12,"INFP","M",false);
+        UserAccount existingUser = UserAccount.of("user01","pass01","user1","서울",12,"INFP","M");
         given(userAccountRepository.findByNickname(nickname)).willReturn(existingUser);
 
         //When

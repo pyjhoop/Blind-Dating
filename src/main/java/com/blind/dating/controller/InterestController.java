@@ -1,9 +1,8 @@
 package com.blind.dating.controller;
 
-import com.blind.dating.domain.Interest;
 import com.blind.dating.domain.UserAccount;
-import com.blind.dating.dto.InterestDto;
-import com.blind.dating.dto.response.InterestResponse;
+import com.blind.dating.dto.interest.InterestDto;
+import com.blind.dating.dto.interest.InterestResponse;
 import com.blind.dating.dto.response.ResponseDto;
 import com.blind.dating.service.InterestService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -60,10 +59,10 @@ public class InterestController {
             @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR", content = @Content(schema = @Schema(implementation = ResponseDto.class)))
     })
     @Parameter(name = "List<InterestDto>", description = "관심사 리스트")
-    public ResponseDto<List<InterestResponse>> saveInterests(@RequestBody List<InterestDto> dtos,
+    public ResponseDto<List<InterestResponse>> saveInterests(@RequestBody List<String> interestName,
                                        Authentication authentication){
 
-        List<InterestResponse> list = interestService.saveInterest(authentication,dtos)
+        List<InterestResponse> list = interestService.saveInterest(authentication,interestName)
                 .stream().map(InterestResponse::from).collect(Collectors.toList());
 
         return ResponseDto.<List<InterestResponse>>builder()
@@ -82,15 +81,15 @@ public class InterestController {
             @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR", content = @Content(schema = @Schema(implementation = ResponseDto.class)))
     })
     @Parameter(name = "List<InterestDto>", description = "관심사 리스트")
-    public ResponseDto<List<InterestResponse>> updateInterests(@RequestBody List<InterestDto> dtos,
+    public ResponseDto<List<InterestResponse>> updateInterests(@RequestBody List<String> interestName,
                                                                Authentication authentication){
 
-        List<InterestResponse> list = interestService.updateInterest(authentication,dtos)
+        List<InterestResponse> list = interestService.updateInterest(authentication,interestName)
                 .stream().map(InterestResponse::from).collect(Collectors.toList());
 
         return ResponseDto.<List<InterestResponse>>builder()
                 .status("OK")
-                .message("관심사가 성공적으로 저장되었습니다.")
+                .message("관심사가 성공적으로 수정되었습니다.")
                 .data(list).build();
 
     }

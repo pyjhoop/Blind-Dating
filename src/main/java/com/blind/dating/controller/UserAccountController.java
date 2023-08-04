@@ -1,12 +1,9 @@
 package com.blind.dating.controller;
 
 import com.blind.dating.domain.UserAccount;
-import com.blind.dating.dto.LoginUserDto;
-import com.blind.dating.dto.UserAccountDto;
-import com.blind.dating.dto.request.UserAccountRequestDto;
-import com.blind.dating.dto.request.UserIdRequestDto;
-import com.blind.dating.dto.response.UserResponse;
+import com.blind.dating.dto.user.UserResponse;
 import com.blind.dating.dto.response.ResponseDto;
+import com.blind.dating.dto.user.UserRequestDto;
 import com.blind.dating.security.TokenProvider;
 import com.blind.dating.service.UserAccountService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -48,7 +45,7 @@ public class UserAccountController {
     })
     @PostMapping("/signup")
     public ResponseDto<UserResponse> registerUser(
-            @RequestBody UserAccountRequestDto dto
+            @RequestBody UserRequestDto dto
             ){
 
         //TODO 필수데이터가 부족할때 통합 예외처리해주기
@@ -76,9 +73,10 @@ public class UserAccountController {
             @Parameter(name = "userPassword", description = "유저 비밀번호", example = "pass01")
     })
     public ResponseDto<UserResponse> authenticate(
-            @RequestBody LoginUserDto dto
-    ){
-        UserAccount user = userAccountService.getByCredentials(dto.getUserId(), dto.getUserPassword());
+            @RequestParam String userId,
+            @RequestParam String userPassword
+            ){
+        UserAccount user = userAccountService.getByCredentials(userId, userPassword);
 
         if(user == null){
             return ResponseDto.<UserResponse>builder()
@@ -109,9 +107,9 @@ public class UserAccountController {
             @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR", content = @Content(schema = @Schema(implementation = ResponseDto.class)))
     })
     @Parameter(name = "userId", description = "유저 아이디", example = "user01")
-    public ResponseDto<Boolean> checkUserId(@RequestBody UserIdRequestDto dto){
+    public ResponseDto<Boolean> checkUserId(@RequestParam String userId){
 
-        boolean check = userAccountService.checkUserId(dto.getUserId());
+        boolean check = userAccountService.checkUserId(userId);
 
         if(check){
             return ResponseDto.<Boolean>builder()

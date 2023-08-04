@@ -1,13 +1,7 @@
-package com.blind.dating.dto.response;
+package com.blind.dating.dto.user;
 
 import com.blind.dating.domain.UserAccount;
-import com.blind.dating.dto.MessageDto;
-import com.blind.dating.dto.TokenDto;
 import lombok.*;
-
-import java.util.LinkedHashSet;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Getter
 @Setter

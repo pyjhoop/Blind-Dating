@@ -1,4 +1,4 @@
-package com.blind.dating.dto;
+package com.blind.dating.dto.message;
 
 import lombok.*;
 
@@ -6,9 +6,8 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class MessageInput {
-    private Long receiver;
+public class MessageRequest {
+    private Long receiverId;
     private String messageContent;
-
 
 }

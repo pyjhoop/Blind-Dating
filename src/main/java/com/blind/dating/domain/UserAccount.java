@@ -59,7 +59,7 @@ public class UserAccount extends BaseEntity implements UserDetails {
     private Boolean deleted;
 
     @OrderBy("createdAt DESC")
-    @OneToMany(mappedBy = "sender", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "sender", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @ToString.Exclude
     private final Set<Message> messages = new LinkedHashSet<>();
 
@@ -67,12 +67,14 @@ public class UserAccount extends BaseEntity implements UserDetails {
     @ToString.Exclude
     private final Set<Interest> interests = new LinkedHashSet<>();
 
-
+    @OneToMany(mappedBy = "userAccount",fetch = FetchType.EAGER)
+    @ToString.Exclude
+    private final Set<Answer> answers = new LinkedHashSet<>();
 
 
     protected UserAccount(){}
 
-    private UserAccount(String userId, String userPassword, String nickname, String region, int score, String mbti, String gender, boolean deleted) {
+    private UserAccount(String userId, String userPassword, String nickname, String region, int score, String mbti, String gender) {
         this.userId = userId;
         this.userPassword = userPassword;
         this.nickname = nickname;
@@ -80,10 +82,9 @@ public class UserAccount extends BaseEntity implements UserDetails {
         this.score = score;
         this.mbti = mbti;
         this.gender = gender;
-        this.deleted = deleted;
     }
-    public static UserAccount of(String userId, String userPassword, String nickname, String region, int score, String mbti, String gender, boolean deleted) {
-        return new UserAccount(userId, userPassword, nickname, region, score, mbti, gender, deleted);
+    public static UserAccount of(String userId, String userPassword, String nickname, String region, int score, String mbti, String gender) {
+        return new UserAccount(userId, userPassword, nickname, region, score, mbti, gender);
     }
 
 

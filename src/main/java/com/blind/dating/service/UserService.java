@@ -18,4 +18,8 @@ public class UserService {
         return userAccountRepository.findAllByScoreBetweenAndGender(score-5, score+5, gender,pageable);
 
     }
+
+    public UserAccount getMyInfo(String userId){
+        return userAccountRepository.findByUserId(userId);
+    }
 }

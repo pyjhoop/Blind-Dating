@@ -2,9 +2,8 @@ package com.blind.dating.controller;
 
 import com.blind.dating.domain.Message;
 import com.blind.dating.domain.UserAccount;
-import com.blind.dating.dto.MessageDto;
-import com.blind.dating.dto.MessageInput;
-import com.blind.dating.dto.response.MessageResponse;
+import com.blind.dating.dto.message.MessageRequest;
+import com.blind.dating.dto.message.MessageDto;
 import com.blind.dating.dto.response.ResponseDto;
 import com.blind.dating.service.MessageService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -18,7 +17,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -42,15 +40,16 @@ public class MessageController {
             @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR", content = @Content(schema = @Schema(implementation = ResponseDto.class)))
     })
     @GetMapping("/messages/me")
-    public ResponseDto<List<MessageResponse>> getMessages(
+    public ResponseDto<List<MessageDto>> getMessages(
             Authentication authentication
     ){
         UserAccount user = (UserAccount) authentication.getPrincipal();
         Long receiverId = user.getId();
-        List<MessageResponse> messageList = messageService.getMessages(receiverId)
-                .stream().map(MessageDto::from).map(MessageResponse::from).collect(Collectors.toList());
+        List<MessageDto> messageList = messageService.getMessages(receiverId)
+                .stream().map(MessageDto::from).collect(Collectors.toList());
 
-        return ResponseDto.<List<MessageResponse>>builder()
+
+        return ResponseDto.<List<MessageDto>>builder()
                 .status("OK")
                 .message("내게 보내진 메세지가 성공적으로 조회되었습니다.")
                 .data(messageList).build();
@@ -65,15 +64,15 @@ public class MessageController {
             @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR", content = @Content(schema = @Schema(implementation = ResponseDto.class)))
     })
     @GetMapping("/messages/sent")
-    public ResponseDto<List<MessageResponse>> getSendMessages(
+    public ResponseDto<List<MessageDto>> getSendMessages(
             Authentication authentication
     ){
         UserAccount sender = (UserAccount) authentication.getPrincipal();
 
-        List<MessageResponse> messageList = messageService.getSentMessages(sender)
-                .stream().map(MessageDto::from).map(MessageResponse::from).collect(Collectors.toList());
+        List<MessageDto> messageList = messageService.getSentMessages(sender)
+                .stream().map(MessageDto::from).collect(Collectors.toList());
 
-        return ResponseDto.<List<MessageResponse>>builder()
+        return ResponseDto.<List<MessageDto>>builder()
                 .status("OK")
                 .message("내가 보낸 메세지가 성공적으로 조회되었습니다.")
                 .data(messageList).build();
@@ -89,15 +88,15 @@ public class MessageController {
             @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR", content = @Content(schema = @Schema(implementation = ResponseDto.class)))
     })
     @GetMapping("/message/{id}")
-    public ResponseDto<MessageResponse> getMessage(
+    public ResponseDto<MessageDto> getMessage(
             @PathVariable Long id
     ){
         Message message = messageService.getMessage(id);
 
-        return ResponseDto.<MessageResponse>builder()
+        return ResponseDto.<MessageDto>builder()
                 .status("OK")
                 .message("메세지가 성공적으로 조회되었습니다.")
-                .data(MessageResponse.from(MessageDto.from(message))).build();
+                .data(MessageDto.from(message)).build();
     }
 
     // 메세지 작성하기
@@ -113,19 +112,19 @@ public class MessageController {
             @Parameter(name = "messageContent", description = "메세지 내용")
     })
     @PostMapping("/message")
-    public ResponseDto<MessageResponse> createMessage(
-           @RequestBody MessageInput messageInput,
+    public ResponseDto<MessageDto> createMessage(
+           @RequestBody MessageRequest messageRequest,
             Authentication authentication
     ){
         UserAccount userAccount = (UserAccount)authentication.getPrincipal();
-        MessageDto dto = MessageDto.of(0L,userAccount, messageInput.getReceiver(), messageInput.getMessageContent(),"UNREAD");
+        Message message = Message.of(userAccount, messageRequest.getReceiverId(), messageRequest.getMessageContent(),"UNREAD");
 
-        MessageDto message = MessageDto.from(messageService.createMessage(dto));
+        Message response = messageService.createMessage(message);
 
-        return ResponseDto.<MessageResponse>builder()
+        return ResponseDto.<MessageDto>builder()
                 .status("OK")
                 .message("성공적으로 메세지를 보냈습니다.")
-                .data(MessageResponse.from(message)).build();
+                .data(MessageDto.from(response)).build();
     }
 
 

@@ -33,8 +33,8 @@ class JpaRepositoryTest {
     @Test
     void givenData_whenInsertData_returnEntity(){
         //Given
-        UserAccount user1 = UserAccount.of("user01","pass01","user1","서울",12,"INFP","M",false);
-        UserAccount user2 = UserAccount.of("user02","pass02","user2","서울",12,"INFP","M",false);
+        UserAccount user1 = UserAccount.of("user01","pass01","user1","서울",12,"INFP","M");
+        UserAccount user2 = UserAccount.of("user02","pass02","user2","서울",12,"INFP","M");
 
         UserAccount savedUser1 = userAccountRepository.save(user1);
         UserAccount savedUser2 = userAccountRepository.save(user2);
@@ -56,8 +56,8 @@ class JpaRepositoryTest {
     @Test
     void givenData_whenSelectData_returnEntity(){
         //Given
-        UserAccount user1 = UserAccount.of("user01","pass01","user1","서울",12,"INFP","M",false);
-        UserAccount user2 = UserAccount.of("user02","pass02","user2","서울",12,"INFP","M",false);
+        UserAccount user1 = UserAccount.of("user01","pass01","user1","서울",12,"INFP","M");
+        UserAccount user2 = UserAccount.of("user02","pass02","user2","서울",12,"INFP","M");
 
         UserAccount savedUser1 = userAccountRepository.save(user1);
         UserAccount savedUser2 = userAccountRepository.save(user2);
@@ -84,8 +84,8 @@ class JpaRepositoryTest {
     @Test
     void givenData_whenUpdateData_returnEntity(){
         //Given
-        UserAccount user1 = UserAccount.of("user01","pass01","user1","서울",12,"INFP","M",false);
-        UserAccount user2 = UserAccount.of("user02","pass02","user2","서울",12,"INFP","M",false);
+        UserAccount user1 = UserAccount.of("user01","pass01","user1","서울",12,"INFP","M");
+        UserAccount user2 = UserAccount.of("user02","pass02","user2","서울",12,"INFP","M");
 
         UserAccount savedUser1 = userAccountRepository.save(user1);
         UserAccount savedUser2 = userAccountRepository.save(user2);
@@ -116,8 +116,8 @@ class JpaRepositoryTest {
     @Test
     void givenData_whenDeleteData_returnEntity(){
         //Given
-        UserAccount user1 = UserAccount.of("user01","pass01","user1","서울",12,"INFP","M",false);
-        UserAccount user2 = UserAccount.of("user02","pass02","user2","서울",12,"INFP","M",false);
+        UserAccount user1 = UserAccount.of("user01","pass01","user1","서울",12,"INFP","M");
+        UserAccount user2 = UserAccount.of("user02","pass02","user2","서울",12,"INFP","M");
 
         UserAccount savedUser1 = userAccountRepository.save(user1);
         UserAccount savedUser2 = userAccountRepository.save(user2);

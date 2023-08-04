@@ -2,6 +2,8 @@ package com.blind.dating.controller;
 
 import com.blind.dating.domain.UserAccount;
 import com.blind.dating.dto.response.ResponseDto;
+import com.blind.dating.dto.user.UserWithInterestAndAnswerDto;
+import com.blind.dating.dto.user.UserWithInterestDto;
 import com.blind.dating.repository.UserAccountRepository;
 import com.blind.dating.service.UserAccountService;
 import com.blind.dating.service.UserService;
@@ -21,14 +23,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@Tag(name = "User List Info", description = "추천 유저 조회 서비스")
+@Tag(name = "User Info", description = "유저 조회 서비스")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
 public class UserController {
 
     private final UserService userService;
-    private final UserAccountRepository userAccountRepository;
 
     // 유저10명 불러오기
 
@@ -40,7 +41,7 @@ public class UserController {
             @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR", content = @Content(schema = @Schema(implementation = ResponseDto.class)))
     })
     @GetMapping("/user-list")
-    public ResponseDto<Page<UserAccount>> getUserList(
+    public ResponseDto<Page<UserWithInterestDto>> getUserList(
             Authentication authentication,
             @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
             ){
@@ -55,12 +56,38 @@ public class UserController {
         }else{
             users = userService.getUserList(score, "M", pageable);
         }
+        Page<UserWithInterestDto> dtos = users.map(UserWithInterestDto::from);
 
-        return ResponseDto.<Page<UserAccount>>builder()
+
+        return ResponseDto.<Page<UserWithInterestDto>>builder()
                 .status("OK")
                 .message("성공적으로 조회되었습니다.")
-                .data(users).build();
+                .data(dtos).build();
 
+    }
+
+    @GetMapping("/user")
+    @Operation(summary = "내 정보 조회", description = "내 정보를 조회합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "400", description = "BAD REQUEST",content = @Content(schema = @Schema(implementation = ResponseDto.class))),
+            @ApiResponse(responseCode = "404", description = "NOT FOUND", content = @Content(schema = @Schema(implementation = ResponseDto.class))),
+            @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR", content = @Content(schema = @Schema(implementation = ResponseDto.class)))
+    })
+    public ResponseDto<UserWithInterestAndAnswerDto> getMyInfo(
+            Authentication authentication
+    ){
+        UserAccount user = (UserAccount) authentication.getPrincipal();
+        String userId = user.getUserId();
+
+        UserAccount userAccount = userService.getMyInfo(userId);
+
+        UserWithInterestAndAnswerDto dto = UserWithInterestAndAnswerDto.from(userAccount);
+
+        return ResponseDto.<UserWithInterestAndAnswerDto>builder()
+                .status("OK")
+                .message("내 정보가 성공적으로 조회되었습니다.")
+                .data(dto).build();
     }
 
 }

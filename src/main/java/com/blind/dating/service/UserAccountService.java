@@ -1,15 +1,12 @@
 package com.blind.dating.service;
 
 import com.blind.dating.domain.UserAccount;
-import com.blind.dating.dto.UserAccountDto;
-import com.blind.dating.dto.request.UserAccountRequestDto;
+import com.blind.dating.dto.user.UserRequestDto;
 import com.blind.dating.repository.UserAccountRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -20,7 +17,7 @@ public class UserAccountService {
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
 
-    public UserAccount create(UserAccountRequestDto dto){
+    public UserAccount create(UserRequestDto dto){
 
         if(dto == null || dto.getUserId() == null){
             throw new RuntimeException("Invalid arguments");
@@ -33,11 +30,11 @@ public class UserAccountService {
             throw new RuntimeException("UserId already exists");
         }
 
-        UserAccountDto userAccountDto = dto.toUserAccountDto();
-        userAccountDto.setDeleted(false);
-        userAccountDto.setUserPassword(bCryptPasswordEncoder.encode(dto.getUserPassword()));
+        UserAccount user = dto.toEntity();
+        user.setDeleted(false);
+        user.setUserPassword(bCryptPasswordEncoder.encode(dto.getUserPassword()));
 
-        return userAccountRepository.save(userAccountDto.toEntity());
+        return userAccountRepository.save(user);
     }
 
     public UserAccount getByCredentials(String userId, String userPassword){

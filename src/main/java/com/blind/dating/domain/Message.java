@@ -1,5 +1,6 @@
 package com.blind.dating.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -16,7 +17,7 @@ public class Message extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne()
+    @ManyToOne
     private UserAccount sender;
 
     @Column(nullable = false)

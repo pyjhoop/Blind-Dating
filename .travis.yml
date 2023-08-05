@@ -16,13 +16,13 @@ cache:
 script: "./gradlew clean build"
 
 before_deploy:
-  - zip -r blind-dating
+  - zip -r blind-dating *
   - mkdir -p deploy
   - mv blind-dating.zip deploy/blind-dating.zip
 
 deploy:
   - provider: s3
-    access_key_id: $AWS_ACCESS_KEY #travis에서 설정된 키값.
+    access_key_id: $AWS_ACCESS_KEY
     secret_access_key: $AWS_SECRET_KEY
     bucket: blind-dating-build
     region: ap-northeast-2

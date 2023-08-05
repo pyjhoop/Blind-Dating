@@ -41,7 +41,7 @@ deploy:
     bucket: blind-dating-build # s3 버킷
     key: blind-dating.zip # 빌드 파일 압축해서 전달
     bundle_type: zip # 압축 확장자
-    application: spring-deploy-test # 웹 콘솔에서 등록한 CodeDelpoy 애플리케이션 이름
+    application: blind-dating # 웹 콘솔에서 등록한 CodeDelpoy 애플리케이션 이름
     deployment_group: spring-deploy-test-group # 웹 콘솔에서 등록한 CodeDelpoy 배포 그룹 이름
     region: ap-northeast-2
     wait-until-deployed: true

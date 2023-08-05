@@ -29,9 +29,9 @@ public class AnswerService {
         return answerRepository.saveAll(list);
     }
 
-    public List<Answer> getAnswers(UserAccount user){
+    public List<Answer> getAnswers(Long id){
 
-        return answerRepository.findAllByUserAccountId(user.getId());
+        return answerRepository.findAllByUserAccountId(id);
     }
 
 

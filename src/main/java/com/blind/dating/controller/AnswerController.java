@@ -65,7 +65,7 @@ public class AnswerController {
     ){
         UserAccount user = (UserAccount) authentication.getPrincipal();
 
-        List<AnswerDto> list = answerService.getAnswers(user)
+        List<AnswerDto> list = answerService.getAnswers(user.getId())
                 .stream().map(AnswerDto::from).collect(Collectors.toList());
 
         return ResponseDto.<List<AnswerDto>>builder()

@@ -17,8 +17,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class InterestService {
 
-    private final EntityManager entityManager;
-
     private final InterestRepository interestRepository;
 
     public List<Interest> getInterests(UserAccount user){

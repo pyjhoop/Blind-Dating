@@ -35,6 +35,7 @@ public class MessageService {
          return message;
     }
 
+    @Transactional
     public Message createMessage(Message message){
 
         return messageRepository.save(message);

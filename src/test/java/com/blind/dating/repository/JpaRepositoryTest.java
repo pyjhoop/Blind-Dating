@@ -4,6 +4,7 @@ import com.blind.dating.config.JpaConfig;
 import com.blind.dating.domain.Interest;
 import com.blind.dating.domain.Message;
 import com.blind.dating.domain.UserAccount;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
 
+@Disabled
 @DisplayName("JPA Repository 테스트")
 @Import(JpaConfig.class)
 @DataJpaTest

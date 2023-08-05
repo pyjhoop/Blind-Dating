@@ -32,6 +32,17 @@ deploy:
     wait-until-deployed: true
     on:
       all_branches: true #해당 라인 추가
+  - provider: codedeploy
+    access_key_id: $AWS_ACCESS_KEY
+    secret_access_key: $AWS_SECRET_KEY
+    bucket: blind-dating-build  # 버킷
+    key : blind-dating.zip
+    bundle_type: zip
+    application: blind-dating # aws 콘솔에 등록한 codedeploy 애플리케이션
+    deployment_group: blind-dating-group
+    region: ap-northeast-2
+    wait-until-deployed: true
+
 
 # CI 실행 완료시 메일로 알람
 notifications:

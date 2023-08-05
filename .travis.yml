@@ -5,6 +5,7 @@ jdk:
 branches:
   only:
     - main
+before_install: chmod +x gradlew
 
 # Travis CI 서버의 HOME
 cache:

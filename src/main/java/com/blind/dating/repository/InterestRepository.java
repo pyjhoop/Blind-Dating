@@ -10,5 +10,6 @@ public interface InterestRepository extends JpaRepository<Interest, Long> {
 
     List<Interest> findAllByUserAccount(UserAccount user);
 
+
     void deleteAllByUserAccount(UserAccount user);
 }

@@ -2,7 +2,16 @@ server:
   port: 8081
 
 spring:
+  # 테스트 환경에서의 db
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:testdb
+    username: sa
+    password:
 
+  h2:
+    console:
+      enabled: true
 
   jpa:
     open-in-view: false

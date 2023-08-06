@@ -15,7 +15,6 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
 
-@Disabled
 @DisplayName("JPA Repository 테스트")
 @Import(JpaConfig.class)
 @DataJpaTest

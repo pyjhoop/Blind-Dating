@@ -38,7 +38,7 @@ class UserAccountControllerTest {
     UserAccountControllerTest(@Autowired MockMvc mvc) {
         this.mvc = mvc;
     }
-
+ 
     @DisplayName("[POST] 로그인 - 정상 호출")
     @Test
     public void givenUserIdAndPassword_whenLogin_thenReturnUserAccount() throws Exception {

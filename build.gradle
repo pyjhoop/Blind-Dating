@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'com.blind'
-version = '0.0.1-SNAPSHOT-'+new Date().format("yyyyMMddHHmmss")
+version = '0.0.1-SNAPSHOT'
 
 java {
 	sourceCompatibility = '11'

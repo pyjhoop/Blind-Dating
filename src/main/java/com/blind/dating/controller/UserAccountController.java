@@ -16,8 +16,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
+@Slf4j
 @Tag(name = "UserAccount Info", description = "인증 관련 서비스")
 @RequiredArgsConstructor
 @RestController
@@ -77,6 +79,7 @@ public class UserAccountController {
             @RequestBody LoginInputDto dto
             ){
         UserAccount user = userAccountService.getByCredentials(dto.getUserId(), dto.getUserPassword());
+        log.info("userId={}",dto.getUserId());
 
         if(user == null){
             return ResponseDto.<UserResponse>builder()

@@ -1,6 +1,7 @@
 package com.blind.dating.controller;
 
 import com.blind.dating.domain.UserAccount;
+import com.blind.dating.dto.user.LoginInputDto;
 import com.blind.dating.dto.user.UserResponse;
 import com.blind.dating.dto.response.ResponseDto;
 import com.blind.dating.dto.user.UserRequestDto;
@@ -73,10 +74,9 @@ public class UserAccountController {
             @Parameter(name = "userPassword", description = "유저 비밀번호", example = "pass01")
     })
     public ResponseDto<UserResponse> authenticate(
-            @RequestParam String userId,
-            @RequestParam String userPassword
+            @RequestBody LoginInputDto dto
             ){
-        UserAccount user = userAccountService.getByCredentials(userId, userPassword);
+        UserAccount user = userAccountService.getByCredentials(dto.getUserId(), dto.getUserPassword());
 
         if(user == null){
             return ResponseDto.<UserResponse>builder()

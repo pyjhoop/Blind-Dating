@@ -1,7 +1,9 @@
 package com.blind.dating.controller;
 
 import com.blind.dating.config.SecurityConfig;
+import com.blind.dating.domain.UserAccount;
 import com.blind.dating.dto.user.UserAccountDto;
+import com.blind.dating.dto.user.UserRequestDto;
 import com.blind.dating.security.TokenProvider;
 import com.blind.dating.service.CustomUserDetailsService;
 import com.blind.dating.service.UserAccountService;
@@ -16,19 +18,18 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@Disabled
 @DisplayName("Auth 컨트롤러 - 테스트")
 @Import(SecurityConfig.class)
 @WebMvcTest(UserAccountController.class)
 class UserAccountControllerTest {
 
-    //TODO : 추후에 공부해서 추가하자!
     private final MockMvc mvc;
 
     @MockBean private UserAccountService userAccountService;
@@ -45,13 +46,98 @@ class UserAccountControllerTest {
         //Given
         UserAccountDto dto = UserAccountDto.of("user01","pass01","user1","서울",12,"INFP","M",false);
         ObjectMapper obj = new ObjectMapper();
-        given(userAccountService.getByCredentials(dto.getUserId(),dto.getUserPassword())).willReturn(eq(dto.toEntity()));
+        given(userAccountService.getByCredentials(anyString(), anyString())).willReturn(dto.toEntity());
+        String token = "token";
+        given(tokenProvider.create(any(UserAccount.class))).willReturn(token);
 
         //When & Then
         mvc.perform(post("/api/login")
                 .contentType(MediaType.APPLICATION_JSON)
-                                .content(obj.writeValueAsString(dto))
-                )
-                .andExpect(status().isOk());
+                                .param("userId","user01")
+                        .param("userPassword","pass01")
+                ).andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("OK"))
+                .andExpect(jsonPath("$.data.nickname").value("user1"));
+
     }
+
+    @DisplayName("회원가입 테스트")
+    @Test
+    void givenUserAccountDto_whenSignUp_thenReturnUser() throws Exception {
+        //Given
+        UserRequestDto user = UserRequestDto.of("user01","pass01","user1","서울",12,"INFP","M");
+        String token = "token";
+        given(userAccountService.create(any(UserRequestDto.class))).willReturn(user.toEntity());
+        given(tokenProvider.create(any(UserAccount.class))).willReturn(token);
+        ObjectMapper obj = new ObjectMapper();
+
+        //When & Then
+        mvc.perform(post("/api/signup")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(obj.writeValueAsString(user)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.nickname").value("user1"));
+
+    }
+
+    @DisplayName("아이디 중복 체크 - 아이디 이미 존재할때")
+    @Test
+    void givenUserId_whenCheckUserId_thenReturnTrue() throws Exception {
+        //Given
+        String userId = "userId";
+        given(userAccountService.checkUserId(userId)).willReturn(false);
+
+        //When & Then
+        mvc.perform(post("/api/check-userId")
+                .contentType(MediaType.APPLICATION_JSON)
+                .param("userId", userId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("OK"))
+                .andExpect(jsonPath("$.data").value(true));
+    }
+
+    @DisplayName("아이디 중복 체크 - 아이디 없을때")
+    @Test
+    void givenUserId_whenCheckUserId_thenReturnFalse() throws Exception {
+        //Given
+        String userId = "userId";
+        given(userAccountService.checkUserId(userId)).willReturn(true);
+
+        //When & Then
+        mvc.perform(post("/api/check-userId")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .param("userId", userId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("OK"))
+                .andExpect(jsonPath("$.data").value(false));
+    }
+
+    @DisplayName("닉네임 중복 체크 - 닉네임 이미 존재할때")
+    @Test
+    void givenNickname_whenCheckNickname_thenReturnTrue() throws Exception {
+        //Given
+        String nickname = "user1";
+        given(userAccountService.checkNickname(nickname)).willReturn(false);
+
+        //When & Then
+        mvc.perform(get("/api/check-nickname/"+nickname))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("OK"))
+                .andExpect(jsonPath("$.data").value(true));
+    }
+
+    @DisplayName("닉네임 중복 체크 - 닉네임이 없을 때")
+    @Test
+    void givenNickname_whenCheckNickname_thenReturnFalse() throws Exception {
+        //Given
+        String nickname = "user1";
+        given(userAccountService.checkNickname(nickname)).willReturn(true);
+
+        //When & Then
+        mvc.perform(get("/api/check-nickname/"+nickname))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("OK"))
+                .andExpect(jsonPath("$.data").value(false));
+    }
+
 }

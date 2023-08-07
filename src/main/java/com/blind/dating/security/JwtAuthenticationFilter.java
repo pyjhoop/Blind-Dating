@@ -28,6 +28,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final CustomUserDetailsService customUserDetailsService;
     private final String signUpUrl = "/api/signup";
     private final String loginUrl = "/api/login";
+    private final String checkIdUrl = "/api/check-userId";
+    private final String checkNicknameUrl = "/api/check-nickname";
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -75,6 +77,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private boolean isSignUpRequest(HttpServletRequest request) {
-        return request.getRequestURI().equals(signUpUrl) && request.getMethod().equals("POST") || request.getRequestURI().equals(loginUrl)&& request.getMethod().equals("POST");
+        return request.getRequestURI().equals(signUpUrl) && request.getMethod().equals("POST")
+                || request.getRequestURI().equals(checkIdUrl) && request.getMethod().equals("POST")
+                || request.getRequestURI().equals(loginUrl)&& request.getMethod().equals("POST")
+                || request.getRequestURI().contains(checkNicknameUrl) && request.getMethod().equals("GET");
     }
 }

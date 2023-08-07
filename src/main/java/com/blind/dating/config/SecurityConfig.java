@@ -26,7 +26,7 @@ public class SecurityConfig {
                 .authorizeRequests(auth->auth
                         .antMatchers("/h2-console/**", "/swagger-ui/**","/v3/api-docs/**").permitAll()
                         .antMatchers("/api/login","/api/signup","/api/profile").permitAll()
-                        .antMatchers("/api/check-nickname/**","/api/check-userId/**").permitAll()
+                        .antMatchers("/api/check-nickname/**","/api/check-userId").permitAll()
                         .anyRequest().authenticated())
                 .headers().frameOptions().sameOrigin()
                 .and().build();

@@ -2,6 +2,7 @@ package com.blind.dating.controller;
 
 import com.blind.dating.config.SecurityConfig;
 import com.blind.dating.domain.UserAccount;
+import com.blind.dating.dto.user.LoginInputDto;
 import com.blind.dating.dto.user.UserAccountDto;
 import com.blind.dating.dto.user.UserRequestDto;
 import com.blind.dating.security.TokenProvider;
@@ -49,12 +50,13 @@ class UserAccountControllerTest {
         given(userAccountService.getByCredentials(anyString(), anyString())).willReturn(dto.toEntity());
         String token = "token";
         given(tokenProvider.create(any(UserAccount.class))).willReturn(token);
+        LoginInputDto dto1 = LoginInputDto.builder()
+                        .userId("user01").userPassword("pass01").build();
 
         //When & Then
         mvc.perform(post("/api/login")
                 .contentType(MediaType.APPLICATION_JSON)
-                                .param("userId","user01")
-                        .param("userPassword","pass01")
+                                .content(obj.writeValueAsString(dto1))
                 ).andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("OK"))
                 .andExpect(jsonPath("$.data.nickname").value("user1"));

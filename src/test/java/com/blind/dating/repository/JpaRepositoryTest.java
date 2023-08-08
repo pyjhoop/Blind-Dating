@@ -37,6 +37,8 @@ class JpaRepositoryTest {
         UserAccount user1 = UserAccount.of("user01","pass01","user1","서울",12,"INFP","M");
         UserAccount user2 = UserAccount.of("user02","pass02","user2","서울",12,"INFP","M");
 
+        user1.setRefreshToken("token");
+        user2.setRefreshToken("token");
         UserAccount savedUser1 = userAccountRepository.save(user1);
         UserAccount savedUser2 = userAccountRepository.save(user2);
 
@@ -60,6 +62,8 @@ class JpaRepositoryTest {
         UserAccount user1 = UserAccount.of("user01","pass01","user1","서울",12,"INFP","M");
         UserAccount user2 = UserAccount.of("user02","pass02","user2","서울",12,"INFP","M");
 
+        user1.setRefreshToken("token");
+        user2.setRefreshToken("token");
         UserAccount savedUser1 = userAccountRepository.save(user1);
         UserAccount savedUser2 = userAccountRepository.save(user2);
 
@@ -87,6 +91,9 @@ class JpaRepositoryTest {
         //Given
         UserAccount user1 = UserAccount.of("user01","pass01","user1","서울",12,"INFP","M");
         UserAccount user2 = UserAccount.of("user02","pass02","user2","서울",12,"INFP","M");
+
+        user1.setRefreshToken("token");
+        user2.setRefreshToken("token");
 
         UserAccount savedUser1 = userAccountRepository.save(user1);
         UserAccount savedUser2 = userAccountRepository.save(user2);
@@ -119,6 +126,9 @@ class JpaRepositoryTest {
         //Given
         UserAccount user1 = UserAccount.of("user01","pass01","user1","서울",12,"INFP","M");
         UserAccount user2 = UserAccount.of("user02","pass02","user2","서울",12,"INFP","M");
+
+        user1.setRefreshToken("token");
+        user2.setRefreshToken("token");
 
         UserAccount savedUser1 = userAccountRepository.save(user1);
         UserAccount savedUser2 = userAccountRepository.save(user2);

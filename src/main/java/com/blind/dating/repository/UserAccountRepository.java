@@ -10,4 +10,5 @@ public interface UserAccountRepository extends JpaRepository<UserAccount, Long> 
     Boolean existsByUserId(String userId);
     UserAccount findByNickname(String nickname);
     Page<UserAccount> findAllByScoreBetweenAndGender(int minScore, int maxScore,String gender, Pageable pageable);
+
 }

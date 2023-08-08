@@ -17,7 +17,7 @@ public class UserAccountService {
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
 
-    public UserAccount create(UserRequestDto dto){
+    public UserAccount create(UserRequestDto dto, String refreshToken){
 
         if(dto == null || dto.getUserId() == null){
             throw new RuntimeException("Invalid arguments");
@@ -31,6 +31,7 @@ public class UserAccountService {
         }
 
         UserAccount user = dto.toEntity();
+        user.setRefreshToken(refreshToken);
         user.setDeleted(false);
         user.setUserPassword(bCryptPasswordEncoder.encode(dto.getUserPassword()));
 

@@ -69,8 +69,10 @@ class UserAccountControllerTest {
         //Given
         UserRequestDto user = UserRequestDto.of("user01","pass01","user1","서울",12,"INFP","M");
         String token = "token";
-        given(userAccountService.create(any(UserRequestDto.class))).willReturn(user.toEntity());
+        given(userAccountService.create(any(UserRequestDto.class), anyString())).willReturn(user.toEntity());
         given(tokenProvider.create(any(UserAccount.class))).willReturn(token);
+        given(tokenProvider.refreshToken(any(UserAccount.class))).willReturn(token);
+
         ObjectMapper obj = new ObjectMapper();
 
         //When & Then

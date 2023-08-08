@@ -1,12 +1,11 @@
 package com.blind.dating.controller;
 
 import com.blind.dating.domain.UserAccount;
-import com.blind.dating.dto.user.LoginInputDto;
-import com.blind.dating.dto.user.TokenDto;
-import com.blind.dating.dto.user.UserResponse;
+import com.blind.dating.dto.interest.InterestResponse;
+import com.blind.dating.dto.user.*;
 import com.blind.dating.dto.response.ResponseDto;
-import com.blind.dating.dto.user.UserRequestDto;
 import com.blind.dating.security.TokenProvider;
+import com.blind.dating.service.InterestService;
 import com.blind.dating.service.UserAccountService;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.swagger.v3.oas.annotations.Operation;
@@ -21,6 +20,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Slf4j
 @Tag(name = "UserAccount Info", description = "인증 관련 서비스")
 @RequiredArgsConstructor
@@ -30,6 +32,7 @@ public class UserAccountController {
 
     private final UserAccountService userAccountService;
     private final TokenProvider tokenProvider;
+    private final InterestService interestService;
 
     @Operation(summary = "회원가입", description = "유저정보를 받아서 회원가입을 진행합니다.")
     @ApiResponses(value = {
@@ -57,10 +60,14 @@ public class UserAccountController {
         String accessToken = tokenProvider.create(dto.toEntity());
         String refreshToken = tokenProvider.refreshToken(dto.toEntity());
         UserAccount user = userAccountService.create(dto, refreshToken);
+
+        List<String> interests = dto.getInterests();
+
+        List<InterestResponse> list = interestService.saveInterest(user,interests)
+                .stream().map(InterestResponse::from).collect(Collectors.toList());
+
         TokenDto tokens = TokenDto.builder().refreshToken(refreshToken)
                 .accessToken(accessToken).build();
-
-
 
         return ResponseDto.<UserResponse>builder()
                 .status("success")
@@ -121,9 +128,9 @@ public class UserAccountController {
             @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR", content = @Content(schema = @Schema(implementation = ResponseDto.class)))
     })
     @Parameter(name = "userId", description = "유저 아이디", example = "user01")
-    public ResponseDto<Boolean> checkUserId(@RequestParam String userId){
+    public ResponseDto<Boolean> checkUserId(@RequestBody UserIdRequestDto dto){
 
-        boolean check = userAccountService.checkUserId(userId);
+        boolean check = userAccountService.checkUserId(dto.getUserId());
 
         if(check){
             return ResponseDto.<Boolean>builder()

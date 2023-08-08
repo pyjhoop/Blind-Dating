@@ -24,13 +24,12 @@ public class InterestService {
     }
 
     @Transactional
-    public List<Interest> saveInterest(Authentication authentication, List<String> interestName){
+    public List<Interest> saveInterest(UserAccount userAccount, List<String> interestName){
 
-        UserAccount user =(UserAccount)authentication.getPrincipal();
         List<Interest> list = new ArrayList<>();
 
         for(String s: interestName){
-            list.add(Interest.of(user,s));
+            list.add(Interest.of(userAccount,s));
         }
 
         return interestRepository.saveAll(list);

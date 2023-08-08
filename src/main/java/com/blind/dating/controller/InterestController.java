@@ -50,26 +50,26 @@ public class InterestController {
     }
 
     // 관심사들 저장하기.
-    @PostMapping
-    @Operation(summary = "내 관심사 저장", description = "내 관심사를 저장합니다.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "OK"),
-            @ApiResponse(responseCode = "400", description = "BAD REQUEST",content = @Content(schema = @Schema(implementation = ResponseDto.class))),
-            @ApiResponse(responseCode = "404", description = "NOT FOUND", content = @Content(schema = @Schema(implementation = ResponseDto.class))),
-            @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR", content = @Content(schema = @Schema(implementation = ResponseDto.class)))
-    })
-    @Parameter(name = "List<InterestDto>", description = "관심사 리스트")
-    public ResponseDto<List<InterestResponse>> saveInterests(@RequestBody List<String> interestName,
-                                       Authentication authentication){
-
-        List<InterestResponse> list = interestService.saveInterest(authentication,interestName)
-                .stream().map(InterestResponse::from).collect(Collectors.toList());
-
-        return ResponseDto.<List<InterestResponse>>builder()
-                .status("OK")
-                .message("관심사가 성공적으로 저장되었습니다.")
-                .data(list).build();
-    }
+//    @PostMapping
+//    @Operation(summary = "내 관심사 저장", description = "내 관심사를 저장합니다.")
+//    @ApiResponses(value = {
+//            @ApiResponse(responseCode = "200", description = "OK"),
+//            @ApiResponse(responseCode = "400", description = "BAD REQUEST",content = @Content(schema = @Schema(implementation = ResponseDto.class))),
+//            @ApiResponse(responseCode = "404", description = "NOT FOUND", content = @Content(schema = @Schema(implementation = ResponseDto.class))),
+//            @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR", content = @Content(schema = @Schema(implementation = ResponseDto.class)))
+//    })
+//    @Parameter(name = "List<InterestDto>", description = "관심사 리스트")
+//    public ResponseDto<List<InterestResponse>> saveInterests(@RequestBody List<String> interestName,
+//                                       Authentication authentication){
+//
+//        List<InterestResponse> list = interestService.saveInterest(authentication,interestName)
+//                .stream().map(InterestResponse::from).collect(Collectors.toList());
+//
+//        return ResponseDto.<List<InterestResponse>>builder()
+//                .status("OK")
+//                .message("관심사가 성공적으로 저장되었습니다.")
+//                .data(list).build();
+//    }
 
     // 내 관심사 수정하기
     @PutMapping

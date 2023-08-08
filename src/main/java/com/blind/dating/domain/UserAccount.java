@@ -62,6 +62,9 @@ public class UserAccount extends BaseEntity implements UserDetails {
     @Column(nullable = false)
     private String refreshToken;
 
+    @Setter
+    private String selfIntroduction;
+
     @OrderBy("createdAt DESC")
     @OneToMany(mappedBy = "sender", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @ToString.Exclude
@@ -75,10 +78,14 @@ public class UserAccount extends BaseEntity implements UserDetails {
     @ToString.Exclude
     private final Set<Answer> answers = new LinkedHashSet<>();
 
+    @OneToMany(mappedBy = "userAccount",fetch = FetchType.EAGER)
+    @ToString.Exclude
+    private final Set<LikesUnlikes> likesUnlikes = new LinkedHashSet<>();
+
 
     protected UserAccount(){}
 
-    private UserAccount(String userId, String userPassword, String nickname, String region, int score, String mbti, String gender) {
+    private UserAccount(String userId, String userPassword, String nickname, String region, int score, String mbti, String gender, String selfIntroduction) {
         this.userId = userId;
         this.userPassword = userPassword;
         this.nickname = nickname;
@@ -86,9 +93,10 @@ public class UserAccount extends BaseEntity implements UserDetails {
         this.score = score;
         this.mbti = mbti;
         this.gender = gender;
+        this.selfIntroduction = selfIntroduction;
     }
-    public static UserAccount of(String userId, String userPassword, String nickname, String region, int score, String mbti, String gender) {
-        return new UserAccount(userId, userPassword, nickname, region, score, mbti, gender);
+    public static UserAccount of(String userId, String userPassword, String nickname, String region, int score, String mbti, String gender, String selfIntroduction) {
+        return new UserAccount(userId, userPassword, nickname, region, score, mbti, gender, selfIntroduction);
     }
 
 
@@ -112,7 +120,7 @@ public class UserAccount extends BaseEntity implements UserDetails {
 
     @Override
     public String getPassword() {
-        return null;
+        return userPassword;
     }
 
     @Override
@@ -122,21 +130,21 @@ public class UserAccount extends BaseEntity implements UserDetails {
 
     @Override
     public boolean isAccountNonExpired() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isEnabled() {
-        return false;
+        return true;
     }
 }

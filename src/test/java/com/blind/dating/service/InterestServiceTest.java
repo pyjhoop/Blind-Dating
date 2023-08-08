@@ -38,7 +38,7 @@ class InterestServiceTest {
     void givenInterestList_whenSaveList_thenReturnList(){
 
         //Given
-        UserAccount user = UserAccount.of("userId","pwd","nick","서울",12,"INFP","M");
+        UserAccount user = UserAccount.of("userId","pwd","nick","서울",12,"INFP","M","하이요");
         user.setDeleted(false);
 
         Authentication authentication = new UsernamePasswordAuthenticationToken(user,"pwd");
@@ -49,7 +49,7 @@ class InterestServiceTest {
         given(interestRepository.saveAll(anyList())).willReturn(list);
 
         //When
-        List<Interest> result = interestService.saveInterest(authentication, content);
+        List<Interest> result = interestService.saveInterest(user, content);
 
         //Then
         assertThat(result).isNotEmpty();
@@ -60,7 +60,7 @@ class InterestServiceTest {
     @Test
     void givenInterestList_thenUpdateInterest_thenReturnUpdatedList(){
         //Given
-        UserAccount user = UserAccount.of("userId","pwd","nick","서울",12,"INFP","M");
+        UserAccount user = UserAccount.of("userId","pwd","nick","서울",12,"INFP","M","하이요");
         user.setDeleted(false);
         Authentication authentication = new UsernamePasswordAuthenticationToken(user, "pwd");
         Interest interest = Interest.of(user,"내용");

@@ -4,6 +4,8 @@ import com.blind.dating.domain.UserAccount;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 public class UserRequestDto {
@@ -15,8 +17,10 @@ public class UserRequestDto {
     private int score;
     private String mbti;
     private String gender;
+    private List<String> interests;
+    private String selfIntroduction;
 
-    private UserRequestDto(String userId, String userPassword, String nickname, String region, int score, String mbti, String gender) {
+    private UserRequestDto(String userId, String userPassword, String nickname, String region, int score, String mbti, String gender, String selfIntroduction) {
         this.userId = userId;
         this.userPassword = userPassword;
         this.nickname = nickname;
@@ -24,10 +28,11 @@ public class UserRequestDto {
         this.score = score;
         this.mbti = mbti;
         this.gender = gender;
+        this.selfIntroduction = selfIntroduction;
     }
 
-    public static UserRequestDto of(String userId, String userPassword, String nickname, String region, int score, String mbti, String gender) {
-        return new UserRequestDto(userId,userPassword, nickname, region, score, mbti,gender);
+    public static UserRequestDto of(String userId, String userPassword, String nickname, String region, int score, String mbti, String gender, String selfIntroduction) {
+        return new UserRequestDto(userId,userPassword, nickname, region, score, mbti,gender, selfIntroduction);
     }
 
     public static UserAccountDto from(UserAccount entity){
@@ -39,7 +44,8 @@ public class UserRequestDto {
                 entity.getScore(),
                 entity.getMbti(),
                 entity.getGender(),
-                entity.getDeleted()
+                entity.getDeleted(),
+                entity.getSelfIntroduction()
         );
     }
 
@@ -51,7 +57,8 @@ public class UserRequestDto {
                 region,
                 score,
                 mbti,
-                gender
+                gender,
+                selfIntroduction
         );
     }
 

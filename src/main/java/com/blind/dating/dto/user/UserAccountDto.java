@@ -28,6 +28,8 @@ public class UserAccountDto {
     private String gender;
     @Schema(description = "회원 탈퇴 여부")
     private Boolean deleted;
+    @Schema(description = "자기소개")
+    private String selfIntroduction;
 
 
     private UserAccountDto(String userId, String userPassword, String nickname, String region, int score, String mbti, String gender) {
@@ -40,8 +42,8 @@ public class UserAccountDto {
         this.gender = gender;
     }
 
-    public static UserAccountDto of(String userId, String userPassword, String nickname, String region, int score, String mbti, String gender, Boolean deleted) {
-        return new UserAccountDto(userId,userPassword, nickname, region, score, mbti, gender, deleted);
+    public static UserAccountDto of(String userId, String userPassword, String nickname, String region, int score, String mbti, String gender, Boolean deleted, String selfIntroduction) {
+        return new UserAccountDto(userId,userPassword, nickname, region, score, mbti, gender, deleted, selfIntroduction);
     }
 
     public static UserAccountDto of(String userId, String userPassword, String nickname, String region, int score, String mbti, String gender) {
@@ -57,7 +59,8 @@ public class UserAccountDto {
                 entity.getScore(),
                 entity.getMbti(),
                 entity.getGender(),
-                entity.getDeleted()
+                entity.getDeleted(),
+                entity.getSelfIntroduction()
         );
     }
 
@@ -69,7 +72,8 @@ public class UserAccountDto {
                 region,
                 score,
                 mbti,
-                gender
+                gender,
+                selfIntroduction
         );
     }
 }

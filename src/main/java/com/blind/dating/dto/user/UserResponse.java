@@ -23,9 +23,9 @@ public class UserResponse {
         return new UserResponse(token, nickname);
     }
 
-    public static UserResponse from(UserAccount user, String token){
+    public static UserResponse from(UserAccount user, TokenDto tokens){
         return new UserResponse(
-                new TokenDto(token),
+                tokens,
                 user.getNickname()
         );
     }

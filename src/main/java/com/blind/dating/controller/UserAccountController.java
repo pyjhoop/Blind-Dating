@@ -2,11 +2,13 @@ package com.blind.dating.controller;
 
 import com.blind.dating.domain.UserAccount;
 import com.blind.dating.dto.user.LoginInputDto;
+import com.blind.dating.dto.user.TokenDto;
 import com.blind.dating.dto.user.UserResponse;
 import com.blind.dating.dto.response.ResponseDto;
 import com.blind.dating.dto.user.UserRequestDto;
 import com.blind.dating.security.TokenProvider;
 import com.blind.dating.service.UserAccountService;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -52,13 +54,18 @@ public class UserAccountController {
             ){
 
         //TODO 필수데이터가 부족할때 통합 예외처리해주기
-        UserAccount user = userAccountService.create(dto);
-        String token = tokenProvider.create(user);
+        String accessToken = tokenProvider.create(dto.toEntity());
+        String refreshToken = tokenProvider.refreshToken(dto.toEntity());
+        UserAccount user = userAccountService.create(dto, refreshToken);
+        TokenDto tokens = TokenDto.builder().refreshToken(refreshToken)
+                .accessToken(accessToken).build();
+
+
 
         return ResponseDto.<UserResponse>builder()
                 .status("success")
                 .message("회원가입이 성공적으로 완료되었습니다.")
-                .data(UserResponse.from(user, token))
+                .data(UserResponse.from(user, tokens))
                 .build();
     }
 
@@ -89,11 +96,15 @@ public class UserAccountController {
                     .build();
 
         }else{
-            String token = tokenProvider.create(user);
+            TokenDto tokens = TokenDto.builder()
+                    .accessToken(tokenProvider.create(user))
+                    .refreshToken(user.getRefreshToken()).build();
+
+
             return ResponseDto.<UserResponse>builder()
                     .status("OK")
                     .message("로그인이 성공적으로 처리되었습니다.")
-                    .data(UserResponse.from(user, token))
+                    .data(UserResponse.from(user, tokens))
                     .build();
         }
 
@@ -152,5 +163,6 @@ public class UserAccountController {
         }
 
     }
+
 
 }

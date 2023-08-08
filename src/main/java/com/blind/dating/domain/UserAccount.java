@@ -58,6 +58,10 @@ public class UserAccount extends BaseEntity implements UserDetails {
     @Column(nullable = true)
     private Boolean deleted;
 
+    @Setter
+    @Column(nullable = false)
+    private String refreshToken;
+
     @OrderBy("createdAt DESC")
     @OneToMany(mappedBy = "sender", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @ToString.Exclude
@@ -113,7 +117,7 @@ public class UserAccount extends BaseEntity implements UserDetails {
 
     @Override
     public String getUsername() {
-        return null;
+        return userId;
     }
 
     @Override

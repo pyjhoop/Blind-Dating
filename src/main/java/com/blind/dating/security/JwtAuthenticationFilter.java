@@ -1,6 +1,7 @@
 package com.blind.dating.security;
 
 import com.blind.dating.service.CustomUserDetailsService;
+import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
@@ -57,10 +58,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                    }else{
                        throw new AuthenticationServiceException("Invalid or missing token");
                    }
+               }catch (ExpiredJwtException e){
+                   e.printStackTrace();
                }catch (Exception e){
-                   logger.error("Could not set user authentication in security context", e);
 
                }
+
            }
 
         filterChain.doFilter(request,response);
@@ -81,5 +84,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 || request.getRequestURI().equals(checkIdUrl) && request.getMethod().equals("POST")
                 || request.getRequestURI().equals(loginUrl)&& request.getMethod().equals("POST")
                 || request.getRequestURI().contains(checkNicknameUrl) && request.getMethod().equals("GET");
+
     }
 }

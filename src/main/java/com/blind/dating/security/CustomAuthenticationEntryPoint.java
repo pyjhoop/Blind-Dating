@@ -29,7 +29,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         ObjectMapper ob = new ObjectMapper();
         ResponseDto dto = ResponseDto.builder().status("ExpiredJwtToken")
-                        .message("jwt 토큰 만료됨")
+                        .message("jwt 토큰 만료되었습니다.")
                                 .build();
         response.getWriter().println(ob.writeValueAsString(dto));
     }

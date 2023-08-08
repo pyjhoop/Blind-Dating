@@ -59,7 +59,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                        throw new AuthenticationServiceException("Invalid or missing token");
                    }
                }catch (ExpiredJwtException e){
-                   e.printStackTrace();
+
                }catch (Exception e){
 
                }

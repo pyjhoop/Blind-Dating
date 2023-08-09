@@ -50,7 +50,7 @@ class MessageServiceTest {
     void givenUserAccount_whenSelectSentMessage_thenReturnMessages(){
         //Given
         List<Message> list = List.of();
-        UserAccount user = UserAccount.of("userId","pwd","nick","서울",12,"INFP","M");
+        UserAccount user = UserAccount.of("user01","pass01","user1","서울",12,"INFP","M","하이요");
         user.setDeleted(false);
         given(messageRepository.findAllBySender(user)).willReturn(list);
 
@@ -67,7 +67,7 @@ class MessageServiceTest {
     @Test
     void givenMessageId_whenSelectMessage_thenReturnMessage(){
         //Given
-        UserAccount user = UserAccount.of("userId","pwd","nick","서울",12,"INFP","M");
+        UserAccount user = UserAccount.of("user01","pass01","user1","서울",12,"INFP","M","하이요");
         user.setDeleted(false);
         Message message = Message.of(user,1L, "내용","UNREAD");
 
@@ -87,7 +87,7 @@ class MessageServiceTest {
     @Test
     void givenMessage_whenSaveMessage_thenReturnMessage(){
         //Given
-        UserAccount user = UserAccount.of("userId","pwd","nick","서울",12,"INFP","M");
+        UserAccount user = UserAccount.of("user01","pass01","user1","서울",12,"INFP","M","하이요");
         user.setDeleted(false);
         Message message = Message.of(user,1L, "내용","UNREAD");
         given(messageRepository.save(any(Message.class))).willReturn(message);

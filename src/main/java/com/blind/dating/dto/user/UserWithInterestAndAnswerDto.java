@@ -14,35 +14,41 @@ import java.util.stream.Collectors;
 public class UserWithInterestAndAnswerDto {
 
     private Long id;
+    private String userId;
     private String nickname;
     private String region;
     private String mbti;
     private String gender;
     private Set<InterestDto> interests;
     private Set<AnswerDto> answers;
+    private String selfIntroduction;
 
-    private UserWithInterestAndAnswerDto(Long id, String nickname, String region, String mbti, String gender, Set<InterestDto> interests, Set<AnswerDto> answers) {
+    private UserWithInterestAndAnswerDto(Long id, String userId, String nickname, String region, String mbti, String gender, Set<InterestDto> interests, Set<AnswerDto> answers, String selfIntroduction) {
         this.id = id;
+        this.userId = userId;
         this.nickname = nickname;
         this.region = region;
         this.mbti = mbti;
         this.gender = gender;
         this.interests = interests;
         this.answers = answers;
+        this.selfIntroduction = selfIntroduction;
     }
-    public static UserWithInterestAndAnswerDto of(Long id, String nickname, String region, String mbti, String gender, Set<InterestDto> interests, Set<AnswerDto> answers) {
-        return new UserWithInterestAndAnswerDto(id, nickname, region, mbti, gender, interests, answers);
+    public static UserWithInterestAndAnswerDto of(Long id,String userId, String nickname, String region, String mbti, String gender, Set<InterestDto> interests, Set<AnswerDto> answers, String selfIntroduction) {
+        return new UserWithInterestAndAnswerDto(id, userId, nickname, region, mbti, gender, interests, answers, selfIntroduction);
     }
 
     public static UserWithInterestAndAnswerDto from(UserAccount user) {
         return new UserWithInterestAndAnswerDto(
                 user.getId(),
+                user.getUserId(),
                 user.getNickname(),
                 user.getRegion(),
                 user.getMbti(),
                 user.getGender(),
                 user.getInterests().stream().map(InterestDto::from).collect(Collectors.toSet()),
-                user.getAnswers().stream().map(AnswerDto::from).collect(Collectors.toSet())
+                user.getAnswers().stream().map(AnswerDto::from).collect(Collectors.toSet()),
+                user.getSelfIntroduction()
         );
 
     }

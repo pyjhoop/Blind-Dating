@@ -32,7 +32,7 @@ class UserAccountServiceTest {
     @Test
     void givenUserAccountDto_whenCreateUser_thenReturnUserAccount(){
         //Given
-        UserRequestDto dto = UserRequestDto.of("user01","pqss01","user1","서울",12,"INFP","M");
+        UserRequestDto dto = UserRequestDto.of("user01","pqss01","user1","서울",12,"INFP","M","gd");
         UserAccount user = dto.toEntity();
         user.setDeleted(false);
 
@@ -60,7 +60,7 @@ class UserAccountServiceTest {
         String userPassword = "pass01";
 
         // 모킹 설정
-        UserAccountDto dto = UserAccountDto.of("user01","pass01","user1","서울",12,"INFP","M",false);
+        UserAccountDto dto = UserAccountDto.of("user01","pass01","user1","서울",12,"INFP","M",false,"gd");
         dto.setUserPassword(bCryptPasswordEncoder.encode(dto.getUserPassword()));
         given(userAccountRepository.findByUserId(userId)).willReturn(dto.toEntity());
 
@@ -95,7 +95,7 @@ class UserAccountServiceTest {
     void givenExistingUserId_whenCheckUserId_thenReturnTrue(){
         // Given
         String existingUserId = "existingUser";
-        UserAccount existingUser = UserAccount.of("user01","pass01","user1","서울",12,"INFP","M");
+        UserAccount existingUser = UserAccount.of("user01","pass01","user1","서울",12,"INFP","M","gd");
         existingUser.setUserId(existingUserId);
         given(userAccountRepository.findByUserId(existingUserId)).willReturn(existingUser);
 
@@ -112,7 +112,7 @@ class UserAccountServiceTest {
     void givenExistingNickname_whenCheckNickname_thenReturnBoolean(){
         //Given
         String nickname = "user1";
-        UserAccount existingUser = UserAccount.of("user01","pass01","user1","서울",12,"INFP","M");
+        UserAccount existingUser = UserAccount.of("user01","pass01","user1","서울",12,"INFP","M","gd");
         given(userAccountRepository.findByNickname(nickname)).willReturn(existingUser);
 
         //When

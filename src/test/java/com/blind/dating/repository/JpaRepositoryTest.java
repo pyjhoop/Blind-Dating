@@ -34,8 +34,8 @@ class JpaRepositoryTest {
     @Test
     void givenData_whenInsertData_returnEntity(){
         //Given
-        UserAccount user1 = UserAccount.of("user01","pass01","user1","서울",12,"INFP","M");
-        UserAccount user2 = UserAccount.of("user02","pass02","user2","서울",12,"INFP","M");
+        UserAccount user1 = UserAccount.of("user01","pass01","user1","서울",12,"INFP","M","하이요");
+        UserAccount user2 = UserAccount.of("user02","pass02","user2","서울",12,"INFP","M","하이");
 
         user1.setRefreshToken("token");
         user2.setRefreshToken("token");
@@ -59,8 +59,8 @@ class JpaRepositoryTest {
     @Test
     void givenData_whenSelectData_returnEntity(){
         //Given
-        UserAccount user1 = UserAccount.of("user01","pass01","user1","서울",12,"INFP","M");
-        UserAccount user2 = UserAccount.of("user02","pass02","user2","서울",12,"INFP","M");
+        UserAccount user1 = UserAccount.of("user01","pass01","user1","서울",12,"INFP","M","하이요");
+        UserAccount user2 = UserAccount.of("user02","pass02","user2","서울",12,"INFP","M","하이");
 
         user1.setRefreshToken("token");
         user2.setRefreshToken("token");
@@ -89,8 +89,8 @@ class JpaRepositoryTest {
     @Test
     void givenData_whenUpdateData_returnEntity(){
         //Given
-        UserAccount user1 = UserAccount.of("user01","pass01","user1","서울",12,"INFP","M");
-        UserAccount user2 = UserAccount.of("user02","pass02","user2","서울",12,"INFP","M");
+        UserAccount user1 = UserAccount.of("user01","pass01","user1","서울",12,"INFP","M","하이요");
+        UserAccount user2 = UserAccount.of("user02","pass02","user2","서울",12,"INFP","M","하이");
 
         user1.setRefreshToken("token");
         user2.setRefreshToken("token");
@@ -124,8 +124,8 @@ class JpaRepositoryTest {
     @Test
     void givenData_whenDeleteData_returnEntity(){
         //Given
-        UserAccount user1 = UserAccount.of("user01","pass01","user1","서울",12,"INFP","M");
-        UserAccount user2 = UserAccount.of("user02","pass02","user2","서울",12,"INFP","M");
+        UserAccount user1 = UserAccount.of("user01","pass01","user1","서울",12,"INFP","M","하이요");
+        UserAccount user2 = UserAccount.of("user02","pass02","user2","서울",12,"INFP","M","하이");
 
         user1.setRefreshToken("token");
         user2.setRefreshToken("token");

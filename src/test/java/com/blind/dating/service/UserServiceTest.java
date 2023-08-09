@@ -40,7 +40,7 @@ class UserServiceTest {
         given(userAccountRepository.findAllByScoreBetweenAndGender(5,15,"M",pageable)).willReturn(Page.empty());
 
         //When
-        Page<UserAccount> pages = userService.getUserList(10,"M",pageable);
+        Page<UserAccount> pages = userService.getUserList(10,"M",pageable,"1");
 
         assertThat(pages).isEmpty();
         then(userAccountRepository).should().findAllByScoreBetweenAndGender(5,15,"M",pageable);
@@ -50,7 +50,7 @@ class UserServiceTest {
     @Test
     void giveUserId_whenSearchMyInfo_thenReturnMyInfo(){
         //Given
-        UserAccount user = UserAccount.of("userId","pwd","nick","서울",12,"INFP","M");
+        UserAccount user = UserAccount.of("userId","pwd","nick","서울",12,"INFP","M","하요");
         user.setDeleted(false);
         given(userAccountRepository.findByUserId(user.getUserId())).willReturn(user);
 

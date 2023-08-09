@@ -33,7 +33,7 @@ class AnswerServiceTest {
     @Test
     void givenAnswerData_whenSaveAnswer_thenReturnAnswerList(){
         //Given
-        UserAccount user = UserAccount.of("userId","pwd","nick","서울",12,"INFP","M");
+        UserAccount user = UserAccount.of("user01","pass01","user1","서울",12,"INFP","M","하이요");
         user.setDeleted(false);
         Answer answer = Answer.of(1L,user,"안녕");
         List<Answer> list = List.of(answer);
@@ -53,7 +53,7 @@ class AnswerServiceTest {
     @Test
     void givenUserAccount_whenSelectAnswers_thenReturnAnswerList(){
         //Given
-        UserAccount user = UserAccount.of("userId","pwd","nick","서울",12,"INFP","M");
+        UserAccount user = UserAccount.of("user01","pass01","user1","서울",12,"INFP","M","하이요");
         user.setDeleted(false);
         Answer answer = Answer.of(1L,user,"안녕");
         List<Answer> list = List.of(answer);

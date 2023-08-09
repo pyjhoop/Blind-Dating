@@ -4,9 +4,11 @@ import com.blind.dating.config.SecurityConfig;
 import com.blind.dating.domain.UserAccount;
 import com.blind.dating.dto.user.LoginInputDto;
 import com.blind.dating.dto.user.UserAccountDto;
+import com.blind.dating.dto.user.UserIdRequestDto;
 import com.blind.dating.dto.user.UserRequestDto;
 import com.blind.dating.security.TokenProvider;
 import com.blind.dating.service.CustomUserDetailsService;
+import com.blind.dating.service.InterestService;
 import com.blind.dating.service.UserAccountService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Disabled;
@@ -36,6 +38,7 @@ class UserAccountControllerTest {
     @MockBean private UserAccountService userAccountService;
     @MockBean private TokenProvider tokenProvider;
     @MockBean private CustomUserDetailsService customUserDetailsService;
+    @MockBean private InterestService interestService;
 
     UserAccountControllerTest(@Autowired MockMvc mvc) {
         this.mvc = mvc;
@@ -45,9 +48,9 @@ class UserAccountControllerTest {
     @Test
     public void givenUserIdAndPassword_whenLogin_thenReturnUserAccount() throws Exception {
         //Given
-        UserAccountDto dto = UserAccountDto.of("user01","pass01","user1","서울",12,"INFP","M",false);
+        UserAccount user = UserAccount.of("user01","pass01","user1","서울",12,"INFP","M","하이요");
         ObjectMapper obj = new ObjectMapper();
-        given(userAccountService.getByCredentials(anyString(), anyString())).willReturn(dto.toEntity());
+        given(userAccountService.getByCredentials(anyString(), anyString())).willReturn(user);
         String token = "token";
         given(tokenProvider.create(any(UserAccount.class))).willReturn(token);
         LoginInputDto dto1 = LoginInputDto.builder()
@@ -67,7 +70,7 @@ class UserAccountControllerTest {
     @Test
     void givenUserAccountDto_whenSignUp_thenReturnUser() throws Exception {
         //Given
-        UserRequestDto user = UserRequestDto.of("user01","pass01","user1","서울",12,"INFP","M");
+        UserRequestDto user = UserRequestDto.of("user01","pass01","user1","서울",12,"INFP","M","하이요");
         String token = "token";
         given(userAccountService.create(any(UserRequestDto.class), anyString())).willReturn(user.toEntity());
         given(tokenProvider.create(any(UserAccount.class))).willReturn(token);
@@ -91,10 +94,15 @@ class UserAccountControllerTest {
         String userId = "userId";
         given(userAccountService.checkUserId(userId)).willReturn(false);
 
+        UserIdRequestDto userIdRequestDto = new UserIdRequestDto();
+        userIdRequestDto.setUserId("userId");
+        ObjectMapper obj = new ObjectMapper();
+
+
         //When & Then
         mvc.perform(post("/api/check-userId")
                 .contentType(MediaType.APPLICATION_JSON)
-                .param("userId", userId))
+                .content(obj.writeValueAsString(userIdRequestDto)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("OK"))
                 .andExpect(jsonPath("$.data").value(true));
@@ -106,11 +114,14 @@ class UserAccountControllerTest {
         //Given
         String userId = "userId";
         given(userAccountService.checkUserId(userId)).willReturn(true);
+        UserIdRequestDto userIdRequestDto = new UserIdRequestDto();
+        userIdRequestDto.setUserId("userId");
+        ObjectMapper obj = new ObjectMapper();
 
         //When & Then
         mvc.perform(post("/api/check-userId")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .param("userId", userId))
+                        .content(obj.writeValueAsString(userIdRequestDto)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("OK"))
                 .andExpect(jsonPath("$.data").value(false));

@@ -13,9 +13,11 @@ public class UserService {
 
     private final UserAccountRepository userAccountRepository;
 
-    public Page<UserAccount> getUserList(int score, String gender, Pageable pageable){
+    public Page<UserAccount> getUserList(int score, String gender, Pageable pageable, String step){
 
-        return userAccountRepository.findAllByScoreBetweenAndGender(score-5, score+5, gender,pageable);
+        int number = Integer.parseInt(step);
+
+        return userAccountRepository.findAllByScoreBetweenAndGender(score-(5*number), score+(5*number), gender,pageable);
 
     }
 

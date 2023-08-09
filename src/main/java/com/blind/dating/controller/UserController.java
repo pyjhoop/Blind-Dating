@@ -19,9 +19,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "User Info", description = "유저 조회 서비스")
 @RestController
@@ -32,7 +30,6 @@ public class UserController {
     private final UserService userService;
 
     // 유저10명 불러오기
-
     @Operation(summary = "추천 유저 조회", description = "추천 유저 10명을 조회합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK"),
@@ -41,9 +38,10 @@ public class UserController {
             @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR", content = @Content(schema = @Schema(implementation = ResponseDto.class)))
     })
     @GetMapping("/user-list")
-    public ResponseDto<Page<UserWithInterestDto>> getUserList(
+    public ResponseDto<Page<UserWithInterestAndAnswerDto>> getUserList(
             Authentication authentication,
-            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
+            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
+            @RequestParam String step
             ){
         UserAccount user = (UserAccount) authentication.getPrincipal();
         String gender = user.getGender();
@@ -52,18 +50,16 @@ public class UserController {
         Page<UserAccount> users = null;
 
         if(gender.equals("M")){
-            users = userService.getUserList(score, "W", pageable);
+            users = userService.getUserList(score, "W", pageable, step);
         }else{
-            users = userService.getUserList(score, "M", pageable);
+            users = userService.getUserList(score, "M", pageable, step);
         }
-        Page<UserWithInterestDto> dtos = users.map(UserWithInterestDto::from);
+        Page<UserWithInterestAndAnswerDto> dtos = users.map(UserWithInterestAndAnswerDto::from);
 
-
-        return ResponseDto.<Page<UserWithInterestDto>>builder()
+        return ResponseDto.<Page<UserWithInterestAndAnswerDto>>builder()
                 .status("OK")
                 .message("성공적으로 조회되었습니다.")
                 .data(dtos).build();
-
     }
 
     @GetMapping("/user")

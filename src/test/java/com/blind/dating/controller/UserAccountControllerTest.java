@@ -2,10 +2,7 @@ package com.blind.dating.controller;
 
 import com.blind.dating.config.SecurityConfig;
 import com.blind.dating.domain.UserAccount;
-import com.blind.dating.dto.user.LoginInputDto;
-import com.blind.dating.dto.user.UserAccountDto;
-import com.blind.dating.dto.user.UserIdRequestDto;
-import com.blind.dating.dto.user.UserRequestDto;
+import com.blind.dating.dto.user.*;
 import com.blind.dating.security.TokenProvider;
 import com.blind.dating.service.CustomUserDetailsService;
 import com.blind.dating.service.InterestService;
@@ -132,10 +129,15 @@ class UserAccountControllerTest {
     void givenNickname_whenCheckNickname_thenReturnTrue() throws Exception {
         //Given
         String nickname = "user1";
+        ObjectMapper obj = new ObjectMapper();
+        UserNicknameRequestDto dto = new UserNicknameRequestDto();
+        dto.setNickname("pyjhoop");
         given(userAccountService.checkNickname(nickname)).willReturn(false);
 
         //When & Then
-        mvc.perform(get("/api/check-nickname/"+nickname))
+        mvc.perform(post("/api/check-nickname")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(obj.writeValueAsString(dto)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("OK"))
                 .andExpect(jsonPath("$.data").value(true));
@@ -146,13 +148,18 @@ class UserAccountControllerTest {
     void givenNickname_whenCheckNickname_thenReturnFalse() throws Exception {
         //Given
         String nickname = "user1";
+        ObjectMapper obj = new ObjectMapper();
+        UserNicknameRequestDto dto = new UserNicknameRequestDto();
+        dto.setNickname("pyjhoop");
         given(userAccountService.checkNickname(nickname)).willReturn(true);
 
         //When & Then
-        mvc.perform(get("/api/check-nickname/"+nickname))
+        mvc.perform(post("/api/check-nickname")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(obj.writeValueAsString(dto)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("OK"))
-                .andExpect(jsonPath("$.data").value(false));
+                .andExpect(jsonPath("$.data").value(true));
     }
 
 }

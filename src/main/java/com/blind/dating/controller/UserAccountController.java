@@ -145,7 +145,7 @@ public class UserAccountController {
         }
     }
 
-    @GetMapping("/check-nickname/{nickname}")
+    @PostMapping("/check-nickname")
     @Operation(summary = "닉네임 중복 체크", description = "닉네임 중복 체크")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK"),
@@ -154,8 +154,8 @@ public class UserAccountController {
             @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR", content = @Content(schema = @Schema(implementation = ResponseDto.class)))
     })
     @Parameter(name = "nickname", description = "닉네임", example = "nick01")
-    public ResponseDto<Boolean> checkNickname(@PathVariable String nickname){
-        boolean check = userAccountService.checkNickname(nickname);
+    public ResponseDto<Boolean> checkNickname(@RequestBody UserNicknameRequestDto dto){
+        boolean check = userAccountService.checkNickname(dto.getNickname());
 
         if(check){
             return ResponseDto.<Boolean>builder()

@@ -40,6 +40,12 @@ dependencies {
 	implementation 'org.springdoc:springdoc-openapi-ui:1.6.6'
 
 	runtimeOnly 'com.mysql:mysql-connector-j'
+
+	implementation 'org.springframework.boot:spring-boot-starter-websocket'
+	implementation group: 'org.webjars', name: 'stomp-websocket', version: '2.3.3-1'
+
+	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+	implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity5'
 }
 
 tasks.named('test') {

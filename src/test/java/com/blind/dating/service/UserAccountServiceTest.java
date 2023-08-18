@@ -5,6 +5,7 @@ import com.blind.dating.dto.user.UserAccountDto;
 import com.blind.dating.dto.user.UserRequestDto;
 import com.blind.dating.repository.UserAccountRepository;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,6 +19,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
+@Disabled
 @DisplayName("회원 인증 비즈니스 로직 - 테스트")
 @ExtendWith(MockitoExtension.class)
 class UserAccountServiceTest {

@@ -7,10 +7,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
-import java.util.Collection;
-import java.util.LinkedHashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.time.LocalDateTime;
+import java.util.*;
 
 @Getter
 @ToString(callSuper = true)
@@ -65,6 +63,9 @@ public class UserAccount extends BaseEntity implements UserDetails {
     @Setter
     private String selfIntroduction;
 
+    @Setter
+    private LocalDateTime recentLogin;
+
     @OrderBy("createdAt DESC")
     @OneToMany(mappedBy = "sender", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @ToString.Exclude
@@ -78,7 +79,7 @@ public class UserAccount extends BaseEntity implements UserDetails {
     @ToString.Exclude
     private final Set<Answer> answers = new LinkedHashSet<>();
 
-    @OneToMany(mappedBy = "userAccount",fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "receiver",fetch = FetchType.EAGER)
     @ToString.Exclude
     private final Set<LikesUnlikes> likesUnlikes = new LinkedHashSet<>();
 

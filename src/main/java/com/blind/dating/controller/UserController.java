@@ -21,6 +21,9 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Tag(name = "User Info", description = "유저 조회 서비스")
 @RestController
 @RequiredArgsConstructor
@@ -40,19 +43,17 @@ public class UserController {
     @GetMapping("/user-list")
     public ResponseDto<Page<UserWithInterestAndAnswerDto>> getUserList(
             Authentication authentication,
-            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
-            @RequestParam String step
+            @PageableDefault(size = 10, sort = "recentLogin", direction = Sort.Direction.DESC) Pageable pageable
             ){
         UserAccount user = (UserAccount) authentication.getPrincipal();
         String gender = user.getGender();
-        int score = user.getScore();
 
         Page<UserAccount> users = null;
 
         if(gender.equals("M")){
-            users = userService.getUserList(score, "W", pageable, step);
+            users = userService.getUserList("W", authentication, pageable);
         }else{
-            users = userService.getUserList(score, "M", pageable, step);
+            users = userService.getUserList("M", authentication, pageable);
         }
         Page<UserWithInterestAndAnswerDto> dtos = users.map(UserWithInterestAndAnswerDto::from);
 

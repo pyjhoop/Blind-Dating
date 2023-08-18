@@ -7,6 +7,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -17,6 +20,7 @@ public class UserAccountService {
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
 
+    @Transactional
     public UserAccount create(UserRequestDto dto, String refreshToken){
 
         if(dto == null || dto.getUserId() == null){
@@ -31,6 +35,7 @@ public class UserAccountService {
         }
 
         UserAccount user = dto.toEntity();
+        user.setRecentLogin(LocalDateTime.now());
         user.setRefreshToken(refreshToken);
         user.setDeleted(false);
         user.setUserPassword(bCryptPasswordEncoder.encode(dto.getUserPassword()));
@@ -38,12 +43,14 @@ public class UserAccountService {
         return userAccountRepository.save(user);
     }
 
+    @Transactional
     public UserAccount getByCredentials(String userId, String userPassword){
         log.info(userId + userPassword);
 
         BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
 
         UserAccount user = userAccountRepository.findByUserId(userId);
+        user.setRecentLogin(LocalDateTime.now());
 
         if(bCryptPasswordEncoder.matches(userPassword,user.getUserPassword())){
             return user;

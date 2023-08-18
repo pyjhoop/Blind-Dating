@@ -3,6 +3,7 @@ package com.blind.dating.service;
 import com.blind.dating.domain.LikesUnlikes;
 import com.blind.dating.domain.UserAccount;
 import com.blind.dating.repository.LikesUnlikesRepository;
+import com.blind.dating.repository.UserAccountRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
@@ -15,16 +16,20 @@ import java.util.Optional;
 public class LikesUnlikesService {
 
     private final LikesUnlikesRepository likesUnlikesRepository;
+    private final UserAccountRepository userAccountRepository;
 
     @Transactional
     public LikesUnlikes likeUser(Authentication authentication, String receiverId){
         UserAccount userAccount = (UserAccount)authentication.getPrincipal();
         Long receiver = Long.parseLong(receiverId);
 
+        // receiverId로 유저 조회
+        UserAccount receiverAccount = userAccountRepository.findById(receiver).get();
+
         // 먼저 상태가 어떤지 확인
-        Optional<LikesUnlikes> likesUnlikes = likesUnlikesRepository.findByUserAccountAndReceiverId(userAccount, receiver);
+        Optional<LikesUnlikes> likesUnlikes = likesUnlikesRepository.findByUserIdAndReceiverId(userAccount.getId(), receiver);
         if(likesUnlikes.isEmpty()){
-            LikesUnlikes like = LikesUnlikes.of(userAccount, receiver, true);
+            LikesUnlikes like = LikesUnlikes.of(userAccount.getId(), receiverAccount, true);
 
             LikesUnlikes result = likesUnlikesRepository.save(like);
             return result;
@@ -50,10 +55,13 @@ public class LikesUnlikesService {
         UserAccount userAccount = (UserAccount)authentication.getPrincipal();
         Long receiver = Long.parseLong(receiverId);
 
+        // receiverId로 유저 조회
+        UserAccount receiverAccount = userAccountRepository.findById(receiver).get();
+
         // 먼저 상태가 어떤지 확인
-        Optional<LikesUnlikes> likesUnlikes = likesUnlikesRepository.findByUserAccountAndReceiverId(userAccount, receiver);
+        Optional<LikesUnlikes> likesUnlikes = likesUnlikesRepository.findByUserIdAndReceiverId(userAccount.getId(), receiver);
         if(likesUnlikes.isEmpty()){
-            LikesUnlikes like = LikesUnlikes.of(userAccount, receiver, false);
+            LikesUnlikes like = LikesUnlikes.of(userAccount.getId(), receiverAccount, false);
 
             LikesUnlikes result = likesUnlikesRepository.save(like);
             return result;

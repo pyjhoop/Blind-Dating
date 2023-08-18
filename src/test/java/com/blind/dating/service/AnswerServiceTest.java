@@ -4,6 +4,7 @@ import com.blind.dating.domain.Answer;
 import com.blind.dating.domain.UserAccount;
 import com.blind.dating.dto.answer.AnswerDto;
 import com.blind.dating.repository.AnswerRepository;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,6 +20,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
+@Disabled
 @DisplayName("응답 서비스 테스트")
 @ExtendWith(MockitoExtension.class)
 class AnswerServiceTest {

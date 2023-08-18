@@ -8,5 +8,5 @@ import java.util.Optional;
 
 public interface LikesUnlikesRepository extends JpaRepository<LikesUnlikes, Long> {
 
-    Optional<LikesUnlikes> findByUserAccountAndReceiverId(UserAccount userAccount, Long receiverId);
+    Optional<LikesUnlikes> findByUserIdAndReceiverId(Long userId, Long receiverId);
 }

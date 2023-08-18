@@ -18,24 +18,23 @@ public class LikesUnlikes {
     private Long id;
 
     @Setter
-    @ManyToOne
-    private UserAccount userAccount;
+    private Long userId;
 
     @Setter
-    @Column(nullable = false)
-    private Long receiverId;
+    @ManyToOne
+    private UserAccount receiver;
 
     @Setter
     private Boolean isLike;
 
-    private LikesUnlikes(UserAccount userAccount, Long receiverId, Boolean isLike) {
-        this.userAccount = userAccount;
-        this.receiverId = receiverId;
+    private LikesUnlikes(Long userId, UserAccount receiver, Boolean isLike) {
+        this.userId = userId;
+        this.receiver = receiver;
         this.isLike = isLike;
     }
 
-    public static LikesUnlikes of(UserAccount userAccount, Long receiverId, Boolean isLike) {
-        return new LikesUnlikes(userAccount, receiverId, isLike);
+    public static LikesUnlikes of(Long userId, UserAccount receiver, Boolean isLike) {
+        return new LikesUnlikes(userId, receiver, isLike);
     }
 
     @Override

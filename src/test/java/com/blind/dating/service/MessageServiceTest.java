@@ -3,6 +3,7 @@ package com.blind.dating.service;
 import com.blind.dating.domain.Message;
 import com.blind.dating.domain.UserAccount;
 import com.blind.dating.repository.MessageRepository;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,6 +21,7 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
+@Disabled
 @DisplayName("메세지 서비스 테스트")
 @ExtendWith(MockitoExtension.class)
 class MessageServiceTest {

@@ -38,16 +38,17 @@ public class LikesUnlikesController {
             Authentication authentication
     ){
 
-        LikesUnlikes result = likesUnlikesService.likeUser(authentication,userReceiverId.getReceiverId());
+        ResponseDto<LikesUnlikes> result = likesUnlikesService.likeUser(authentication,userReceiverId.getReceiverId());
         String message = "";
-        if(result.getIsLike()== null){
+        if(result.getData().getIsLike()== null){
             message = "좋아요 취소";
         }else{
             message = "좋아요 성공";
         }
         return ResponseEntity.<ResponseDto>status(HttpStatus.OK)
                 .body(ResponseDto.builder().status("OK")
-                        .message(message).build());
+                        .message(message)
+                        .data(result.getMessage()).build());
 
     }
 

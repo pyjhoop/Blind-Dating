@@ -1,5 +1,6 @@
 package com.blind.dating.domain;
 
+import lombok.Getter;
 import lombok.ToString;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -9,7 +10,7 @@ import javax.persistence.Column;
 import javax.persistence.EntityListeners;
 import javax.persistence.MappedSuperclass;
 import java.time.LocalDateTime;
-
+@Getter
 @ToString
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)

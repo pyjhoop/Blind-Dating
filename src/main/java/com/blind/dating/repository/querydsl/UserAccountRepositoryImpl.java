@@ -64,10 +64,9 @@ public class UserAccountRepositoryImpl extends QuerydslRepositorySupport impleme
                    user.gender.eq(gender)
                            .and(likesUnlikes.userId.ne(userId).or(likesUnlikes.userId.isNull()))
                 )
-                .orderBy(ORDERS.stream().toArray(OrderSpecifier[]::new))
+                .orderBy(user.recentLogin.desc())
                 .offset(pageable.getOffset())   // (2) 페이지 번호
                 .limit(pageable.getPageSize())
-
                 .fetch();
 
         Long count = queryFactory
@@ -95,7 +94,7 @@ public class UserAccountRepositoryImpl extends QuerydslRepositorySupport impleme
             for (Sort.Order order : pageable.getSort()) {
                 Order direction = order.getDirection().isAscending() ? Order.ASC : Order.DESC;
                 switch (order.getProperty()) {
-                    case "id":
+                    case "recentLogin":
                         OrderSpecifier<?> orderId = QueryDslUtil.getSortedColumn(direction, QLikesUnlikes.likesUnlikes, "recentLogin");
                         ORDERS.add(orderId);
                         break;

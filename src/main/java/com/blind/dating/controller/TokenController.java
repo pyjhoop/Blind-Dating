@@ -28,7 +28,7 @@ public class TokenController {
     private final TokenService tokenService;
     private final TokenProvider tokenProvider;
 
-    @GetMapping("/token/refresh")
+    @PutMapping ("/token/refresh")
     @Operation(summary = "AccessToken 재발급", description = "RefreshToken 으로 AccessToken 을 재발급 합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK"),

@@ -2,6 +2,7 @@ package com.blind.dating.controller;
 
 import com.blind.dating.domain.LikesUnlikes;
 import com.blind.dating.dto.response.ResponseDto;
+import com.blind.dating.dto.user.UserReceiverId;
 import com.blind.dating.service.LikesUnlikesService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -13,10 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "Like & Unlike", description = "좋아요, 싫어요 서비스")
 @RequiredArgsConstructor
@@ -26,7 +24,7 @@ public class LikesUnlikesController {
 
     private final LikesUnlikesService likesUnlikesService;
 
-    @GetMapping("/like/{receiverId}")
+    @PostMapping("/like")
     @Operation(summary = "좋아요", description = "좋아요 버튼 클릭시 상태에 따라 좋아요 상태를 반환한다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK"),
@@ -36,11 +34,11 @@ public class LikesUnlikesController {
 
     })
     public ResponseEntity<ResponseDto> likeUser(
-            @PathVariable String receiverId,
+            @RequestBody UserReceiverId userReceiverId,
             Authentication authentication
     ){
 
-        LikesUnlikes result = likesUnlikesService.likeUser(authentication,receiverId);
+        LikesUnlikes result = likesUnlikesService.likeUser(authentication,userReceiverId.getReceiverId());
         String message = "";
         if(result.getIsLike()== null){
             message = "좋아요 취소";
@@ -53,7 +51,7 @@ public class LikesUnlikesController {
 
     }
 
-    @GetMapping("/unlike/{receiverId}")
+    @PostMapping("/unlike")
     @Operation(summary = "싫어요", description = "싫어요 버튼 클릭시 상태에 따라 싫어요 상태를 반환한다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK"),
@@ -63,11 +61,11 @@ public class LikesUnlikesController {
 
     })
     public ResponseEntity<ResponseDto> unlikeUser(
-            @PathVariable String receiverId,
+            @RequestBody UserReceiverId userReceiverId,
             Authentication authentication
     ){
 
-        LikesUnlikes result = likesUnlikesService.unlikeUser(authentication,receiverId);
+        LikesUnlikes result = likesUnlikesService.unlikeUser(authentication,userReceiverId.getReceiverId());
         String message = "";
         if(result.getIsLike()== null){
             message = "싫어요 취소";

@@ -4,18 +4,34 @@ import com.blind.dating.domain.UserAccount;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import java.util.List;
 
 @Data
 @NoArgsConstructor
 public class UserRequestDto {
 
+    @NotNull(message = "아이디는 필수 입력 값입니다.")
+    @Pattern(regexp = "^[A-Za-z0-9가-힣]{5,20}$", message = "아이디는 문자, 숫자, 한글만 가능하며, 길이는 5~20사이만 가능합니다.")
     private String userId;
+
+    @NotNull(message = "비밀번호는 필수 입력 값입니다.")
+    @Pattern(regexp = "^[A-Za-z0-9가-힣]{8,20}$", message = "패스워드는 문자, 숫자, 한글만 가능하며, 길이는 8~20사이만 가능합니다.")
     private String userPassword;
+
+    @NotNull(message = "닉네임은 필수 입력 값입니다.")
+    @Pattern(regexp = "^[A-Za-z0-9가-힣]{3,20}$", message = "닉네임은 문자, 숫자, 한글만 가능하며, 길이는 3~20사이만 가능합니다.")
     private String nickname;
+
+    @NotNull(message = "지역은 필수 입력 값입니다.")
     private String region;
     private int score;
+
+    @NotNull(message = "MBTI는 필수 입력 값입니다.")
     private String mbti;
+
+    @NotNull(message = "성별은 필수 입력 값입니다.")
     private String gender;
     private List<String> interests;
     private List<Boolean> questions;

@@ -10,6 +10,7 @@ public class ChatRequestDto {
     private String chatRoomId;
     private String writerId;
     private String message;
+    private String status;
 
     public ChatRequestDto(String chatRoomId, String writerId, String message) {
         this.chatRoomId = chatRoomId;

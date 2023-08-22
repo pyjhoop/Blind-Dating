@@ -1,6 +1,10 @@
 package com.blind.dating.handler;
 
+import com.blind.dating.domain.Chat;
+import com.blind.dating.domain.ReadChat;
 import com.blind.dating.dto.user.UserSession;
+import com.blind.dating.repository.ChatRepository;
+import com.blind.dating.repository.ReadChatRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +29,8 @@ public class CustomWebSocketInterceptor implements ChannelInterceptor {
 
     // session을 관리하는 핸들러
     private final SessionHandler sessionHandler;
+    private final ChatRepository chatRepository;
+    private final ReadChatRepository readChatRepository;
 
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
@@ -32,9 +38,6 @@ public class CustomWebSocketInterceptor implements ChannelInterceptor {
 
         // CONNECT, DISCONNECT 등 상태를 알아내줌
         StompCommand command = accessor.getCommand();
-
-        System.out.println(command);
-        System.out.println("+======================");
 
         if (command == null) {
             return message;
@@ -49,31 +52,23 @@ public class CustomWebSocketInterceptor implements ChannelInterceptor {
 
                 //방번호로 접속해있는 유저를 찾기 위해 세션에 방번호 저장.
                 accessor.getSessionAttributes().put("roomId",roomId);
-                System.out.println(username);
+                Chat chat = chatRepository.findFirstByChatRoomIdOrderByCreatedAtDesc(Long.valueOf(roomId));
+                ReadChat readChat = readChatRepository.findByRoomIdAndUserId(Long.valueOf(roomId), Long.valueOf(userId)).get();
+                readChat.setChatId(chat.getId());
+                readChatRepository.save(readChat);
 
                 // 접속중인 유저 정보 인스턴스 생성
                 UserSession userSession = new UserSession(username, userId, accessor.getSessionId(), roomId);
 
-                System.out.println(accessor.getSessionId());
                 //유저정보 sessionhandler에 저장하기.
                 sessionHandler.addSession(userSession);
-                System.out.println(sessionHandler.getUsers(roomId));
                 break;
             case DISCONNECT:
-                // 세션 종료 처리
-//                Principal principal = accessor.getUser();
-//                if (principal != null) {
-//                    String sessionId = principal.getName();
-//                    sessionHandler.removeSession(sessionId);
-//                }
-                System.out.println("방번호 ");
-                System.out.println(accessor.getSessionAttributes().get("roomId"));
 
+                // 세션 종료 처리
                 String roomId1 = accessor.getSessionAttributes().get("roomId").toString();
                 String sessionId = accessor.getSessionId();
                 sessionHandler.removeSession(roomId1,sessionId);
-
-                System.out.println(sessionHandler.getUsers(roomId1));
                 break;
             default:
                 break;

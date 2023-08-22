@@ -12,9 +12,7 @@ public interface ChatRepository extends JpaRepository<Chat,Long> {
 
     Long countByIdBetween(Long chatId1, Long chatId2);
 
-
-
-
+    Chat findFirstByChatRoomIdOrderByCreatedAtDesc(Long roomId);
 
 
 }

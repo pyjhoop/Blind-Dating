@@ -25,6 +25,7 @@ public class StompChatController {
     private final SimpMessagingTemplate template; //특정 Broker로 메세지를 전달
     private final ChatService chatService;
     private final ReadChatService readChatService;
+    private final SessionHandler sessionHandler;
 
 
     //Client가 SEND할 수 있는 경로

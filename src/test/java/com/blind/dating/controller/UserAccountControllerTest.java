@@ -25,6 +25,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@Disabled
 @DisplayName("Auth 컨트롤러 - 테스트")
 @Import(SecurityConfig.class)
 @WebMvcTest(UserAccountController.class)

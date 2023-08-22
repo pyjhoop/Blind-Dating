@@ -1,9 +1,24 @@
 package com.blind.dating.config;
 
+import com.blind.dating.handler.CustomWebSocketInterceptor;
+import com.blind.dating.handler.SocketHandler;
+import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
+import org.springframework.messaging.support.ChannelInterceptor;
+import org.springframework.web.socket.CloseStatus;
+import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.config.annotation.*;
+import org.springframework.web.socket.handler.TextWebSocketHandler;
+import org.springframework.web.socket.server.HandshakeInterceptor;
+import org.springframework.web.socket.server.support.DefaultHandshakeHandler;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+@RequiredArgsConstructor
 @Configuration
 @EnableWebSocketMessageBroker
 public class StompWebSocketConfig implements WebSocketMessageBrokerConfigurer {
@@ -11,6 +26,10 @@ public class StompWebSocketConfig implements WebSocketMessageBrokerConfigurer {
     //Get /info 404 Error가 발생한다. 그래서 아래와 같이 2개의 계층으로 분리하고
     //origins를 개발 도메인으로 변경하니 잘 동작하였다.
     //이유는 왜 그런지 아직 찾지 못함
+    private final SocketHandler socketHandler;
+    private final CustomWebSocketInterceptor customWebSocketInterceptor;
+    // 세션 관리를 위한 맵을 선언합니다.
+    private final Map<String, WebSocketSession> sessions = new ConcurrentHashMap<>();
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/stomp/chat")
@@ -25,5 +44,9 @@ public class StompWebSocketConfig implements WebSocketMessageBrokerConfigurer {
         registry.enableSimpleBroker("/sub");
     }
 
+    @Override
+    public void configureClientInboundChannel(ChannelRegistration registration) {
+        registration.interceptors(customWebSocketInterceptor);
+    }
 
 }

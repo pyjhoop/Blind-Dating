@@ -30,9 +30,8 @@ public class ChatRoom extends BaseEntity{
     @OneToOne
     private UserAccount user2;
 
-    @OneToMany
-    @ToString.Exclude
-    private final Set<Chat> chats = new LinkedHashSet<>();
+    @Setter
+    private String recentMessage;
 
     public ChatRoom(UserAccount user1, UserAccount user2) {
         this.user1 = user1;

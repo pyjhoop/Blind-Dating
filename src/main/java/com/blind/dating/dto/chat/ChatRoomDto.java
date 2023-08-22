@@ -2,27 +2,26 @@ package com.blind.dating.dto.chat;
 
 import com.blind.dating.domain.ChatRoom;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Data
+@NoArgsConstructor
 public class ChatRoomDto {
 
     private Long roomId;
-    private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private String user1Nickname;
-    private String user2Nickname;
+    private Long otherUserid;
+    private String otherUserNickname;
+    private String recentMessage;
+    private Long unReadCount;
 
-    public ChatRoomDto(Long roomId, LocalDateTime createdAt, LocalDateTime updatedAt, String user1Nickname, String user2Nickname) {
+    public ChatRoomDto(Long roomId, LocalDateTime updatedAt, Long otherUserid, String otherUserNickname, String recentMessage) {
         this.roomId = roomId;
-        this.createdAt = createdAt;
         this.updatedAt = updatedAt;
-        this.user1Nickname = user1Nickname;
-        this.user2Nickname = user2Nickname;
-    }
-
-    public static ChatRoomDto from(ChatRoom room){
-        return new ChatRoomDto(room.getId(), room.getCreatedAt(), room.getUpdatedAt(),room.getUser1().getNickname(), room.getUser2().getNickname());
+        this.otherUserid = otherUserid;
+        this.otherUserNickname = otherUserNickname;
+        this.recentMessage = recentMessage;
     }
 }

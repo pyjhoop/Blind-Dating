@@ -1,9 +1,12 @@
 package com.blind.dating.service;
 
+import com.blind.dating.domain.ChatRoom;
 import com.blind.dating.domain.LikesUnlikes;
+import com.blind.dating.domain.ReadChat;
 import com.blind.dating.domain.UserAccount;
 import com.blind.dating.dto.response.ResponseDto;
 import com.blind.dating.repository.LikesUnlikesRepository;
+import com.blind.dating.repository.ReadChatRepository;
 import com.blind.dating.repository.UserAccountRepository;
 import com.blind.dating.repository.querydsl.LikesUnlikesRepositoryImpl;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +25,7 @@ public class LikesUnlikesService {
     private final UserAccountRepository userAccountRepository;
     private final LikesUnlikesRepositoryImpl likesUnlikesRepositoryImpl;
     private final ChattingRoomService chatRoomService;
+    private final ReadChatRepository readChatRepository;
 
     @Transactional
     public ResponseDto<LikesUnlikes> likeUser(Authentication authentication, String receiverId){
@@ -42,11 +46,15 @@ public class LikesUnlikesService {
         // receiverId를 가진 유저가 나를 이미 좋아요 눌렀는지 확인 후 좋아요 눌렀으면 채팅 방 생성하기.
         List<LikesUnlikes> list = likesUnlikesRepositoryImpl.findLikes(receiverAccount.getId(), userAccount);
 
-
+        //ReadChat도 생성해야함.
+        ChatRoom chatRoom = null;
         if(list.isEmpty()){
             bol = false;
         }else {
-            chatRoomService.create(userAccount, receiverAccount);
+            chatRoom = chatRoomService.create(userAccount, receiverAccount);
+            // 여기서 ReadChat 생성
+            readChatRepository.save(ReadChat.of(chatRoom.getId(),userAccount.getId(),0L));
+            readChatRepository.save(ReadChat.of(chatRoom.getId(),receiverAccount.getId(),0L));
             bol = true;
         }
 

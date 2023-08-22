@@ -11,6 +11,7 @@
 <div class="container">
   <div class="col-6">
     <h1>[[${room.name}]]</h1>
+    <input type="text" id="userId">
   </div>
   <div>
     <div id="msgArea" class="col"></div>
@@ -29,18 +30,17 @@
 <script th:inline="javascript">
   $(document).ready(function(){
 
+    var userId = 2;
     var roomName = [[${room.name}]];
-    var roomId = [[${room.roomId}]];
+    var roomId = 1;
     var username = "user"+Date.now();
-
-    console.log(roomName + ", " + roomId + ", " + username);
 
     var sockJs = new SockJS("/stomp/chat");
     //1. SockJS를 내부에 들고있는 stomp를 내어줌
     var stomp = Stomp.over(sockJs);
 
     //2. connection이 맺어지면 실행
-    stomp.connect({}, function (){
+    stomp.connect({username:username,roomId:roomId, userId:userId}, function (){
       console.log("STOMP Connection")
 
       //4. subscribe(path, callback)으로 메세지를 받을 수 있음
@@ -77,9 +77,10 @@
       var msg = document.getElementById("msg");
 
       console.log(username + ":" + msg.value);
-      stomp.send('/pub/chat/message', {}, JSON.stringify({roomId: roomId, message: msg.value, writer: username}));
+      stomp.send('/pub/chat/message', {}, JSON.stringify({chatRoomId: roomId, writerId: userId, message: msg.value}));
       msg.value = '';
     });
+
   });
 </script>
 <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>

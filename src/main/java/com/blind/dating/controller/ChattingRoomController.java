@@ -2,6 +2,7 @@ package com.blind.dating.controller;
 
 import com.blind.dating.domain.Chat;
 import com.blind.dating.domain.ChatRoom;
+import com.blind.dating.domain.UserAccount;
 import com.blind.dating.dto.chat.ChatDto;
 import com.blind.dating.dto.chat.ChatRoomDto;
 import com.blind.dating.dto.response.ResponseDto;
@@ -20,6 +21,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -48,9 +50,28 @@ public class ChattingRoomController {
     @Parameter(name = "userId", description = "회원의 현재 번호")
     public ResponseEntity<ResponseDto> getMyMessageList(
             @PathVariable String userId,
-            @PageableDefault(size = 10, sort = "updatedAt", direction = Sort.Direction.DESC) Pageable pageable
+            @PageableDefault(size = 10, sort = "updatedAt", direction = Sort.Direction.DESC) Pageable pageable,
+            Authentication authentication
     ){
-        Page<ChatRoomDto> rooms = chattingRoomService.getRooms(userId, pageable).map(ChatRoomDto::from);
+        UserAccount userAccount = (UserAccount) authentication.getPrincipal();
+        Page<ChatRoomDto> rooms = chattingRoomService.getRooms(userId, pageable).map(chatRoom -> {
+            ChatRoomDto dto = new ChatRoomDto();
+            if(chatRoom.getUser1().getId() != userAccount.getId()){
+                chatRoom.setUser2(chatRoom.getUser1());
+            }
+            Long unReadCount = chatService.unreadChat(userAccount.getId(), chatRoom.getId());
+
+            dto.setRoomId(chatRoom.getId());
+            dto.setUpdatedAt(chatRoom.getUpdatedAt());
+            dto.setOtherUserid(chatRoom.getUser2().getId());
+            dto.setOtherUserNickname(chatRoom.getUser2().getNickname());
+            dto.setRecentMessage(chatRoom.getRecentMessage());
+            dto.setUnReadCount(unReadCount);
+
+            // 읽지 않은 메세지 개수도 조회 해야함.
+
+            return dto;
+        });
 
         return ResponseEntity.<ResponseDto>ok()
                 .body(ResponseDto.builder()

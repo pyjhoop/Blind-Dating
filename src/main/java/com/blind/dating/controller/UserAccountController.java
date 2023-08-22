@@ -19,9 +19,14 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -54,9 +59,23 @@ public class UserAccountController {
             @Parameter(name = "gender", description = "성별", example = "M"),
     })
     @PostMapping("/signup")
-    public ResponseDto<UserResponse> registerUser(
-            @RequestBody UserRequestDto dto
+    public ResponseEntity<ResponseDto> registerUser(
+            @RequestBody @Valid UserRequestDto dto,
+            Errors errors
             ){
+        if (errors.hasErrors()) {
+
+            // 유효성 통과 못한 필드와 메시지를 핸들링
+            Map<String, String> validatorResult = userAccountService.validateHandling(errors);
+            return ResponseEntity.<ResponseDto>badRequest()
+                    .body(ResponseDto.builder()
+                            .status("BAD REQUEST")
+                            .message("회원가입에 실패했습니다.")
+                            .data(validatorResult)
+                            .build());
+
+        }
+
 
         //TODO 필수데이터가 부족할때 통합 예외처리해주기
         String accessToken = tokenProvider.create(dto.toEntity());
@@ -74,11 +93,16 @@ public class UserAccountController {
         TokenDto tokens = TokenDto.builder().refreshToken(refreshToken)
                 .accessToken(accessToken).build();
 
-        return ResponseDto.<UserResponse>builder()
-                .status("success")
-                .message("회원가입이 성공적으로 완료되었습니다.")
-                .data(UserResponse.from(user, tokens))
-                .build();
+
+
+
+        return ResponseEntity.<ResponseDto>ok()
+                .body(ResponseDto.builder()
+                        .status("OK")
+                        .message("회원가입이 성공적으로 완료되었습니다.")
+                        .data(UserResponse.from(user, tokens))
+                        .build());
+
     }
 
     @PostMapping("/login")

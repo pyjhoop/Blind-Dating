@@ -3,6 +3,7 @@ package com.blind.dating.handler;
 import com.blind.dating.domain.Chat;
 import com.blind.dating.domain.ReadChat;
 import com.blind.dating.dto.user.UserSession;
+import com.blind.dating.handler.SessionHandler;
 import com.blind.dating.repository.ChatRepository;
 import com.blind.dating.repository.ReadChatRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,7 @@ import org.springframework.messaging.support.MessageHeaderAccessor;
 import org.springframework.stereotype.Component;
 
 import java.security.Principal;
+import java.util.Optional;
 
 /**
  * 웹 소켓에 연결되거나 연결이 끊겼을때 session을 관리하기 위한 인터셉터
@@ -52,14 +54,18 @@ public class CustomWebSocketInterceptor implements ChannelInterceptor {
 
                 //방번호로 접속해있는 유저를 찾기 위해 세션에 방번호 저장.
                 accessor.getSessionAttributes().put("roomId",roomId);
-                Chat chat = chatRepository.findFirstByChatRoomIdOrderByCreatedAtDesc(Long.valueOf(roomId));
+
+                Optional<Chat> chat = chatRepository.findFirstByChatRoomIdOrderByCreatedAtDesc(Long.valueOf(roomId));
+                Long chatId = 0L;
+                if(chat.isPresent()){
+                    chatId = chat.get().getId();
+                }
+
                 ReadChat readChat = readChatRepository.findByRoomIdAndUserId(Long.valueOf(roomId), Long.valueOf(userId)).get();
-                readChat.setChatId(chat.getId());
-                readChatRepository.save(readChat);
+                readChat.setChatId(chatId);
 
                 // 접속중인 유저 정보 인스턴스 생성
-                UserSession userSession = new UserSession(username, userId, accessor.getSessionId(), roomId);
-
+                UserSession userSession = UserSession.of(username, userId, accessor.getSessionId(), roomId);
                 //유저정보 sessionhandler에 저장하기.
                 sessionHandler.addSession(userSession);
                 break;

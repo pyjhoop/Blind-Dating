@@ -1,9 +1,7 @@
 package com.blind.dating.controller;
 
 import com.blind.dating.domain.Chat;
-import com.blind.dating.dto.chat.ChatMessageDto;
 import com.blind.dating.dto.chat.ChatRequestDto;
-import com.blind.dating.dto.user.UserSession;
 import com.blind.dating.handler.SessionHandler;
 import com.blind.dating.service.ChatService;
 import com.blind.dating.service.ReadChatService;
@@ -12,11 +10,6 @@ import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
-
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Controller
 @RequiredArgsConstructor

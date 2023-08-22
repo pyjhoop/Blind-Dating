@@ -18,6 +18,7 @@ public class UserRequestDto {
     private String mbti;
     private String gender;
     private List<String> interests;
+    private List<Boolean> questions;
     private String selfIntroduction;
 
     private UserRequestDto(String userId, String userPassword, String nickname, String region, int score, String mbti, String gender, String selfIntroduction) {

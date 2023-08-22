@@ -14,10 +14,14 @@ public class UserSession {
     private String sessionId;
     private String roomId;
 
-    public UserSession(String userName, String userId, String sessionId, String roomId) {
+    private UserSession(String userName, String userId, String sessionId, String roomId) {
         this.userName = userName;
         this.userId = userId;
         this.sessionId = sessionId;
         this.roomId = roomId;
+    }
+
+    public static UserSession of(String userName, String userId, String sessionId, String roomId) {
+        return new UserSession(userName, userId, sessionId, roomId);
     }
 }

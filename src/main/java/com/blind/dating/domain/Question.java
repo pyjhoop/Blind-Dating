@@ -18,17 +18,21 @@ public class Question {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @ManyToOne()
+    private UserAccount userAccount;
+
     @Setter
-    @Column(length = 1000, nullable = false)
-    private String content;
+    private Boolean status;
 
-    public Question(String content) {
-        this.content = content;
+    private Question(UserAccount userAccount, Boolean status) {
+        this.userAccount = userAccount;
+        this.status = status;
     }
 
-    public static Question of( String answer){
-        return new Question(answer);
+    public static Question of(UserAccount userAccount, Boolean status) {
+        return new Question(userAccount, status);
     }
+
 
     @Override
     public boolean equals(Object o) {

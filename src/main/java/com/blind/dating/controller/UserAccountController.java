@@ -6,6 +6,7 @@ import com.blind.dating.dto.user.*;
 import com.blind.dating.dto.response.ResponseDto;
 import com.blind.dating.security.TokenProvider;
 import com.blind.dating.service.InterestService;
+import com.blind.dating.service.QuestionService;
 import com.blind.dating.service.UserAccountService;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.swagger.v3.oas.annotations.Operation;
@@ -33,6 +34,7 @@ public class UserAccountController {
     private final UserAccountService userAccountService;
     private final TokenProvider tokenProvider;
     private final InterestService interestService;
+    private final QuestionService questionService;
 
     @Operation(summary = "회원가입", description = "유저정보를 받아서 회원가입을 진행합니다.")
     @ApiResponses(value = {
@@ -62,6 +64,9 @@ public class UserAccountController {
         UserAccount user = userAccountService.create(dto, refreshToken);
 
         List<String> interests = dto.getInterests();
+        List<Boolean> questions = dto.getQuestions();
+        questionService.saveQuestions(user,questions);
+
 
         List<InterestResponse> list = interestService.saveInterest(user,interests)
                 .stream().map(InterestResponse::from).collect(Collectors.toList());

@@ -1,15 +1,8 @@
 package com.blind.dating.handler;
 
 import com.blind.dating.dto.user.UserSession;
-import lombok.Data;
 import org.springframework.stereotype.Component;
-import org.springframework.web.socket.WebSocketSession;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 @Component
 public class SessionHandler {

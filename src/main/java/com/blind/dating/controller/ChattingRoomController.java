@@ -6,6 +6,7 @@ import com.blind.dating.domain.UserAccount;
 import com.blind.dating.dto.chat.ChatDto;
 import com.blind.dating.dto.chat.ChatRoomDto;
 import com.blind.dating.dto.response.ResponseDto;
+import com.blind.dating.dto.user.UserWithInterestAndAnswerDto;
 import com.blind.dating.service.ChatService;
 import com.blind.dating.service.ChattingRoomService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -48,7 +49,7 @@ public class ChattingRoomController {
             @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR", content = @Content(schema = @Schema(implementation = ResponseDto.class)))
     })
     @Parameter(name = "userId", description = "회원의 현재 번호")
-    public ResponseEntity<ResponseDto> getMyMessageList(
+    public ResponseDto<Page<ChatRoomDto>> getMyMessageList(
             @PathVariable String userId,
             @PageableDefault(size = 10, sort = "updatedAt", direction = Sort.Direction.DESC) Pageable pageable,
             Authentication authentication
@@ -73,11 +74,11 @@ public class ChattingRoomController {
             return dto;
         });
 
-        return ResponseEntity.<ResponseDto>ok()
-                .body(ResponseDto.builder()
-                        .status("OK")
-                        .message("채팅방이 성공적으로 조회되었습니다.")
-                        .data(rooms).build());
+        return ResponseDto.<Page<ChatRoomDto>>builder()
+                .status("OK")
+                .message("설공적으로 조회되었습니다.")
+                .data(rooms)
+                .build();
     }
 
     @GetMapping("/chatroom/{roomId}")

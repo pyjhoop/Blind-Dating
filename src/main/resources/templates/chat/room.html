@@ -35,7 +35,7 @@
     var roomId = 1;
     var username = "user"+Date.now();
 
-    var sockJs = new SockJS("/stomp/chat");
+    var sockJs = new SockJS("http://52.78.66.72:8081/stomp/chat");
     //1. SockJS를 내부에 들고있는 stomp를 내어줌
     var stomp = Stomp.over(sockJs);
 

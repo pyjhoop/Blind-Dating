@@ -54,7 +54,7 @@ public class CustomWebSocketInterceptor implements ChannelInterceptor {
                 System.out.println("============");
                 System.out.println("userName: "+username);
                 System.out.println("roomId: "+roomId);
-                System.out.println("roomId: "+roomId);
+                System.out.println("userId: "+userId);
 
                 //방번호로 접속해있는 유저를 찾기 위해 세션에 방번호 저장.
                 accessor.getSessionAttributes().put("roomId",roomId);
@@ -65,8 +65,15 @@ public class CustomWebSocketInterceptor implements ChannelInterceptor {
                     chatId = chat.get().getId();
                 }
 
-                ReadChat readChat = readChatRepository.findByRoomIdAndUserId(Long.valueOf(roomId), Long.valueOf(userId)).get();
-                readChat.setChatId(chatId);
+                Optional<ReadChat> readChat = readChatRepository.findByRoomIdAndUserId(Long.valueOf(roomId), Long.valueOf(userId));
+                if(readChat.isPresent()){
+                    readChat.get().setChatId(chatId);
+                    readChatRepository.save(readChat);
+                }else{
+                    readChat = null;
+                }
+
+                System.out.println("과연");
 
                 // 접속중인 유저 정보 인스턴스 생성
                 UserSession userSession = UserSession.of(username, userId, accessor.getSessionId(), roomId);

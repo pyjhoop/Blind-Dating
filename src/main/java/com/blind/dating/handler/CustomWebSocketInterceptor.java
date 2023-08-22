@@ -68,7 +68,7 @@ public class CustomWebSocketInterceptor implements ChannelInterceptor {
                 Optional<ReadChat> readChat = readChatRepository.findByRoomIdAndUserId(Long.valueOf(roomId), Long.valueOf(userId));
                 if(readChat.isPresent()){
                     readChat.get().setChatId(chatId);
-                    readChatRepository.save(readChat);
+                    readChatRepository.save(readChat.get());
                 }else{
                     readChat = null;
                 }

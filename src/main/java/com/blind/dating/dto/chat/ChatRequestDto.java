@@ -18,9 +18,4 @@ public class ChatRequestDto {
         this.message = message;
     }
 
-    public Chat toEntity(){
-        return Chat.of(Long.valueOf(chatRoomId)
-        ,Long.valueOf(writerId)
-        ,message);
-    }
 }

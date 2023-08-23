@@ -10,26 +10,18 @@ import lombok.*;
 @Builder
 public class UserResponse {
 
-    private TokenDto token;
+    private String accessToken;
     private Long id;
     private String nickname;
 
 
-    protected UserResponse(TokenDto token,Long id, String nickname) {
-        this.token = token;
+    protected UserResponse(String accessToken,Long id, String nickname) {
+        this.accessToken = accessToken;
         this.id = id;
         this.nickname = nickname;
     }
 
-    public static UserResponse of(TokenDto token,Long id, String nickname) {
-        return new UserResponse(token,id, nickname);
-    }
-
-    public static UserResponse from(UserAccount user, TokenDto tokens){
-        return new UserResponse(
-                tokens,
-                user.getId(),
-                user.getNickname()
-        );
+    public static UserResponse of(String accessToken,Long id, String nickname) {
+        return new UserResponse(accessToken,id, nickname);
     }
 }

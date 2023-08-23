@@ -10,6 +10,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @RequiredArgsConstructor
 @Service
 public class ChattingRoomService {
@@ -24,13 +26,13 @@ public class ChattingRoomService {
 
     }
 
-    public Page<ChatRoom> getRooms(String userId, Pageable pageable){
-        return chattingRoomRepositoryImpl.findAllByUserId(Long.valueOf(userId),Long.valueOf(userId), pageable);
+    public Page<ChatRoom> getRooms(Long userId, Pageable pageable){
+        return chattingRoomRepositoryImpl.findAllByUserId(userId, pageable);
     }
 
-    public boolean checkRoomNumber(String roomId){
+    public Optional<ChatRoom> getRoom(String roomId){
 
-        return chatRoomRepository.existsById(Long.valueOf(roomId));
+        return chatRoomRepository.findById(Long.valueOf(roomId));
 
     }
 }

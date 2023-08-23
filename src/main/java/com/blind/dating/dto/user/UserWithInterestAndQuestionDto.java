@@ -1,8 +1,8 @@
 package com.blind.dating.dto.user;
 
 import com.blind.dating.domain.UserAccount;
-import com.blind.dating.dto.answer.AnswerDto;
 import com.blind.dating.dto.interest.InterestDto;
+import com.blind.dating.dto.question.QuestionDto;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 
 @Data
 @NoArgsConstructor
-public class UserWithInterestAndAnswerDto {
+public class UserWithInterestAndQuestionDto {
 
     private Long id;
     private String userId;
@@ -20,10 +20,10 @@ public class UserWithInterestAndAnswerDto {
     private String mbti;
     private String gender;
     private Set<InterestDto> interests;
-    private Set<AnswerDto> answers;
+    private Set<QuestionDto> questions;
     private String selfIntroduction;
 
-    private UserWithInterestAndAnswerDto(Long id, String userId, String nickname, String region, String mbti, String gender, Set<InterestDto> interests, Set<AnswerDto> answers, String selfIntroduction) {
+private UserWithInterestAndQuestionDto(Long id, String userId, String nickname, String region, String mbti, String gender, Set<InterestDto> interests, Set<QuestionDto> questions, String selfIntroduction) {
         this.id = id;
         this.userId = userId;
         this.nickname = nickname;
@@ -31,15 +31,15 @@ public class UserWithInterestAndAnswerDto {
         this.mbti = mbti;
         this.gender = gender;
         this.interests = interests;
-        this.answers = answers;
+        this.questions = questions;
         this.selfIntroduction = selfIntroduction;
     }
-    public static UserWithInterestAndAnswerDto of(Long id,String userId, String nickname, String region, String mbti, String gender, Set<InterestDto> interests, Set<AnswerDto> answers, String selfIntroduction) {
-        return new UserWithInterestAndAnswerDto(id, userId, nickname, region, mbti, gender, interests, answers, selfIntroduction);
+    public static UserWithInterestAndQuestionDto of(Long id, String userId, String nickname, String region, String mbti, String gender, Set<InterestDto> interests, Set<QuestionDto> questions, String selfIntroduction) {
+        return new UserWithInterestAndQuestionDto(id, userId, nickname, region, mbti, gender, interests, questions, selfIntroduction);
     }
 
-    public static UserWithInterestAndAnswerDto from(UserAccount user) {
-        return new UserWithInterestAndAnswerDto(
+    public static UserWithInterestAndQuestionDto from(UserAccount user) {
+        return new UserWithInterestAndQuestionDto(
                 user.getId(),
                 user.getUserId(),
                 user.getNickname(),
@@ -47,7 +47,7 @@ public class UserWithInterestAndAnswerDto {
                 user.getMbti(),
                 user.getGender(),
                 user.getInterests().stream().map(InterestDto::from).collect(Collectors.toSet()),
-                user.getAnswers().stream().map(AnswerDto::from).collect(Collectors.toSet()),
+                user.getQuestions().stream().map(QuestionDto::from).collect(Collectors.toSet()),
                 user.getSelfIntroduction()
         );
 

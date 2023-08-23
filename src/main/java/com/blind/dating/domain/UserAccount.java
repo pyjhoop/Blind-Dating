@@ -73,7 +73,7 @@ public class UserAccount extends BaseEntity implements UserDetails {
 
     @OneToMany(mappedBy = "userAccount",fetch = FetchType.EAGER)
     @ToString.Exclude
-    private final Set<Answer> answers = new LinkedHashSet<>();
+    private final Set<Question> questions = new LinkedHashSet<>();
 
     @OneToMany(mappedBy = "receiver",fetch = FetchType.EAGER)
     @ToString.Exclude

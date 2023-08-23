@@ -66,10 +66,6 @@ public class UserAccount extends BaseEntity implements UserDetails {
     @Setter
     private LocalDateTime recentLogin;
 
-    @OrderBy("createdAt DESC")
-    @OneToMany(mappedBy = "sender", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @ToString.Exclude
-    private final Set<Message> messages = new LinkedHashSet<>();
 
     @OneToMany(mappedBy = "userAccount", fetch = FetchType.EAGER)
     @ToString.Exclude

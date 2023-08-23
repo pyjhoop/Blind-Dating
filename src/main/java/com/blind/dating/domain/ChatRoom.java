@@ -33,6 +33,9 @@ public class ChatRoom extends BaseEntity{
     @Setter
     private String recentMessage;
 
+    @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL)
+    private final Set<Chat> chats = new LinkedHashSet<>();
+
     public ChatRoom(UserAccount user1, UserAccount user2) {
         this.user1 = user1;
         this.user2 = user2;

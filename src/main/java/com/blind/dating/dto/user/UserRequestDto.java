@@ -26,7 +26,6 @@ public class UserRequestDto {
 
     @NotNull(message = "지역은 필수 입력 값입니다.")
     private String region;
-    private int score;
 
     @NotNull(message = "MBTI는 필수 입력 값입니다.")
     private String mbti;
@@ -37,19 +36,18 @@ public class UserRequestDto {
     private List<Boolean> questions;
     private String selfIntroduction;
 
-    private UserRequestDto(String userId, String userPassword, String nickname, String region, int score, String mbti, String gender, String selfIntroduction) {
+    private UserRequestDto(String userId, String userPassword, String nickname, String region, String mbti, String gender, String selfIntroduction) {
         this.userId = userId;
         this.userPassword = userPassword;
         this.nickname = nickname;
         this.region = region;
-        this.score = score;
         this.mbti = mbti;
         this.gender = gender;
         this.selfIntroduction = selfIntroduction;
     }
 
-    public static UserRequestDto of(String userId, String userPassword, String nickname, String region, int score, String mbti, String gender, String selfIntroduction) {
-        return new UserRequestDto(userId,userPassword, nickname, region, score, mbti,gender, selfIntroduction);
+    public static UserRequestDto of(String userId, String userPassword, String nickname, String region, String mbti, String gender, String selfIntroduction) {
+        return new UserRequestDto(userId,userPassword, nickname, region, mbti,gender, selfIntroduction);
     }
 
     public static UserAccountDto from(UserAccount entity){
@@ -58,7 +56,6 @@ public class UserRequestDto {
                 entity.getUserPassword(),
                 entity.getNickname(),
                 entity.getRegion(),
-                entity.getScore(),
                 entity.getMbti(),
                 entity.getGender(),
                 entity.getDeleted(),
@@ -72,7 +69,6 @@ public class UserRequestDto {
                 userPassword,
                 nickname,
                 region,
-                score,
                 mbti,
                 gender,
                 selfIntroduction

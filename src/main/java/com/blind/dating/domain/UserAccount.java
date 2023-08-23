@@ -40,9 +40,6 @@ public class UserAccount extends BaseEntity implements UserDetails {
     @Column(nullable = false, length = 100)
     private String region;
 
-    @Setter
-    @Column(nullable = true)
-    private int score;
 
     @Setter
     @Column(nullable = true, length = 20)
@@ -82,18 +79,17 @@ public class UserAccount extends BaseEntity implements UserDetails {
 
     protected UserAccount(){}
 
-    private UserAccount(String userId, String userPassword, String nickname, String region, int score, String mbti, String gender, String selfIntroduction) {
+    private UserAccount(String userId, String userPassword, String nickname, String region, String mbti, String gender, String selfIntroduction) {
         this.userId = userId;
         this.userPassword = userPassword;
         this.nickname = nickname;
         this.region = region;
-        this.score = score;
         this.mbti = mbti;
         this.gender = gender;
         this.selfIntroduction = selfIntroduction;
     }
-    public static UserAccount of(String userId, String userPassword, String nickname, String region, int score, String mbti, String gender, String selfIntroduction) {
-        return new UserAccount(userId, userPassword, nickname, region, score, mbti, gender, selfIntroduction);
+    public static UserAccount of(String userId, String userPassword, String nickname, String region, String mbti, String gender, String selfIntroduction) {
+        return new UserAccount(userId, userPassword, nickname, region, mbti, gender, selfIntroduction);
     }
 
 

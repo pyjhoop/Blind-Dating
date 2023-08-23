@@ -34,13 +34,13 @@ public class ChatService {
         // 속한 방번호를 통해 최근 메세지를 업데이트 후에 chat 저장하기
         ChatRoom room = chattingRoomRepository.findById(Long.valueOf(dto.getChatRoomId())).get();
         room.setRecentMessage(dto.getMessage());
-        return chatRepository.save(dto.toEntity());
+        return chatRepository.save(Chat.of(room,Long.valueOf(dto.getWriterId()),dto.getMessage()));
     }
 
     public Long unreadChat(Long userId, Long roomId){
 
         List<Chat> list = chatRepository.findAllByChatRoomIdOrderByIdDesc(roomId);
-        Long listSize = Long.valueOf(list.size());
+        Long listSize = (long) list.size();
 
         Optional<ReadChat> readChat = readChatRepository.findByRoomIdAndUserId(roomId, userId);
         if(readChat.get().getChatId() == 0){

@@ -20,8 +20,6 @@ public class UserAccountDto {
     private String nickname;
     @Schema(description = "사는 지역")
     private String region;
-    @Schema(description = "가중치")
-    private int score;
     @Schema(description = "MBTI")
     private String mbti;
     @Schema(description = "성별")
@@ -32,22 +30,21 @@ public class UserAccountDto {
     private String selfIntroduction;
 
 
-    private UserAccountDto(String userId, String userPassword, String nickname, String region, int score, String mbti, String gender) {
+    private UserAccountDto(String userId, String userPassword, String nickname, String region, String mbti, String gender) {
         this.userId = userId;
         this.userPassword = userPassword;
         this.nickname = nickname;
         this.region = region;
-        this.score = score;
         this.mbti = mbti;
         this.gender = gender;
     }
 
-    public static UserAccountDto of(String userId, String userPassword, String nickname, String region, int score, String mbti, String gender, Boolean deleted, String selfIntroduction) {
-        return new UserAccountDto(userId,userPassword, nickname, region, score, mbti, gender, deleted, selfIntroduction);
+    public static UserAccountDto of(String userId, String userPassword, String nickname, String region, String mbti, String gender, Boolean deleted, String selfIntroduction) {
+        return new UserAccountDto(userId,userPassword, nickname, region, mbti, gender, deleted, selfIntroduction);
     }
 
-    public static UserAccountDto of(String userId, String userPassword, String nickname, String region, int score, String mbti, String gender) {
-        return new UserAccountDto(userId,userPassword, nickname, region, score, mbti, gender);
+    public static UserAccountDto of(String userId, String userPassword, String nickname, String region, String mbti, String gender) {
+        return new UserAccountDto(userId,userPassword, nickname, region, mbti, gender);
     }
 
     public static UserAccountDto from(UserAccount entity){
@@ -56,7 +53,6 @@ public class UserAccountDto {
                 entity.getUserPassword(),
                 entity.getNickname(),
                 entity.getRegion(),
-                entity.getScore(),
                 entity.getMbti(),
                 entity.getGender(),
                 entity.getDeleted(),
@@ -70,7 +66,6 @@ public class UserAccountDto {
                 userPassword,
                 nickname,
                 region,
-                score,
                 mbti,
                 gender,
                 selfIntroduction

@@ -22,11 +22,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 
 @Tag(name = "Chatting Room Info", description = "채팅방 관련 서비스")
@@ -46,35 +44,16 @@ public class ChattingRoomController {
             @ApiResponse(responseCode = "404", description = "NOT FOUND", content = @Content(schema = @Schema(implementation = ResponseDto.class))),
             @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR", content = @Content(schema = @Schema(implementation = ResponseDto.class)))
     })
-    public ResponseEntity<ResponseDto<Page<ChatRoomDto>>> getMyMessageList(
-            @PageableDefault(size = 10, sort = "updatedAt", direction = Sort.Direction.DESC) Pageable pageable,
+    public ResponseEntity<ResponseDto<List<ChatRoomDto>>> getMyMessageList(
             Authentication authentication
     ){
         UserAccount userAccount = (UserAccount) authentication.getPrincipal();
 
         //나에게 생성된 채팅룸 조회
-        Page<ChatRoomDto> rooms = chattingRoomService.getRooms(userAccount.getId(), pageable).map(chatRoom -> {
-            ChatRoomDto dto = new ChatRoomDto();
+        List<ChatRoomDto> rooms = chattingRoomService.getRooms(userAccount);
 
-            // 조회를 위해 상대방 유저 정보 찾은 후 user2에 저장하기
-            if(chatRoom.getUser1().getId() != userAccount.getId()){
-                chatRoom.setUser2(chatRoom.getUser1());
-            }
-            // 채팅방에서 읽지 않은 채팅 개수 조회
-            Long unReadCount = chatService.unreadChat(userAccount.getId(), chatRoom.getId());
-
-            // 응답 데이터를 보여주기 위해 ChatRoom -> ChatRoomDto 로 변환
-            dto.setRoomId(chatRoom.getId());
-            dto.setUpdatedAt(chatRoom.getUpdatedAt());
-            dto.setOtherUserid(chatRoom.getUser2().getId());
-            dto.setOtherUserNickname(chatRoom.getUser2().getNickname());
-            dto.setRecentMessage(chatRoom.getRecentMessage());
-            dto.setUnReadCount(unReadCount);
-
-            return dto;
-        });
-        return ResponseEntity.<ResponseDto<Page<ChatRoomDto>>>ok()
-                .body(ResponseDto.<Page<ChatRoomDto>>builder()
+        return ResponseEntity.<ResponseDto<List<ChatRoomDto>>>ok()
+                .body(ResponseDto.<List<ChatRoomDto>>builder()
                         .status("OK")
                         .message("채팅방 리스트가 성공적으로 조회되었습니다.")
                         .data(rooms)
@@ -103,6 +82,7 @@ public class ChattingRoomController {
         if(chatRoom.isEmpty()){
             throw new RuntimeException(roomId+"에 해당하는 채팅방이 존재하지 않습니다.");
         }
+
         //
         UserAccount userInfo = chatRoom.get().getUser1();
 
@@ -110,9 +90,7 @@ public class ChattingRoomController {
             userInfo = chatRoom.get().getUser2();
         }
 
-
-
-        //존재할경우 채팅 메세지 50개를 id 오름차순으로 가져오기
+        //존재할경우 채팅 메세지 30개를 id 오름차순으로 가져오기
         Page<ChatDto> chatList = chatService.selectChatList(roomId, pageable).map(ChatDto::from);
 
         return ResponseEntity.ok().body(ResponseDto.<ChatListWithOtherUserInfo>builder()
@@ -121,4 +99,29 @@ public class ChattingRoomController {
                 .data(ChatListWithOtherUserInfo.of(userInfo.getId(), userInfo.getNickname(), chatList))
                 .build());
     }
+
+//    @PutMapping("/chatroom/{roomId}")
+//    public ResponseEntity<ResponseDto> leaveChatRoom(@PathVariable String roomId, Authentication authentication){
+//        //룸 조회후 내 정보를 null로 수정
+//        UserAccount user = (UserAccount) authentication.getPrincipal();
+//        //채팅방 떠나는 기능
+//        ChatRoom room = chattingRoomService.leaveChatRoom(roomId, user);
+//        //채팅방에 아무도 없을 때 채팅방 삭제
+//        boolean check = chattingRoomService.removeRoom(room);
+//        String message = "";
+//
+//        if(check){
+//            message = "채팅방이 삭제되었습니다.";
+//        }else{
+//            message = "채팅방을 성공적으로 나갔습니다.";
+//        }
+//
+//        return ResponseEntity.<ResponseDto>ok()
+//                .body(ResponseDto.<String>builder()
+//                        .status("OK")
+//                        .message(message)
+//                        .build());
+//    }
+
+
 }

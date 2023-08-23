@@ -15,21 +15,24 @@ public class Chat extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Setter
-    private Long chatRoomId;
+
+    @ManyToOne
+    private ChatRoom chatRoom;
+
     @Setter
     private Long writerId;
+
     @Setter
     private String message;
 
-    private Chat(Long chatRoomId, Long writerId, String message) {
-        this.chatRoomId = chatRoomId;
+    private Chat(ChatRoom chatRoom, Long writerId, String message) {
+        this.chatRoom = chatRoom;
         this.writerId = writerId;
         this.message = message;
     }
 
-    public static Chat of(Long chatRoomId, Long writerId, String message) {
-        return new Chat(chatRoomId, writerId, message);
+    public static Chat of(ChatRoom chatRoom, Long writerId, String message) {
+        return new Chat(chatRoom, writerId, message);
     }
 
 

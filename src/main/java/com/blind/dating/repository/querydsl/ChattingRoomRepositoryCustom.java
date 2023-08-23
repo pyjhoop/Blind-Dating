@@ -10,6 +10,6 @@ import java.util.List;
 
 public interface ChattingRoomRepositoryCustom {
 
-    Page<ChatRoom> findAllByUserId(Long userId1, Pageable pageable);
+    List<ChatRoom> findAllByUserId(Long userId1);
 
 }

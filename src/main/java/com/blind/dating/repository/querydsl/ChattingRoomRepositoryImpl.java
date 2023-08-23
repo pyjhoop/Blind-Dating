@@ -34,22 +34,16 @@ public class ChattingRoomRepositoryImpl extends QuerydslRepositorySupport implem
 
 
     @Override
-    public Page<ChatRoom> findAllByUserId(Long userId1, Pageable pageable) {
+    public List<ChatRoom> findAllByUserId(Long userId1) {
         JPAQueryFactory queryFactory = new JPAQueryFactory(entityManager);
         QChatRoom chatRoom = QChatRoom.chatRoom;
-        List<OrderSpecifier> ORDERS = getAllOrderSpecifiers(pageable);
 
         List<ChatRoom> content = queryFactory.select(chatRoom)
                 .from(chatRoom)
                 .where(chatRoom.user1.id.eq(userId1).or(chatRoom.user2.id.eq(userId1)))
-                .orderBy(ORDERS.toArray(OrderSpecifier[]::new))
-                .offset(pageable.getOffset())   // (2) 페이지 번호
-                .limit(pageable.getPageSize())
                 .fetch();
 
-        Long count = Long.valueOf(content.size());
-
-        return new PageImpl<>(content, pageable, count);
+        return content;
     }
 
 

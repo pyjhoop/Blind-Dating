@@ -2,7 +2,6 @@ package com.blind.dating.repository;
 
 import com.blind.dating.config.JpaConfig;
 import com.blind.dating.domain.Interest;
-import com.blind.dating.domain.Message;
 import com.blind.dating.domain.UserAccount;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;

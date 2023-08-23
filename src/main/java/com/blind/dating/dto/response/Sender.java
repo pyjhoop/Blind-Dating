@@ -1,7 +1,5 @@
 package com.blind.dating.dto.response;
 
-import com.blind.dating.domain.Message;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 

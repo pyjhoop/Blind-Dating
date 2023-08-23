@@ -24,6 +24,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.util.List;
 import java.util.Map;
@@ -61,7 +63,8 @@ public class UserAccountController {
     @PostMapping("/signup")
     public ResponseEntity<ResponseDto> registerUser(
             @RequestBody @Valid UserRequestDto dto,
-            Errors errors
+            Errors errors,
+            HttpServletResponse response
             ){
         if (errors.hasErrors()) {
 
@@ -76,7 +79,7 @@ public class UserAccountController {
 
         }
 
-
+        // 토큰과 user 생성하기
         //TODO 필수데이터가 부족할때 통합 예외처리해주기
         String accessToken = tokenProvider.create(dto.toEntity());
         String refreshToken = tokenProvider.refreshToken(dto.toEntity());
@@ -90,17 +93,16 @@ public class UserAccountController {
         List<InterestResponse> list = interestService.saveInterest(user,interests)
                 .stream().map(InterestResponse::from).collect(Collectors.toList());
 
-        TokenDto tokens = TokenDto.builder().refreshToken(refreshToken)
-                .accessToken(accessToken).build();
-
-
-
+        // 리프래쉬 토큰 httponly로 설정
+        Cookie cookie = new Cookie("refreshToken", refreshToken);
+        cookie.setHttpOnly(true);
+        response.addCookie(cookie);
 
         return ResponseEntity.<ResponseDto>ok()
                 .body(ResponseDto.builder()
                         .status("OK")
                         .message("회원가입이 성공적으로 완료되었습니다.")
-                        .data(UserResponse.from(user, tokens))
+                        .data(UserResponse.of(accessToken, user.getId(), user.getNickname()))
                         .build());
 
     }
@@ -119,7 +121,8 @@ public class UserAccountController {
             @Parameter(name = "userPassword", description = "유저 비밀번호", example = "pass01")
     })
     public ResponseDto<UserResponse> authenticate(
-            @RequestBody LoginInputDto dto
+            @RequestBody LoginInputDto dto,
+            HttpServletResponse response
             ){
         UserAccount user = userAccountService.getByCredentials(dto.getUserId(), dto.getUserPassword());
         log.info("userId={}",dto.getUserId());
@@ -132,15 +135,19 @@ public class UserAccountController {
                     .build();
 
         }else{
-            TokenDto tokens = TokenDto.builder()
-                    .accessToken(tokenProvider.create(user))
-                    .refreshToken(user.getRefreshToken()).build();
+
+            String accessToken = tokenProvider.create(user);
+            String refreshToken = user.getRefreshToken();
+
+            Cookie cookie = new Cookie("refreshToken", refreshToken);
+            cookie.setHttpOnly(true);
+            response.addCookie(cookie);
 
 
             return ResponseDto.<UserResponse>builder()
                     .status("OK")
                     .message("로그인이 성공적으로 처리되었습니다.")
-                    .data(UserResponse.from(user, tokens))
+                    .data(UserResponse.of(accessToken, user.getId(), user.getNickname()))
                     .build();
         }
 

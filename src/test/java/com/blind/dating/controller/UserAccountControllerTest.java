@@ -46,7 +46,7 @@ class UserAccountControllerTest {
     @Test
     public void givenUserIdAndPassword_whenLogin_thenReturnUserAccount() throws Exception {
         //Given
-        UserAccount user = UserAccount.of("user01","pass01","user1","서울",12,"INFP","M","하이요");
+        UserAccount user = UserAccount.of("user01","pass01","user1","서울","INFP","M","하이요");
         ObjectMapper obj = new ObjectMapper();
         given(userAccountService.getByCredentials(anyString(), anyString())).willReturn(user);
         String token = "token";
@@ -68,7 +68,7 @@ class UserAccountControllerTest {
     @Test
     void givenUserAccountDto_whenSignUp_thenReturnUser() throws Exception {
         //Given
-        UserRequestDto user = UserRequestDto.of("user01","pass01","user1","서울",12,"INFP","M","하이요");
+        UserRequestDto user = UserRequestDto.of("user01","pass01","user1","서울","INFP","M","하이요");
         String token = "token";
         given(userAccountService.create(any(UserRequestDto.class), anyString())).willReturn(user.toEntity());
         given(tokenProvider.create(any(UserAccount.class))).willReturn(token);

@@ -32,7 +32,7 @@ class CustomUserDetailsServiceTest {
     void givenUserId_whenSelectUser_thenReturnUser(){
 
         //Given
-        UserAccount user = UserAccount.of("user01","pass01","user1","서울",12,"INFP","M","하이요");
+        UserAccount user = UserAccount.of("user01","pass01","user1","서울","INFP","M","하이요");
         user.setDeleted(false);
         given(userAccountRepository.findByUserId("user01")).willReturn(user);
 

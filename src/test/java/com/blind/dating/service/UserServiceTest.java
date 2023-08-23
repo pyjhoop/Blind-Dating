@@ -53,7 +53,7 @@ class UserServiceTest {
     @Test
     void giveUserId_whenSearchMyInfo_thenReturnMyInfo(){
         //Given
-        UserAccount user = UserAccount.of("userId","pwd","nick","서울",12,"INFP","M","하요");
+        UserAccount user = UserAccount.of("userId","pwd","nick","서울","INFP","M","하요");
         user.setDeleted(false);
         given(userAccountRepository.findByUserId(user.getUserId())).willReturn(user);
 

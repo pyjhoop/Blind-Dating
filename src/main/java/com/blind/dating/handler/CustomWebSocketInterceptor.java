@@ -48,6 +48,10 @@ public class CustomWebSocketInterceptor implements ChannelInterceptor {
         switch (command) {
             case CONNECT:
                 // 세션 연결 처리
+                if(accessor.getNativeHeader("username") == null){
+                    break;
+                }
+
                 String username = accessor.getNativeHeader("username").get(0);
                 String roomId = accessor.getNativeHeader("roomId").get(0);
                 String userId = accessor.getNativeHeader("userId").get(0);

@@ -1,13 +1,11 @@
 package com.blind.dating.controller;
 
-import com.blind.dating.domain.Chat;
 import com.blind.dating.domain.ChatRoom;
 import com.blind.dating.domain.UserAccount;
 import com.blind.dating.dto.chat.ChatDto;
 import com.blind.dating.dto.chat.ChatListWithOtherUserInfo;
 import com.blind.dating.dto.chat.ChatRoomDto;
 import com.blind.dating.dto.response.ResponseDto;
-import com.blind.dating.dto.user.UserWithInterestAndAnswerDto;
 import com.blind.dating.service.ChatService;
 import com.blind.dating.service.ChattingRoomService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -29,9 +27,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Tag(name = "Chatting Room Info", description = "채팅방 관련 서비스")
 @RestController

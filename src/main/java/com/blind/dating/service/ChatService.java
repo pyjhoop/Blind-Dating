@@ -8,6 +8,8 @@ import com.blind.dating.repository.ChatRepository;
 import com.blind.dating.repository.ChattingRoomRepository;
 import com.blind.dating.repository.ReadChatRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,8 +25,8 @@ public class ChatService {
     private final ReadChatRepository readChatRepository;
 
 
-    public List<Chat> selectChatList(String roomId){
-        return chatRepository.findAllByChatRoomIdOrderByIdAsc(Long.valueOf(roomId));
+    public Page<Chat> selectChatList(String roomId, Pageable pageable){
+        return chatRepository.findAllByChatRoomId(Long.valueOf(roomId), pageable);
     }
 
     @Transactional

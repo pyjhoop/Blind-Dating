@@ -69,8 +69,8 @@
 
       });
 
-      //3. send(path, header, message)로 메세지를 보낼 수 있음
-      //stomp.send('/pub/chat/enter', {}, JSON.stringify({roomId: roomId, writer: username}))
+     // 3. send(path, header, message)로 메세지를 보낼 수 있음
+      stomp.send('/pub/chat/enter', {}, JSON.stringify({roomId: roomId, writer: username}))
     });
 
     $("#button-send").on("click", function(e){
@@ -80,7 +80,7 @@
       stomp.send('/pub/chat/message', {}, JSON.stringify({chatRoomId: roomId, writerId: userId, message: msg.value}));
       msg.value = '';
     });
-    stomp.send('/pub/chat/disconnect',{}, JSON.stringify({chatRoomId: roomId}))
+    //stomp.send('/pub/chat/disconnect',{}, JSON.stringify({chatRoomId: roomId}))
 
   });
 </script>

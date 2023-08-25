@@ -25,6 +25,8 @@ import java.io.IOException;
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
+    private String alreadyFilteredAttributeName = "JwtAuthenticationFilter_alreadyFiltered";
+
     private final TokenProvider tokenProvider;
     private final CustomUserDetailsService customUserDetailsService;
     private final String signUpUrl = "/api/signup";

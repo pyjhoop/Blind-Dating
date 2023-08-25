@@ -32,8 +32,14 @@ public class UserRequestDto {
 
     @NotNull(message = "성별은 필수 입력 값입니다.")
     private String gender;
+
+    @NotNull(message = "관심사는 필수 입력 값입니다.")
     private List<String> interests;
+
+    @NotNull(message = "답변은 필수 입력 값입니다.")
     private List<Boolean> questions;
+
+    @NotNull(message = "자기소개는 필수 입력 값입니다.")
     private String selfIntroduction;
 
     private UserRequestDto(String userId, String userPassword, String nickname, String region, String mbti, String gender, String selfIntroduction) {

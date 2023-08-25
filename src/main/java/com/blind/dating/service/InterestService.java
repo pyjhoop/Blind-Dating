@@ -19,10 +19,12 @@ public class InterestService {
 
     private final InterestRepository interestRepository;
 
-    public List<Interest> getInterests(UserAccount user){
-        return interestRepository.findAllByUserAccount(user);
-    }
-
+    /**
+     * 내 관심사 저장하기.
+     * @param userAccount
+     * @param interestName
+     * @return List<Interest>
+     */
     @Transactional
     public List<Interest> saveInterest(UserAccount userAccount, List<String> interestName){
 
@@ -34,29 +36,4 @@ public class InterestService {
 
         return interestRepository.saveAll(list);
     }
-
-    @Transactional
-    public List<Interest> updateInterest(Authentication authentication, List<String> interestName){
-        UserAccount user =(UserAccount)authentication.getPrincipal();
-        List<Interest> list = new ArrayList<>();
-
-        interestRepository.deleteAllByUserAccount(user);
-
-        for(String s: interestName){
-            list.add(Interest.of(user,s));
-        }
-
-        return interestRepository.saveAll(list);
-    }
-
-
-    @Transactional
-    public void deleteInterest(UserAccount user){
-        interestRepository.deleteAllByUserAccount(user);
-
-
-    }
-
-
-
 }

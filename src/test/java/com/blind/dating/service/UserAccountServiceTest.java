@@ -1,147 +1,162 @@
 package com.blind.dating.service;
 
 import com.blind.dating.domain.UserAccount;
-import com.blind.dating.dto.user.UserAccountDto;
+import com.blind.dating.dto.user.UserInfoWithTokens;
 import com.blind.dating.dto.user.UserRequestDto;
 import com.blind.dating.repository.UserAccountRepository;
-import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.Disabled;
+import com.blind.dating.security.TokenProvider;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.Errors;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
+
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
 
-@Disabled
-@DisplayName("회원 인증 비즈니스 로직 - 테스트")
+@DisplayName("유저 조회 서비스")
 @ExtendWith(MockitoExtension.class)
 class UserAccountServiceTest {
 
     @InjectMocks private UserAccountService userAccountService;
-
     @Mock private UserAccountRepository userAccountRepository;
+    @Spy
+    private BCryptPasswordEncoder bCryptPasswordEncoder;
+    @Mock private TokenProvider tokenProvider;
+    @Mock private QuestionService questionService;
+    @Mock private InterestService interestService;
 
-    @Mock private BCryptPasswordEncoder bCryptPasswordEncoder;
-
-    @DisplayName("회원 가입 테스트")
+    @DisplayName("회원가입 테스트")
     @Test
-    void givenUserAccountDto_whenCreateUser_thenReturnUserAccount(){
-        //Given
-        UserRequestDto dto = UserRequestDto.of("user01","pqss01","user1","서울","INFP","M","gd");
+    void givenUserRequestDto_whenRegister_thenRegisterSuccess(){
+        //given
+        UserRequestDto dto = UserRequestDto.of("userId","userPass01","userNickname","서울","INFP","M","안녕하세요");
+        dto.setInterests(List.of("자전거타기","놀기","게임하기"));
+        dto.setQuestions(List.of(true, false, true));
+
+        String accessToken = "asdffqwerqwerdfgscvASDF";
+        String refreshToken = "sdfgvcwerwdrafasfdsfdf";
+        String password = "hashPass";
+
         UserAccount user = dto.toEntity();
+        user.setRecentLogin(LocalDateTime.now());
+        user.setRefreshToken(refreshToken);
         user.setDeleted(false);
 
-        given(userAccountRepository.save(any(UserAccount.class))).willReturn(user);
+        user.setUserPassword(bCryptPasswordEncoder.encode(dto.getUserPassword()));
 
+        given(userAccountRepository.existsByUserId(dto.getUserId())).willReturn(false);
+        given(tokenProvider.create(dto.toEntity())).willReturn(accessToken);
+        given(tokenProvider.refreshToken(dto.toEntity())).willReturn(refreshToken);
+        given(bCryptPasswordEncoder.encode(dto.getUserPassword())).willReturn(password);
+        given(userAccountRepository.save(user)).willReturn(user);
 
-        //When
-        UserAccount user1 = userAccountService.create(dto,"adsfasdfasdfsaf");
-
-        //Then
-        assertThat(user).isNotNull();
-
-    }
-
-    @DisplayName("로그인 회원정보 유무 테스트")
-    @Test
-    void givenUserIdANdUserPassword_whenCheckUser_thenReturnUser(){
-        //Given
-        BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
-
-        // 모킹할 Repository
-
-        // 테스트 데이터
-        String userId = "user01";
-        String userPassword = "pass01";
-
-        // 모킹 설정
-        UserAccountDto dto = UserAccountDto.of("user01","pass01","user1","서울","INFP","M",false,"gd");
-        dto.setUserPassword(bCryptPasswordEncoder.encode(dto.getUserPassword()));
-        given(userAccountRepository.findByUserId(userId)).willReturn(dto.toEntity());
-
-        // 테스트 메소드 실행
-        UserAccount actual = userAccountService.getByCredentials(userId, userPassword);
-
-        // 모킹 검증
-        then(userAccountRepository).should().findByUserId(userId);
-
-        // 테스트 검증
-        Assertions.assertThat(actual).isNotNull();
-
-    }
-
-    @DisplayName("유저아이디 중복 체크 - 아이디 존재하지 않는 경우")
-    @Test
-    void givenNonExistingUserId_whenCheckUserId_thenReturnBoolean(){
-        // Given
-        String nonExistingUserId = "nonExistingUser";
-        given(userAccountRepository.findByUserId(nonExistingUserId)).willReturn(null);
-
-        // When
-        boolean result = userAccountService.checkUserId(nonExistingUserId);
-
-        // Then
-        then(userAccountRepository).should().findByUserId(nonExistingUserId);
-        assertThat(result).isFalse();
-    }
-
-    @DisplayName("유저아이디 중복 체크 - 이미 존재하는 아이디인 경우")
-    @Test
-    void givenExistingUserId_whenCheckUserId_thenReturnTrue(){
-        // Given
-        String existingUserId = "existingUser";
-        UserAccount existingUser = UserAccount.of("user01","pass01","user1","서울","INFP","M","gd");
-        existingUser.setUserId(existingUserId);
-        given(userAccountRepository.findByUserId(existingUserId)).willReturn(existingUser);
-
-        // When
-        boolean result = userAccountService.checkUserId(existingUserId);
-
-        // Then
-        then(userAccountRepository).should().findByUserId(existingUserId);
-        assertThat(result).isTrue();
-    }
-
-    @DisplayName("닉네임 중복 체크 - 이미 존재하는 닉네임일 경우")
-    @Test
-    void givenExistingNickname_whenCheckNickname_thenReturnBoolean(){
-        //Given
-        String nickname = "user1";
-        UserAccount existingUser = UserAccount.of("user01","pass01","user1","서울","INFP","M","gd");
-        given(userAccountRepository.findByNickname(nickname)).willReturn(existingUser);
-
-        //When
-        boolean result = userAccountService.checkNickname(nickname);
-
-        //Then
-        then(userAccountRepository).should().findByNickname(nickname);
-        assertThat(result).isTrue();
-    }
-
-    @DisplayName("닉네임 중복 체크 - 닉네임이 없는 경우")
-    @Test
-    void givenNonExistingNickname_whenCheckNickname_thenReturnBoolean(){
-        //Given
-        String nickname = "nick1";
-        given(userAccountRepository.findByNickname(nickname)).willReturn(null);
-
-        //When
-        boolean result = userAccountService.checkNickname(nickname);
+        //when
+        UserInfoWithTokens info = userAccountService.register(dto);
 
         //then
-        then(userAccountRepository).should().findByNickname(nickname);
-        assertThat(result).isFalse();
+        assertThat(info).isNotNull()
+                .hasFieldOrPropertyWithValue("id",info.getId());
+
     }
 
 
+    @DisplayName("로그인 서비스 - 성공 테스트")
+    @Test
+    void givenLoginInfo_whenLogin_thenReturnUserInfoWithTokens(){
+        //given
+        String userId = "userId";
+        String password = "asdffsdas123";
+        String accessToken = "asdffasd";
+        String encodedPassword = bCryptPasswordEncoder.encode(password);
+
+        System.out.println(encodedPassword);
+        UserAccount user = UserAccount.of(userId,encodedPassword, "nick1","asdf","asdf","M","하이요");
 
 
+        given(userAccountRepository.findByUserId(userId)).willReturn(user);
+        given(tokenProvider.create(user)).willReturn(accessToken);
+
+        //when
+        UserInfoWithTokens userInfo = userAccountService.getLoginInfo(userId, password);
+
+        //then
+        assertThat(userInfo).isNotNull()
+                .hasFieldOrPropertyWithValue("accessToken", accessToken)
+                .hasFieldOrPropertyWithValue("nickname",user.getNickname());
+    }
+
+
+    @DisplayName("유저아이디 확인 테스트 - 아이디 존재")
+    @Test
+    void givenUserId_whenCheckUserId_thenReturnTrue(){
+        //given
+        String userId = "userId";
+        UserAccount user = UserAccount.of(userId,"asdfdf", "nick1","asdf","asdf","M","하이요");
+        given(userAccountRepository.findByUserId(userId)).willReturn(user);
+
+        //when
+        boolean result = userAccountService.checkUserId(userId);
+
+        //then
+        assertThat(result).isTrue();
+
+    }
+
+    @DisplayName("유저아이디 확인 테스트 - 아이디 없음.")
+    @Test
+    void givenUserId_whenCheckUserId_thenReturnFalse(){
+        //given
+        String userId = "userId";
+        UserAccount user = UserAccount.of(userId,"asdfdf", "nick1","asdf","asdf","M","하이요");
+        given(userAccountRepository.findByUserId(userId)).willReturn(null);
+
+        //when
+        boolean result = userAccountService.checkUserId(userId);
+
+        //then
+        assertThat(result).isFalse();
+
+    }
+
+    @DisplayName("유저 닉네임 확인 테스트 - 닉네임 없음.")
+    @Test
+    void givenUserNickname_whenCheckUserNickname_thenReturnFalse(){
+        //given
+        String userNickname = "nick11";
+        UserAccount user = UserAccount.of("qweeqw","asdfdf", userNickname,"asdf","asdf","M","하이요");
+        given(userAccountRepository.findByNickname(userNickname)).willReturn(null);
+
+        //when
+        boolean result = userAccountService.checkNickname(userNickname);
+
+        //then
+        assertThat(result).isFalse();
+
+    }
+    @DisplayName("유저 닉네임 확인 테스트 - 닉네임 없음.")
+    @Test
+    void givenUserNickname_whenCheckUserNickname_thenReturnTrue(){
+        //given
+        String userNickname = "nick11";
+        UserAccount user = UserAccount.of("qweeqw","asdfdf", userNickname,"asdf","asdf","M","하이요");
+        given(userAccountRepository.findByNickname(userNickname)).willReturn(user);
+
+        //when
+        boolean result = userAccountService.checkNickname(userNickname);
+
+        //then
+        assertThat(result).isTrue();
+
+    }
 
 }

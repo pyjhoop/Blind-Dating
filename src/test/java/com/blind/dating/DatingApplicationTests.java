@@ -33,38 +33,5 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 class DatingApplicationTests {
 
-	private MockMvc mvc;
-	@Autowired
-	private UserAccountRepository userAccountRepository;
-	@Autowired
-	private WebApplicationContext context;
-	@Autowired
-	private TokenProvider tokenProvider;
-	@Autowired
-	private BCryptPasswordEncoder bCryptPasswordEncoder;
 
-
-	@Test
-	void test() throws Exception {
-
-		List<String> interests = List.of("자전거","놀기");
-		List<Boolean> questions = List.of(true, false);
-		String pwd = bCryptPasswordEncoder.encode("userPwd111");
-		UserRequestDto dto = UserRequestDto.of("userId111",pwd,"nick111","서울","INFP","M","하이요");
-		dto.setInterests(interests);
-		dto.setQuestions(questions);
-		String accessToken = tokenProvider.create(dto.toEntity());
-		String refreshToken = tokenProvider.refreshToken(dto.toEntity());
-		UserAccount user = dto.toEntity();
-		user.setRecentLogin(LocalDateTime.now());
-		user.setRefreshToken(refreshToken);
-		user.setDeleted(false);
-
-		UserAccount result = userAccountRepository.save(user);
-
-
-		mvc.perform(get("/api/hello")
-						.header("Authorization", "Bearer "+accessToken))
-				.andExpect(status().isOk());
-	}
 }

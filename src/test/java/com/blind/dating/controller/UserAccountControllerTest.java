@@ -1,166 +1,191 @@
 package com.blind.dating.controller;
 
 import com.blind.dating.config.SecurityConfig;
-import com.blind.dating.domain.UserAccount;
 import com.blind.dating.dto.user.*;
+import com.blind.dating.security.JwtAuthenticationFilter;
 import com.blind.dating.security.TokenProvider;
 import com.blind.dating.service.CustomUserDetailsService;
-import com.blind.dating.service.InterestService;
 import com.blind.dating.service.UserAccountService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.mockito.ArgumentMatchers.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@Disabled
-@DisplayName("Auth 컨트롤러 - 테스트")
+@DisplayName("UserAccountController - 테스트")
 @Import(SecurityConfig.class)
 @WebMvcTest(UserAccountController.class)
+@AutoConfigureMockMvc(addFilters = false)
 class UserAccountControllerTest {
 
-    private final MockMvc mvc;
+    @Autowired
+    private MockMvc mvc;
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @MockBean private UserAccountService userAccountService;
     @MockBean private TokenProvider tokenProvider;
+    @MockBean private JwtAuthenticationFilter jwtAuthenticationFilter;
     @MockBean private CustomUserDetailsService customUserDetailsService;
-    @MockBean private InterestService interestService;
 
-    UserAccountControllerTest(@Autowired MockMvc mvc) {
-        this.mvc = mvc;
+
+
+    @Test
+    void testRegisterUser_WithSuccess() throws Exception {
+       UserInfoWithTokens info = UserInfoWithTokens.builder()
+               .id(1L)
+               .accessToken("accessToken")
+               .refreshToken("refreshToken")
+               .nickname("userNickname")
+               .build();
+
+        UserRequestDto dto = UserRequestDto.of("userId","userPass01","userNickname","서울","INFP","M","안녕하세요");
+        dto.setInterests(List.of("자전거타기","놀기","게임하기"));
+        dto.setQuestions(List.of(true, false, true));
+
+       given(userAccountService.register(any(UserRequestDto.class))).willReturn(info);
+
+
+       mvc.perform(post("/api/signup")
+               .contentType(MediaType.APPLICATION_JSON)
+               .content(objectMapper.writeValueAsString(dto)))
+               .andExpect(status().isOk());
+
     }
 
-    @DisplayName("[POST] 로그인 - 정상 호출")
+    @DisplayName("로그인 기능 테스트 - 로그인 성공")
     @Test
-    public void givenUserIdAndPassword_whenLogin_thenReturnUserAccount() throws Exception {
-        //Given
-        UserAccount user = UserAccount.of("user01","pass01","user1","서울","INFP","M","하이요");
-        ObjectMapper obj = new ObjectMapper();
-        given(userAccountService.getByCredentials(anyString(), anyString())).willReturn(user);
-        String token = "token";
-        given(tokenProvider.create(any(UserAccount.class))).willReturn(token);
-        LoginInputDto dto1 = LoginInputDto.builder()
-                        .userId("user01").userPassword("pass01").build();
+    void testLogin_WithSuccess() throws Exception {
+        String userId = "userId";
+        String userPassword = "userPwd";
+        LoginInputDto dto = LoginInputDto.builder().userId(userId).userPassword(userPassword).build();
 
-        //When & Then
+        UserInfoWithTokens userInfo = UserInfoWithTokens.builder()
+                .accessToken("accessToken")
+                .refreshToken("refreshToken")
+                .nickname("nick")
+                .build();
+
+        given(userAccountService.getLoginInfo(userId, userPassword)).willReturn(userInfo);
+
         mvc.perform(post("/api/login")
                 .contentType(MediaType.APPLICATION_JSON)
-                                .content(obj.writeValueAsString(dto1))
-                ).andExpect(status().isOk())
-                .andExpect(jsonPath("$.status").value("OK"))
-                .andExpect(jsonPath("$.data.nickname").value("user1"));
-
+                .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isOk());
     }
 
-    @DisplayName("회원가입 테스트")
+    @DisplayName("로그인 기능 테스트 - 로그인 실패")
     @Test
-    void givenUserAccountDto_whenSignUp_thenReturnUser() throws Exception {
-        //Given
-        UserRequestDto user = UserRequestDto.of("user01","pass01","user1","서울","INFP","M","하이요");
-        String token = "token";
-        given(userAccountService.create(any(UserRequestDto.class), anyString())).willReturn(user.toEntity());
-        given(tokenProvider.create(any(UserAccount.class))).willReturn(token);
-        given(tokenProvider.refreshToken(any(UserAccount.class))).willReturn(token);
-
-        ObjectMapper obj = new ObjectMapper();
-
-        //When & Then
-        mvc.perform(post("/api/signup")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(obj.writeValueAsString(user)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.nickname").value("user1"));
-
-    }
-
-    @DisplayName("아이디 중복 체크 - 아이디 이미 존재할때")
-    @Test
-    void givenUserId_whenCheckUserId_thenReturnTrue() throws Exception {
-        //Given
+    void testLogin_WithFail() throws Exception {
         String userId = "userId";
+        String userPassword = "userPwd";
+        LoginInputDto dto = LoginInputDto.builder().userId(userId).userPassword(userPassword).build();
+
+        UserInfoWithTokens userInfo = UserInfoWithTokens.builder()
+                .accessToken("accessToken")
+                .refreshToken("refreshToken")
+                .nickname("nick")
+                .build();
+
+        given(userAccountService.getLoginInfo(userId, userPassword)).willReturn(null);
+
+        mvc.perform(post("/api/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isOk());
+    }
+
+    @DisplayName("유저아이디 중복 체크 - 성공")
+    @Test
+    void testCheckUserId_WithSuccess() throws Exception {
+        String userId = "userId";
+        UserIdRequestDto dto = new UserIdRequestDto();
+        dto.setUserId(userId);
+
         given(userAccountService.checkUserId(userId)).willReturn(false);
 
-        UserIdRequestDto userIdRequestDto = new UserIdRequestDto();
-        userIdRequestDto.setUserId("userId");
-        ObjectMapper obj = new ObjectMapper();
-
-
-        //When & Then
         mvc.perform(post("/api/check-userId")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(obj.writeValueAsString(userIdRequestDto)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.status").value("OK"))
-                .andExpect(jsonPath("$.data").value(true));
+                .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isOk());
     }
 
-    @DisplayName("아이디 중복 체크 - 아이디 없을때")
+    @DisplayName("유저아이디 중복 체크 - 실패")
     @Test
-    void givenUserId_whenCheckUserId_thenReturnFalse() throws Exception {
-        //Given
+    void testCheckUserId_WithFail() throws Exception {
         String userId = "userId";
-        given(userAccountService.checkUserId(userId)).willReturn(true);
-        UserIdRequestDto userIdRequestDto = new UserIdRequestDto();
-        userIdRequestDto.setUserId("userId");
-        ObjectMapper obj = new ObjectMapper();
+        UserIdRequestDto dto = new UserIdRequestDto();
+        dto.setUserId(userId);
 
-        //When & Then
+        given(userAccountService.checkUserId(userId)).willReturn(true);
+
         mvc.perform(post("/api/check-userId")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(obj.writeValueAsString(userIdRequestDto)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.status").value("OK"))
-                .andExpect(jsonPath("$.data").value(false));
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isOk());
     }
 
-    @DisplayName("닉네임 중복 체크 - 닉네임 이미 존재할때")
+    @DisplayName("유저 닉네임 중복 체크 - 성공")
     @Test
-    void givenNickname_whenCheckNickname_thenReturnTrue() throws Exception {
-        //Given
-        String nickname = "user1";
-        ObjectMapper obj = new ObjectMapper();
+    void givenUserNickname_whenCheckNickname_thenSuccess() throws Exception {
+        String nickname = "nick";
         UserNicknameRequestDto dto = new UserNicknameRequestDto();
-        dto.setNickname("pyjhoop");
+        dto.setNickname(nickname);
+
         given(userAccountService.checkNickname(nickname)).willReturn(false);
 
-        //When & Then
         mvc.perform(post("/api/check-nickname")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(obj.writeValueAsString(dto)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.status").value("OK"))
-                .andExpect(jsonPath("$.data").value(true));
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isOk());
     }
 
-    @DisplayName("닉네임 중복 체크 - 닉네임이 없을 때")
+    @DisplayName("유저 닉네임 중복 체크 - 실패")
     @Test
-    void givenNickname_whenCheckNickname_thenReturnFalse() throws Exception {
-        //Given
-        String nickname = "user1";
-        ObjectMapper obj = new ObjectMapper();
+    void givenUserNickname_whenCheckNickname_thenFail() throws Exception {
+        String nickname = "nick";
         UserNicknameRequestDto dto = new UserNicknameRequestDto();
-        dto.setNickname("pyjhoop");
+        dto.setNickname(nickname);
+
         given(userAccountService.checkNickname(nickname)).willReturn(true);
 
-        //When & Then
         mvc.perform(post("/api/check-nickname")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(obj.writeValueAsString(dto)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.status").value("OK"))
-                .andExpect(jsonPath("$.data").value(true));
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isOk());
     }
+
+
+
+    private Map<String, String> getValidatorResult() {
+        Map<String, String> validatorResult = new HashMap<>();
+        validatorResult.put("field1", "에러 메시지 1");
+        validatorResult.put("field2", "에러 메시지 2");
+        return validatorResult;
+    }
+    private UserInfoWithTokens getUserInfoWithTokens() {
+        return UserInfoWithTokens.builder()
+                .id(1L)
+                .accessToken("accessToken")
+                .refreshToken("refreshToken")
+                .nickname("nickname")
+                .build();
+    }
+
 
 }

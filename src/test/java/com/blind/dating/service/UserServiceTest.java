@@ -1,8 +1,10 @@
 package com.blind.dating.service;
 
 import com.blind.dating.domain.UserAccount;
+import com.blind.dating.dto.user.UserUpdateRequestDto;
+import com.blind.dating.repository.InterestRepository;
 import com.blind.dating.repository.UserAccountRepository;
-import org.junit.jupiter.api.Disabled;
+import com.blind.dating.repository.querydsl.UserAccountRepositoryImpl;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -10,61 +12,84 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 
-import java.awt.print.Book;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
 
-@Disabled
-@DisplayName("유저 조회 서비스")
+
+@DisplayName("UserService 테스트")
 @ExtendWith(MockitoExtension.class)
-class UserServiceTest {
+public class UserServiceTest {
+
+    @InjectMocks private UserService userService;
+    @Mock private UserAccountRepository userAccountRepository;
+    @Mock private UserAccountRepositoryImpl userAccountRepositoryImpl;
+    @Mock private InterestRepository interestRepository;
 
 
-    @InjectMocks
-    private UserService userService;
-
-    @Mock
-    private UserAccountRepository userAccountRepository;
-
-
-    @Disabled
-    @DisplayName("추천 유저리스트 조회")
+    @DisplayName("추천리스트 테스트")
     @Test
-    void givenData_whenSearchUserList_thenReturnRecommendedUserList(){
+    void givenRequireData_whenSelectList_thenReturnUserList(){
 
-        //Given
+        UserAccount user = UserAccount.of("qweeqw","asdfdf", "nickname","asdf","asdf","M","하이요");
+        String gender ="M";
+
+        Authentication authentication = new UsernamePasswordAuthenticationToken(user,user.getPassword());
         Pageable pageable = Pageable.ofSize(10);
-        //given(userAccountRepository.findAllByScoreBetweenAndGender(5,15,"M",pageable)).willReturn(Page.empty());
+        List<UserAccount> list = List.of(user);
+        Page<UserAccount> pages = new PageImpl<>(list, pageable, 10);
 
-        //When
-        //Page<UserAccount> pages = userService.getUserList(10,"M",pageable,"1");
+        given(userAccountRepositoryImpl.findAllByGenderAndNotLikes("W",user.getId(), pageable)).willReturn(pages);
 
-        //assertThat(pages).isEmpty();
-        //then(userAccountRepository).should().findAllByScoreBetweenAndGender(5,15,"M",pageable);
+        Page<UserAccount> result = userService.getUserList(authentication, pageable);
+
+        assertThat(result).isNotNull();
+        assertThat(result.getTotalPages()).isEqualTo(1);
+
     }
 
-    @DisplayName("내 정보 조회하기")
+    @DisplayName("내정보 조회 테스트")
     @Test
-    void giveUserId_whenSearchMyInfo_thenReturnMyInfo(){
+    void givenUser_whenGetMyInfo_thenReturnUserInfo(){
         //Given
-        UserAccount user = UserAccount.of("userId","pwd","nick","서울","INFP","M","하요");
-        user.setDeleted(false);
+        UserAccount user = UserAccount.of("qweeqw","asdfdf", "nickname","asdf","asdf","M","하이요");
+        Authentication authentication = new UsernamePasswordAuthenticationToken(user,user.getPassword());
         given(userAccountRepository.findByUserId(user.getUserId())).willReturn(user);
 
         //When
-        UserAccount result = userService.getMyInfo(user.getUserId());
+        UserAccount result = userService.getMyInfo(authentication);
 
         //Then
-        assertThat(result).hasFieldOrPropertyWithValue("userId",user.getUserId())
-                .isNotNull();
-        then(userAccountRepository).should().findByUserId(user.getUserId());
+        assertThat(result).isNotNull();
     }
 
+    @DisplayName("내 정보 수정하기")
+    @Test
+    void givenUser_whenUpdateMyInfo_thenReturnUserInfo(){
+        //Given
+        UserAccount user = UserAccount.of("qweeqw","asdfdf", "nickname","asdf","asdf","M","하이요");
+        Authentication authentication = new UsernamePasswordAuthenticationToken(user,user.getPassword());
+        List<String> list = new ArrayList<>();
+        list.add("놀기");
+        list.add("피하기");
+        UserUpdateRequestDto dto = UserUpdateRequestDto.builder()
+                .region("인천")
+                .mbti("MBTI")
+                .selfIntroduction("하이요")
+                .interests(list).build();
 
+        given(userAccountRepository.save(any(UserAccount.class))).willReturn(user);
+
+        UserAccount result = userService.updateMyInfo(authentication, dto);
+
+        assertThat(result).isNotNull();
+    }
 }

@@ -20,11 +20,10 @@ public class TokenProvider {
 
     public String create(UserAccount userAccount){
 
-        //TODO : plusSeconds 에서 min으로 바꾸기
         Date now = new Date();
+        // 유효시간 1시간으로 처리
         Date expiredAt = Date.from(LocalDateTime.now().plusHours(1).atZone(ZoneId.systemDefault()).toInstant());
         key = Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
-        Claims claims = Jwts.claims();
 
         return Jwts.builder()
                 .setSubject(userAccount.getUserId())
@@ -40,7 +39,6 @@ public class TokenProvider {
         Date now = new Date();
         Date expiredAt = Date.from(LocalDateTime.now().plusDays(7).atZone(ZoneId.systemDefault()).toInstant());
         key = Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
-        Claims claims = Jwts.claims();
 
         return Jwts.builder()
                 .setSubject(userAccount.getUserId())

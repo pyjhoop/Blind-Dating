@@ -39,9 +39,6 @@ import java.util.stream.Collectors;
 public class UserAccountController {
 
     private final UserAccountService userAccountService;
-    private final TokenProvider tokenProvider;
-    private final InterestService interestService;
-    private final QuestionService questionService;
 
     @Operation(summary = "회원가입", description = "유저정보를 받아서 회원가입을 진행합니다.")
     @ApiResponses(value = {
@@ -56,9 +53,11 @@ public class UserAccountController {
             @Parameter(name = "userPassword", description = "비밀번호", example = "qwe123!"),
             @Parameter(name = "nickname", description = "닉네임", example = "사과"),
             @Parameter(name = "region", description = "사는 지역", example = "경기도, 강원도, 경상도..."),
-            @Parameter(name = "score", description = "가중치 점수", example = "5"),
             @Parameter(name = "mbti", description = "MBTI", example = "INFP"),
             @Parameter(name = "gender", description = "성별", example = "M"),
+            @Parameter(name = "interests", description = "관심사", example = "['자전거','독서']"),
+            @Parameter(name = "questions", description = "질문에 대한 답변", example = "[true,false]"),
+            @Parameter(name = "selfIntroduction", description = "자기소개", example = "hello")
     })
     @PostMapping("/signup")
     public ResponseEntity<ResponseDto> registerUser(
@@ -66,8 +65,9 @@ public class UserAccountController {
             Errors errors,
             HttpServletResponse response
             ){
-        if (errors.hasErrors()) {
 
+        // validation 에서 에러가 발생할 때 사용.
+        if (errors.hasErrors()) {
             // 유효성 통과 못한 필드와 메시지를 핸들링
             Map<String, String> validatorResult = userAccountService.validateHandling(errors);
             return ResponseEntity.<ResponseDto>badRequest()
@@ -79,32 +79,19 @@ public class UserAccountController {
 
         }
 
-        // 토큰과 user 생성하기
-        //TODO 필수데이터가 부족할때 통합 예외처리해주기
-        String accessToken = tokenProvider.create(dto.toEntity());
-        String refreshToken = tokenProvider.refreshToken(dto.toEntity());
-        UserAccount user = userAccountService.create(dto, refreshToken);
-
-        List<String> interests = dto.getInterests();
-        List<Boolean> questions = dto.getQuestions();
-        questionService.saveQuestions(user,questions);
-
-
-        List<InterestResponse> list = interestService.saveInterest(user,interests)
-                .stream().map(InterestResponse::from).collect(Collectors.toList());
+        UserInfoWithTokens userInfo = userAccountService.register(dto);
 
         // 리프래쉬 토큰 httponly로 설정
-        Cookie cookie = new Cookie("refreshToken", refreshToken);
+        Cookie cookie = new Cookie("refreshToken", userInfo.getRefreshToken());
         cookie.setHttpOnly(true);
         response.addCookie(cookie);
 
-        return ResponseEntity.<ResponseDto>ok()
+        return ResponseEntity.ok()
                 .body(ResponseDto.builder()
                         .status("OK")
                         .message("회원가입이 성공적으로 완료되었습니다.")
-                        .data(UserResponse.of(accessToken, user.getId(), user.getNickname()))
+                        .data(UserResponse.of(userInfo.getAccessToken(), userInfo.getId(),userInfo.getNickname()))
                         .build());
-
     }
 
     @PostMapping("/login")
@@ -124,8 +111,8 @@ public class UserAccountController {
             @RequestBody LoginInputDto dto,
             HttpServletResponse response
             ){
-        UserAccount user = userAccountService.getByCredentials(dto.getUserId(), dto.getUserPassword());
-        log.info("userId={}",dto.getUserId());
+
+        UserInfoWithTokens user = userAccountService.getLoginInfo(dto.getUserId(), dto.getUserPassword());
 
         if(user == null){
             return ResponseDto.<UserResponse>builder()
@@ -135,25 +122,17 @@ public class UserAccountController {
                     .build();
 
         }else{
-
-            String accessToken = tokenProvider.create(user);
-            String refreshToken = user.getRefreshToken();
-
-            Cookie cookie = new Cookie("refreshToken", refreshToken);
+            Cookie cookie = new Cookie("refreshToken", user.getRefreshToken());
             cookie.setHttpOnly(true);
             response.addCookie(cookie);
-
 
             return ResponseDto.<UserResponse>builder()
                     .status("OK")
                     .message("로그인이 성공적으로 처리되었습니다.")
-                    .data(UserResponse.of(accessToken, user.getId(), user.getNickname()))
+                    .data(UserResponse.of(user.getAccessToken(), user.getId(), user.getNickname()))
                     .build();
         }
-
-
     }
-
 
     @PostMapping("/check-userId")
     @Operation(summary = "아이디 중복 체크", description = "아이디 중복을 체크합니다.")

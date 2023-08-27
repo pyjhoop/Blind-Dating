@@ -41,7 +41,6 @@ public class TokenProvider {
         key = Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
 
         return Jwts.builder()
-                .setSubject(userAccount.getUserId())
                 .setIssuer("blind dating web")
                 .setIssuedAt(now)
                 .setExpiration(expiredAt)
@@ -61,6 +60,24 @@ public class TokenProvider {
         Claims claims = (Claims)jwt.getBody();
 
         return claims.get("sub", String.class);
+    }
+
+    public Boolean validateToken(String refreshToken){
+        try {
+            key = Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
+
+            Claims claims = Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(refreshToken)
+                    .getBody();
+            return true;
+        }catch (ExpiredJwtException | UnsupportedJwtException | MalformedJwtException | IllegalArgumentException e) {
+            // JWT 유효성 검사 중 에러가 발생하면 false 반환
+            return false;
+        }
+
+
     }
 
 

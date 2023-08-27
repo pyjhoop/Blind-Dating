@@ -13,6 +13,8 @@ import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.data.querydsl.binding.QuerydslBinderCustomizer;
 import org.springframework.data.querydsl.binding.QuerydslBindings;
 
+import java.util.Optional;
+
 public interface UserAccountRepository extends
         JpaRepository<UserAccount, Long>
 , QuerydslPredicateExecutor<UserAccount>
@@ -27,6 +29,10 @@ public interface UserAccountRepository extends
     UserAccount findByUserId(String username);
     Boolean existsByUserId(String userId);
     UserAccount findByNickname(String nickname);
+
+    Boolean existsByRefreshToken(String refreshToken);
+
+    Optional<UserAccount> findByRefreshToken(String refreshToken);
 
 //    @Query("SELECT u FROM UserAccount u " +
 //            "LEFT JOIN u.likesUnlikes lu " +

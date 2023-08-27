@@ -83,6 +83,7 @@ public class UserAccountController {
 
         // 리프래쉬 토큰 httponly로 설정
         Cookie cookie = new Cookie("refreshToken", userInfo.getRefreshToken());
+        cookie.setMaxAge(60*60*24*7);
         cookie.setHttpOnly(true);
         response.addCookie(cookie);
 
@@ -132,6 +133,30 @@ public class UserAccountController {
                     .data(UserResponse.of(user.getAccessToken(), user.getId(), user.getNickname()))
                     .build();
         }
+    }
+
+    @PostMapping("/logout")
+    @Operation(summary = "로그인", description = "아이디와 비밀번호를 받아서 로그인을 합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "400", description = "BAD REQUEST",content = @Content(schema = @Schema(implementation = ResponseDto.class))),
+            @ApiResponse(responseCode = "404", description = "NOT FOUND", content = @Content(schema = @Schema(implementation = ResponseDto.class))),
+            @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR", content = @Content(schema = @Schema(implementation = ResponseDto.class)))
+
+    })
+    public ResponseEntity<ResponseDto> logOut(
+            @CookieValue(name = "refreshToken") Cookie cookie,
+            HttpServletResponse response){
+
+        cookie.setMaxAge(0);
+        response.addCookie(cookie);
+
+        return ResponseEntity.<ResponseDto>ok()
+                .body(ResponseDto.builder()
+                        .status("OK")
+                        .message("로그아웃이 성공적으로 실행되었습니다.")
+                        .build());
+
     }
 
     @PostMapping("/check-userId")

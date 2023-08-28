@@ -21,6 +21,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Tag(name = "User Info", description = "유저 조회 서비스")
 @SecurityRequirement(name = "Bearer Authentication")
 @RestController
@@ -39,7 +41,7 @@ public class UserController {
             @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR", content = @Content(schema = @Schema(implementation = ResponseDto.class)))
     })
     @GetMapping("/user-list")
-    public ResponseDto<Page<UserWithInterestAndQuestionDto>> getUserList(
+    public ResponseDto<List<UserWithInterestAndQuestionDto>> getUserList(
             Authentication authentication,
             @PageableDefault(size = 10, sort = "recentLogin", direction = Sort.Direction.DESC) Pageable pageable
             ){
@@ -48,10 +50,11 @@ public class UserController {
         Page<UserAccount> users = userService.getUserList(authentication,pageable);
         Page<UserWithInterestAndQuestionDto> pages = users.map(UserWithInterestAndQuestionDto::from);
 
-        return ResponseDto.<Page<UserWithInterestAndQuestionDto>>builder()
+
+        return ResponseDto.<List<UserWithInterestAndQuestionDto>>builder()
                 .status("OK")
                 .message("성공적으로 조회되었습니다.")
-                .data(pages).build();
+                .data(pages.getContent()).build();
     }
 
     @GetMapping("/user")

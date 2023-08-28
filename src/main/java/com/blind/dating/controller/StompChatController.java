@@ -47,15 +47,15 @@ public class StompChatController {
     // roomId, userId, message,
     @MessageMapping(value = "/chat/message")
     @Operation(summary = "메세지를 전송", description = "채팅방에 접속중인 유저에게 메세지를 전송합니다.")
-    public void message(ChatRequestDto message, Authentication authentication){
+    public void message(ChatRequestDto message){
         // 일단 채팅방에 메세지 저장하고
         Chat chat = chatService.saveChat(message);
         // 현재 접속중인 사람만 읽은 메세지 update해주기.
         readChatService.updateReadChat(message.getChatRoomId(), chat.getId());
         // 내 채팅 리스트 가져오기
-        UserAccount user = (UserAccount)authentication.getPrincipal();
-        List<ChatRoomDto> rooms = chattingRoomService.getRooms(user);
-        template.convertAndSend("/sub/chatroom/"+user.getId(), rooms);
+//        UserAccount user = (UserAccount)authentication.getPrincipal();
+//        List<ChatRoomDto> rooms = chattingRoomService.getRooms(user);
+//        template.convertAndSend("/sub/chatroom/"+user.getId(), rooms);
         template.convertAndSend("/sub/chat/room/" + message.getChatRoomId(), message);
     }
 

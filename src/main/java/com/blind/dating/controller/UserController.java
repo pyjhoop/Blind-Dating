@@ -2,6 +2,7 @@ package com.blind.dating.controller;
 
 import com.blind.dating.domain.UserAccount;
 import com.blind.dating.dto.response.ResponseDto;
+import com.blind.dating.dto.user.UserInfoWithPageInfo;
 import com.blind.dating.dto.user.UserUpdateRequestDto;
 import com.blind.dating.dto.user.UserWithInterestAndQuestionDto;
 import com.blind.dating.service.UserService;
@@ -41,7 +42,7 @@ public class UserController {
             @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR", content = @Content(schema = @Schema(implementation = ResponseDto.class)))
     })
     @GetMapping("/user-list")
-    public ResponseDto<List<UserWithInterestAndQuestionDto>> getUserList(
+    public ResponseDto<UserInfoWithPageInfo> getUserList(
             Authentication authentication,
             @PageableDefault(size = 10, sort = "recentLogin", direction = Sort.Direction.DESC) Pageable pageable
             ){
@@ -49,12 +50,16 @@ public class UserController {
         // 이성 추천 유저리스트 가져오기.
         Page<UserAccount> users = userService.getUserList(authentication,pageable);
         Page<UserWithInterestAndQuestionDto> pages = users.map(UserWithInterestAndQuestionDto::from);
+        UserInfoWithPageInfo content = new UserInfoWithPageInfo();
+        content.setContent(pages.getContent());
+        content.setTotalPages(pages.getTotalPages());
+        content.setPageNumber(pages.getNumber());
 
 
-        return ResponseDto.<List<UserWithInterestAndQuestionDto>>builder()
+        return ResponseDto.<UserInfoWithPageInfo>builder()
                 .status("OK")
                 .message("성공적으로 조회되었습니다.")
-                .data(pages.getContent()).build();
+                .data(content).build();
     }
 
     @GetMapping("/user")

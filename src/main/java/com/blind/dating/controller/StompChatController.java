@@ -52,10 +52,17 @@ public class StompChatController {
         Chat chat = chatService.saveChat(message);
         // 현재 접속중인 사람만 읽은 메세지 update해주기.
         readChatService.updateReadChat(message.getChatRoomId(), chat.getId());
-        // 내 채팅 리스트 가져오기
-//        UserAccount user = (UserAccount)authentication.getPrincipal();
-//        List<ChatRoomDto> rooms = chattingRoomService.getRooms(user);
-//        template.convertAndSend("/sub/chatroom/"+user.getId(), rooms);
+        // 내 채팅방 가져와서 현제 writer외의 다른 사람의 rooms를 가져와서 convert해주기
+        ChatRoom room = chattingRoomService.getRoom(message.getChatRoomId()).get();
+        Long userId = 0L;
+        if(room.getUser1().getId() == Long.valueOf(message.getWriterId())){
+            userId = room.getUser2().getId();
+        }else{
+            userId = room.getUser1().getId();
+        }
+
+        List<ChatRoomDto> rooms = chattingRoomService.getRooms(userId);
+        template.convertAndSend("/sub/chatroom/"+userId, rooms);
         template.convertAndSend("/sub/chat/room/" + message.getChatRoomId(), message);
     }
 

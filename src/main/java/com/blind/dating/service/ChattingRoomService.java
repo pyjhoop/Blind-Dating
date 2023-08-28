@@ -32,19 +32,19 @@ public class ChattingRoomService {
 
     /**
      * 현재 내가 참여하고 있는 채팅방 조회 서비스
-     * @param userAccount
+     * @param userId
      * @return List<ChatRoomDto></ChatRoomDto>
      */
-    public List<ChatRoomDto> getRooms( UserAccount userAccount){
-        List<ChatRoomDto> rooms = chattingRoomRepositoryImpl.findAllByUserId(userAccount.getId()).stream().map(room -> {
+    public List<ChatRoomDto> getRooms(Long userId){
+        List<ChatRoomDto> rooms = chattingRoomRepositoryImpl.findAllByUserId(userId).stream().map(room -> {
             ChatRoomDto dto = new ChatRoomDto();
 
             // 조회를 위해 상대방 유저 정보 찾은 후 user2에 저장하기
-            if(room.getUser1().getId() != userAccount.getId()){
+            if(room.getUser1().getId() != userId){
                 room.setUser2(room.getUser1());
             }
             // 채팅방에서 읽지 않은 채팅 개수 조회
-            Long unReadCount = chatService.unreadChat(userAccount.getId(), room.getId());
+            Long unReadCount = chatService.unreadChat(userId, room.getId());
 
             // 응답 데이터를 보여주기 위해 ChatRoom -> ChatRoomDto 로 변환
             dto.setRoomId(room.getId());

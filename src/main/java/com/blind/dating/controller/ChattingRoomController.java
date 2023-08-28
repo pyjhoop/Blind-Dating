@@ -50,7 +50,7 @@ public class ChattingRoomController {
         UserAccount userAccount = (UserAccount) authentication.getPrincipal();
 
         //나에게 생성된 채팅룸 조회
-        List<ChatRoomDto> rooms = chattingRoomService.getRooms(userAccount);
+        List<ChatRoomDto> rooms = chattingRoomService.getRooms(userAccount.getId());
 
         return ResponseEntity.<ResponseDto<List<ChatRoomDto>>>ok()
                 .body(ResponseDto.<List<ChatRoomDto>>builder()

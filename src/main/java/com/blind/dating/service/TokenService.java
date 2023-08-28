@@ -7,6 +7,7 @@ import com.blind.dating.dto.user.UserInfoWithTokens;
 import com.blind.dating.repository.UserAccountRepository;
 import com.blind.dating.security.TokenProvider;
 import lombok.RequiredArgsConstructor;
+import org.apache.tomcat.websocket.AuthenticationException;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,7 +29,7 @@ public class TokenService {
      * @param cookie
      * @return
      */
-    public Boolean validRefreshToken(Cookie cookie){
+    public Boolean validRefreshToken(Cookie cookie) throws AuthenticationException {
 
         // 유효한지 확인해줘
         boolean validate = tokenProvider.validateToken(cookie.getValue());

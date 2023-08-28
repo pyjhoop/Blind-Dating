@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.tomcat.websocket.AuthenticationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -42,7 +43,7 @@ public class TokenController {
     public ResponseEntity<ResponseDto> newAccessToken(
             @CookieValue(name = "refreshToken") Cookie cookie,
             HttpServletResponse response
-    ){
+    ) throws AuthenticationException {
 
         //리프레쉬 토큰이 해당 유저에 저장된 데이터가 맞는지 확인
         Boolean validate = tokenService.validRefreshToken(cookie);

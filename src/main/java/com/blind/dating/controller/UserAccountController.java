@@ -136,7 +136,7 @@ public class UserAccountController {
     }
 
     @PostMapping("/logout")
-    @Operation(summary = "로그인", description = "아이디와 비밀번호를 받아서 로그인을 합니다.")
+    @Operation(summary = "로그아웃", description = "로그아웃을 진행합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "400", description = "BAD REQUEST",content = @Content(schema = @Schema(implementation = ResponseDto.class))),

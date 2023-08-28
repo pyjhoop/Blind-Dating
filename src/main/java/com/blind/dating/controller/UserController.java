@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -21,6 +22,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "User Info", description = "유저 조회 서비스")
+@SecurityRequirement(name = "Bearer Authentication")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
@@ -99,11 +101,6 @@ public class UserController {
                         .build());
 
 
-    }
-
-    @GetMapping("/hello")
-    public String test(){
-        return "Heoolo";
     }
 
 }

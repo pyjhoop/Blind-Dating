@@ -15,6 +15,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -29,6 +30,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Tag(name = "Chatting Room Info", description = "채팅방 관련 서비스")
+@SecurityRequirement(name = "Bearer Authentication")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
@@ -103,29 +105,4 @@ public class ChattingRoomController {
                 .data(ChatListWithOtherUserInfo.of(userInfo.getId(), userInfo.getNickname(), chatList))
                 .build());
     }
-
-//    @PutMapping("/chatroom/{roomId}")
-//    public ResponseEntity<ResponseDto> leaveChatRoom(@PathVariable String roomId, Authentication authentication){
-//        //룸 조회후 내 정보를 null로 수정
-//        UserAccount user = (UserAccount) authentication.getPrincipal();
-//        //채팅방 떠나는 기능
-//        ChatRoom room = chattingRoomService.leaveChatRoom(roomId, user);
-//        //채팅방에 아무도 없을 때 채팅방 삭제
-//        boolean check = chattingRoomService.removeRoom(room);
-//        String message = "";
-//
-//        if(check){
-//            message = "채팅방이 삭제되었습니다.";
-//        }else{
-//            message = "채팅방을 성공적으로 나갔습니다.";
-//        }
-//
-//        return ResponseEntity.<ResponseDto>ok()
-//                .body(ResponseDto.<String>builder()
-//                        .status("OK")
-//                        .message(message)
-//                        .build());
-//    }
-
-
 }

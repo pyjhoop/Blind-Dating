@@ -1,12 +1,32 @@
 package com.blind.dating.config;
 
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
+import io.swagger.v3.oas.annotations.info.Contact;
+import io.swagger.v3.oas.annotations.info.Info;
+import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import io.swagger.v3.oas.models.OpenAPI;
-import io.swagger.v3.oas.models.info.Info;
 import org.springdoc.core.GroupedOpenApi;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
+@OpenAPIDefinition(
+        info = @Info(
+                title = "Blind Dating Back End API",
+                version = "v0.0.1",
+                description = "데이팅 웹사이트 API 명세서입니다.",
+                contact = @Contact(
+                        name = "YeonJun", email = "pyjhoop@naver.com"
+                )
+        )
+)
+@SecurityScheme(
+        name = "Bearer Authentication",
+        type = SecuritySchemeType.HTTP,
+        bearerFormat = "JWT",
+        scheme = "bearer"
+)
 public class SwaggerConfig {
     @Bean
     public GroupedOpenApi publicApi(){
@@ -16,12 +36,6 @@ public class SwaggerConfig {
                 .build();
     }
 
-    @Bean
-    public OpenAPI springShopOpenApi(){
-        return new OpenAPI()
-                .info(new Info().title("Blind Dating Back End API")
-                        .description("데이팅 웹사이트 API 명세서입니다.")
-                        .version("v0.0.1"));
-    }
+
 
 }

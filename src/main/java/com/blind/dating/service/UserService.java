@@ -86,4 +86,7 @@ public class UserService {
         return user;
     }
 
+    public UserAccount getUser(Long otherId) {
+        return userAccountRepository.findById(otherId).get();
+    }
 }

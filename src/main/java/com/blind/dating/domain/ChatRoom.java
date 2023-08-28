@@ -23,20 +23,19 @@ public class ChatRoom extends BaseEntity{
     private Long id;
 
     @Setter
-    @OneToOne
-    private UserAccount user1;
+    private Long user1;
 
     @Setter
-    @OneToOne
-    private UserAccount user2;
+    private Long user2;
 
     @Setter
     private String recentMessage;
 
+    @ToString.Exclude
     @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL)
     private final Set<Chat> chats = new LinkedHashSet<>();
 
-    public ChatRoom(UserAccount user1, UserAccount user2) {
+    public ChatRoom(Long user1, Long user2) {
         this.user1 = user1;
         this.user2 = user2;
     }

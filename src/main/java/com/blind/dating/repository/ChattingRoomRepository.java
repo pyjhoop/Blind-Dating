@@ -8,6 +8,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface ChattingRoomRepository extends JpaRepository<ChatRoom, Long> {
-
+    List<ChatRoom> findAllByUser1OrUser2(Long user1, Long user2);
 
 }

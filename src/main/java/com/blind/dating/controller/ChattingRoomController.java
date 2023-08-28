@@ -8,6 +8,7 @@ import com.blind.dating.dto.chat.ChatRoomDto;
 import com.blind.dating.dto.response.ResponseDto;
 import com.blind.dating.service.ChatService;
 import com.blind.dating.service.ChattingRoomService;
+import com.blind.dating.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -35,6 +36,7 @@ public class ChattingRoomController {
 
     private final ChattingRoomService chattingRoomService;
     private final ChatService chatService;
+    private final UserService userService;
 
     @GetMapping("/chatroom")
     @Operation(summary = "채팅방 전체 조회", description = "내가 들어간 채팅방을 조회합니다.")
@@ -83,12 +85,14 @@ public class ChattingRoomController {
             throw new RuntimeException(roomId+"에 해당하는 채팅방이 존재하지 않습니다.");
         }
 
-        //
-        UserAccount userInfo = chatRoom.get().getUser1();
-
-        if(user == chatRoom.get().getUser1()){
-            userInfo = chatRoom.get().getUser2();
+        //다른 유저 정보 조회하기.
+        Long otherId = 0L;
+        if(chatRoom.get().getUser1() == user.getId()){
+            otherId = chatRoom.get().getUser2();
+        }else{
+            otherId = chatRoom.get().getUser1();
         }
+        UserAccount userInfo = userService.getUser(otherId);
 
         //존재할경우 채팅 메세지 30개를 id 오름차순으로 가져오기
         Page<ChatDto> chatList = chatService.selectChatList(roomId, pageable).map(ChatDto::from);

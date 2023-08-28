@@ -20,6 +20,7 @@
         <input type="text" id="msg" class="form-control">
         <div class="input-group-append">
           <button class="btn btn-outline-secondary" type="button" id="button-send">전송</button>
+          <button class="btn btn-outline-secondary" type="button" id="button-th">테스트</button>
         </div>
       </div>
     </div>
@@ -81,6 +82,10 @@
       stomp.send('/pub/chat/message', {}, JSON.stringify({chatRoomId: roomId, writerId: userId, message: msg.value}));
       msg.value = '';
     });
+
+    $("#button-th").on("click",function (){
+      stomp.send('/pub/chat/disconnect',{}, JSON.stringify({chatRoomId: roomId, writerId: userId}))
+    })
     //stomp.send('/pub/chat/disconnect',{}, JSON.stringify({chatRoomId: roomId}))
 
   });

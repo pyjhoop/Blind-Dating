@@ -38,12 +38,10 @@ public class ChattingRoomRepositoryImpl extends QuerydslRepositorySupport implem
         JPAQueryFactory queryFactory = new JPAQueryFactory(entityManager);
         QChatRoom chatRoom = QChatRoom.chatRoom;
 
-        List<ChatRoom> content = queryFactory.select(chatRoom)
+        return queryFactory.select(chatRoom)
                 .from(chatRoom)
-                .where(chatRoom.user1.id.eq(userId1).or(chatRoom.user2.id.eq(userId1)))
+                .where(chatRoom.user1.eq(userId1).or(chatRoom.user2.eq(userId1)))
                 .fetch();
-
-        return content;
     }
 
 

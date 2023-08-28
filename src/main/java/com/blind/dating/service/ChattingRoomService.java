@@ -4,8 +4,10 @@ import com.blind.dating.domain.ChatRoom;
 import com.blind.dating.domain.UserAccount;
 import com.blind.dating.dto.chat.ChatRoomDto;
 import com.blind.dating.repository.ChattingRoomRepository;
+import com.blind.dating.repository.UserAccountRepository;
 import com.blind.dating.repository.querydsl.ChattingRoomRepositoryImpl;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -15,6 +17,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class ChattingRoomService {
@@ -22,9 +25,10 @@ public class ChattingRoomService {
     private final ChattingRoomRepository chatRoomRepository;
     private final ChattingRoomRepositoryImpl chattingRoomRepositoryImpl;
     private final ChatService chatService;
+    private final UserAccountRepository userAccountRepository;
 
     public ChatRoom create(UserAccount user1, UserAccount user2){
-       ChatRoom room = new ChatRoom(user1, user2);
+       ChatRoom room = new ChatRoom(user1.getId(), user2.getId());
 
         return chatRoomRepository.save(room);
 
@@ -36,21 +40,34 @@ public class ChattingRoomService {
      * @return List<ChatRoomDto></ChatRoomDto>
      */
     public List<ChatRoomDto> getRooms(Long userId){
-        List<ChatRoomDto> rooms = chattingRoomRepositoryImpl.findAllByUserId(userId).stream().map(room -> {
+        System.out.println(userId);
+
+        List<ChatRoom> chatRooms = chatRoomRepository.findAllByUser1OrUser2(userId, userId);
+        System.out.println("=================");
+
+        List<ChatRoomDto> rooms = chatRooms.stream().map(room -> {
             ChatRoomDto dto = new ChatRoomDto();
 
+            Long otherId = 0L;
             // 조회를 위해 상대방 유저 정보 찾은 후 user2에 저장하기
-            if(room.getUser1().getId() != userId){
-                room.setUser2(room.getUser1());
+            if(room.getUser1() == userId){
+                otherId = room.getUser2();
+            }else{
+                otherId = room.getUser1();
             }
             // 채팅방에서 읽지 않은 채팅 개수 조회
             Long unReadCount = chatService.unreadChat(userId, room.getId());
+            // 상대방 정보 조회하기
+
+            Optional<UserAccount> other = userAccountRepository.findById(otherId);
+            if(other.isPresent()){
+                dto.setOtherUserid(other.get().getId());
+                dto.setOtherUserNickname(other.get().getNickname());
+            }
 
             // 응답 데이터를 보여주기 위해 ChatRoom -> ChatRoomDto 로 변환
             dto.setRoomId(room.getId());
             dto.setUpdatedAt(room.getUpdatedAt());
-            dto.setOtherUserid(room.getUser2().getId());
-            dto.setOtherUserNickname(room.getUser2().getNickname());
             dto.setRecentMessage(room.getRecentMessage());
             dto.setUnReadCount(unReadCount);
 
@@ -68,7 +85,7 @@ public class ChattingRoomService {
 
     public boolean removeRoom(ChatRoom chatRoom){
 
-        if(chatRoom.getUser1() == null && chatRoom.getUser2() == null){
+        if(chatRoom.getUser1() == 0L && chatRoom.getUser2() == 0L){
             chatRoomRepository.delete(chatRoom);
             return true;
         }
@@ -76,17 +93,17 @@ public class ChattingRoomService {
     }
 
     @Transactional
-    public ChatRoom leaveChatRoom(String roomId, UserAccount user){
+    public ChatRoom leaveChatRoom(String roomId, String userId){
 
         Optional<ChatRoom> chatRoom = chatRoomRepository.findById(Long.valueOf(roomId));
 
         if(chatRoom.isPresent()){
             ChatRoom room = chatRoom.get();
 
-            if(room.getUser2().equals(user)){
-                room.setUser2(null);
-            }else if(room.getUser1().equals(user)){
-                room.setUser1(null);
+            if(room.getUser2() == Long.valueOf(userId)){
+                room.setUser2(0L);
+            }else if(room.getUser1() == Long.valueOf(userId)){
+                room.setUser1(0L);
             }
             return room;
         }else {

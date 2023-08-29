@@ -30,9 +30,6 @@ public interface UserAccountRepository extends
     Boolean existsByUserId(String userId);
     UserAccount findByNickname(String nickname);
 
-    Boolean existsByRefreshToken(String refreshToken);
-
-    Optional<UserAccount> findByRefreshToken(String refreshToken);
 
 //    @Query("SELECT u FROM UserAccount u " +
 //            "LEFT JOIN u.likesUnlikes lu " +

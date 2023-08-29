@@ -54,10 +54,6 @@ public class UserAccount extends BaseEntity implements UserDetails {
     private Boolean deleted;
 
     @Setter
-    @Column(nullable = false)
-    private String refreshToken;
-
-    @Setter
     private String selfIntroduction;
 
     @Setter

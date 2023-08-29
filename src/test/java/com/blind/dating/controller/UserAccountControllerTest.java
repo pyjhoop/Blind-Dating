@@ -58,7 +58,7 @@ class UserAccountControllerTest {
         dto.setInterests(List.of("자전거타기","놀기","게임하기"));
         dto.setQuestions(List.of(true, false, true));
 
-       given(userAccountService.register(any(UserRequestDto.class))).willReturn(info);
+       given(userAccountService.register(any(UserRequestDto.class))).willReturn(dto.toEntity());
 
 
        mvc.perform(post("/api/signup")

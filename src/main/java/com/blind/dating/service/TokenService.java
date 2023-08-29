@@ -4,6 +4,7 @@ import com.blind.dating.domain.UserAccount;
 import com.blind.dating.dto.user.TokenDto;
 import com.blind.dating.dto.user.UserIdRequestDto;
 import com.blind.dating.dto.user.UserInfoWithTokens;
+import com.blind.dating.repository.RefreshTokenRepository;
 import com.blind.dating.repository.UserAccountRepository;
 import com.blind.dating.security.TokenProvider;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,7 @@ public class TokenService {
 
     private final UserAccountRepository userAccountRepository;
     private final TokenProvider tokenProvider;
+    private final RefreshTokenRepository refreshTokenRepository;
 
 
     /**
@@ -28,13 +30,24 @@ public class TokenService {
      * @param cookie
      * @return
      */
-    public Boolean validRefreshToken(Cookie cookie){
+    public String validRefreshToken(Cookie cookie){
 
         // 유효한지 확인해줘
         boolean validate = tokenProvider.validateToken(cookie.getValue());
+        // id 추출해서 refreshToken 가져오기
+
+        String userId = tokenProvider.validateAndGetUserId(cookie.getValue());
+
 
         if(validate){
-            return userAccountRepository.existsByRefreshToken(cookie.getValue());
+
+            String refreshToken = refreshTokenRepository.getRefreshToken(userId);
+            if(refreshToken != null){
+                return userId;
+            }else{
+                return null;
+            }
+                    //userAccountRepository.existsByRefreshToken(cookie.getValue());
         }else{
             return null;
         }
@@ -42,18 +55,21 @@ public class TokenService {
 
     /**
      * 리프래쉬 토큰을 새로운 리프래쉬 토큰으로 업데이트
-     * @param cookie
+     * @param userId
      * @return
      */
     @Transactional
-    public UserInfoWithTokens updateRefreshToken(Cookie cookie){
-
-        Optional<UserAccount> user = userAccountRepository.findByRefreshToken(cookie.getValue());
+    public UserInfoWithTokens updateRefreshToken(String userId){
+        Optional<UserAccount> user = userAccountRepository.findById(Long.valueOf(userId));
         String accessToken = null;
         String refreshToken = null;
         if(user.isPresent()){
             accessToken = tokenProvider.create(user.get());
             refreshToken = tokenProvider.refreshToken(user.get());
+            // redis에있는 이전 refreshToken 삭제 후 다시 생성
+            refreshTokenRepository.deleteRefreshToken(userId);
+
+            refreshTokenRepository.save(userId, refreshToken);
         }else{
             throw new RuntimeException(user.get().getId() +"에 해당하는 유저는 존재하지 앖습니다.");
         }

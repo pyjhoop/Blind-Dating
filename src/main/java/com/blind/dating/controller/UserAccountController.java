@@ -79,19 +79,12 @@ public class UserAccountController {
 
         }
 
-        UserInfoWithTokens userInfo = userAccountService.register(dto);
-
-        // 리프래쉬 토큰 httponly로 설정
-        Cookie cookie = new Cookie("refreshToken", userInfo.getRefreshToken());
-        cookie.setMaxAge(60*60*24*7);
-        cookie.setHttpOnly(true);
-        response.addCookie(cookie);
+        UserAccount userInfo = userAccountService.register(dto);
 
         return ResponseEntity.ok()
                 .body(ResponseDto.builder()
                         .status("OK")
                         .message("회원가입이 성공적으로 완료되었습니다.")
-                        .data(UserResponse.of(userInfo.getAccessToken(), userInfo.getId(),userInfo.getNickname()))
                         .build());
     }
 

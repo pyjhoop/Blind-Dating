@@ -44,24 +44,21 @@ class UserAccountServiceTest {
         dto.setQuestions(List.of(true, false, true));
 
         String accessToken = "asdffqwerqwerdfgscvASDF";
-        String refreshToken = "sdfgvcwerwdrafasfdsfdf";
         String password = "hashPass";
 
         UserAccount user = dto.toEntity();
         user.setRecentLogin(LocalDateTime.now());
-        user.setRefreshToken(refreshToken);
         user.setDeleted(false);
 
         user.setUserPassword(bCryptPasswordEncoder.encode(dto.getUserPassword()));
 
         given(userAccountRepository.existsByUserId(dto.getUserId())).willReturn(false);
         given(tokenProvider.create(dto.toEntity())).willReturn(accessToken);
-        given(tokenProvider.refreshToken(dto.toEntity())).willReturn(refreshToken);
         given(bCryptPasswordEncoder.encode(dto.getUserPassword())).willReturn(password);
         given(userAccountRepository.save(user)).willReturn(user);
 
         //when
-        UserInfoWithTokens info = userAccountService.register(dto);
+        UserAccount info = userAccountService.register(dto);
 
         //then
         assertThat(info).isNotNull()

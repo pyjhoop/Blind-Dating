@@ -45,9 +45,9 @@ public class TokenController {
     ){
 
         //리프레쉬 토큰이 해당 유저에 저장된 데이터가 맞는지 확인
-        Boolean validate = tokenService.validRefreshToken(cookie);
+        String userId = tokenService.validRefreshToken(cookie);
 
-        if(validate == null){
+        if(userId == null){
             //쿠키 삭제해라.
             cookie.setMaxAge(0);
             response.addCookie(cookie);
@@ -60,16 +60,14 @@ public class TokenController {
 
         // 맞는지 확인하고 있으면 리프레쉬 토큰 업데이트 후 access, refresh 반환하기.
         UserInfoWithTokens dto = null;
-        if(validate){
-            dto = tokenService.updateRefreshToken(cookie);
-            cookie.setMaxAge(0);
-            Cookie newCookie = new Cookie("refreshToken",dto.getRefreshToken());
-            newCookie.setMaxAge(60*60*24*7);
-            cookie.setHttpOnly(true);
-            response.addCookie(cookie);
-        }else {
-            throw new RuntimeException("잘못된 refreshToken 입니다.");
-        }
+
+        dto = tokenService.updateRefreshToken(userId);
+        cookie.setMaxAge(0);
+        Cookie newCookie = new Cookie("refreshToken",dto.getRefreshToken());
+        newCookie.setMaxAge(60*60*24*7);
+        cookie.setHttpOnly(true);
+        response.addCookie(cookie);
+
         return ResponseEntity.<ResponseDto<UserResponse>>ok()
                 .body(ResponseDto.<UserResponse>builder()
                         .status("OK")

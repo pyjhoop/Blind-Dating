@@ -17,7 +17,9 @@ public interface ChatRepository extends JpaRepository<Chat,Long> {
 
     Optional<Chat> findFirstByChatRoomIdOrderByCreatedAtDesc(Long roomId);
 
-    Page<Chat> findAllByChatRoomId(Long roomId, Pageable pageable);
+    List<Chat> findAllByChatRoomIdOrderById(Long roomId);
+
+    List<Chat> findByChatRoomIdAndIdLessThanEqualOrderByIdDesc(Long roomId, Long chatId);
 
 
 }

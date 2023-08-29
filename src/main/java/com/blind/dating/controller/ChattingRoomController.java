@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Tag(name = "Chatting Room Info", description = "채팅방 관련 서비스")
 @SecurityRequirement(name = "Bearer Authentication")
@@ -76,6 +77,7 @@ public class ChattingRoomController {
     @Parameter(name = "roomId", description = "채팅방 번호")
     public ResponseEntity<ResponseDto<ChatListWithOtherUserInfo>> enterRoom(
             @PathVariable String roomId,
+            @RequestParam String chatId,
             @PageableDefault(size = 30, sort = "id", direction = Sort.Direction.DESC) Pageable pageable,
             Authentication authentication
     ){
@@ -95,18 +97,16 @@ public class ChattingRoomController {
         }else{
             otherId = chatRoom.get().getUser1();
         }
-        System.out.println("user1"+chatRoom.get().getUser1());
-        System.out.println("user2"+chatRoom.get().getUser2());
-        System.out.println(otherId);
+
         Optional<UserAccount> userInfo = userService.getUser(otherId);
         //존재할경우 채팅 메세지 30개를 id 오름차순으로 가져오기
-        Page<ChatDto> chatList = chatService.selectChatList(roomId, pageable).map(ChatDto::from);
+        List<ChatDto> chatList = chatService.selectChatList(roomId, chatId).stream().map(ChatDto::from).limit(30).collect(Collectors.toList());
         ChatListWithOtherUserInfo chatListWithOtherUserInfo = null;
 
         if(userInfo.isEmpty()){
-            chatListWithOtherUserInfo = ChatListWithOtherUserInfo.of(null,null,chatList);
+            chatListWithOtherUserInfo = ChatListWithOtherUserInfo.of(null,null,chatRoom.get().getStatus(),chatList);
         }else{
-            chatListWithOtherUserInfo = ChatListWithOtherUserInfo.of(userInfo.get().getId(), userInfo.get().getNickname(), chatList);
+            chatListWithOtherUserInfo = ChatListWithOtherUserInfo.of(userInfo.get().getId(), userInfo.get().getNickname(),chatRoom.get().getStatus(), chatList);
         }
 
         return ResponseEntity.ok().body(ResponseDto.<ChatListWithOtherUserInfo>builder()

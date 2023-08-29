@@ -98,6 +98,7 @@ public class ChattingRoomService {
 
             }else {
                 room.setLeaveId(Long.valueOf(userId));
+                room.setStatus(false);
                 return false;
             }
         }else {

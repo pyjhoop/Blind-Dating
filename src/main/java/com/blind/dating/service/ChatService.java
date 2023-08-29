@@ -25,8 +25,12 @@ public class ChatService {
     private final ReadChatRepository readChatRepository;
 
 
-    public Page<Chat> selectChatList(String roomId, Pageable pageable){
-        return chatRepository.findAllByChatRoomId(Long.valueOf(roomId), pageable);
+    public List<Chat> selectChatList(String roomId, String chatId){
+        if(Long.parseLong(chatId) == 0){
+            return chatRepository.findAllByChatRoomIdOrderByIdDesc(Long.valueOf(roomId));
+        }else{
+            return chatRepository.findByChatRoomIdAndIdLessThanEqualOrderByIdDesc(Long.valueOf(roomId), Long.valueOf(chatId));
+        }
     }
 
     @Transactional

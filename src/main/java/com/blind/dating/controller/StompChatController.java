@@ -70,9 +70,8 @@ public class StompChatController {
     @Operation(summary = "채팅방 나가기", description = "채팅방 나갈시 다른 유저에게 메세지를 전송합니다.")
     public void leave(ChatRequestDto message){
         //채팅방 떠나는 기능
-        ChatRoom room = chattingRoomService.leaveChatRoom(message.getChatRoomId(), message.getWriterId());
+        Boolean check = chattingRoomService.leaveChatRoom(message.getChatRoomId(), message.getWriterId());
         //채팅방에 아무도 없을 때 채팅방 삭제
-        boolean check = chattingRoomService.removeRoom(room);
         String response = "";
 
         if(!check){

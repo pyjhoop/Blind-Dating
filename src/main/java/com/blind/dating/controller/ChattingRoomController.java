@@ -27,6 +27,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Tag(name = "Chatting Room Info", description = "채팅방 관련 서비스")
@@ -89,20 +90,28 @@ public class ChattingRoomController {
 
         //다른 유저 정보 조회하기.
         Long otherId = 0L;
-        if(chatRoom.get().getUser1() == user.getId()){
+        if(chatRoom.get().getUser1() == user.getId() || chatRoom.get().getUser1() == 0){
             otherId = chatRoom.get().getUser2();
         }else{
             otherId = chatRoom.get().getUser1();
         }
-        UserAccount userInfo = userService.getUser(otherId);
-
+        System.out.println("user1"+chatRoom.get().getUser1());
+        System.out.println("user2"+chatRoom.get().getUser2());
+        System.out.println(otherId);
+        Optional<UserAccount> userInfo = userService.getUser(otherId);
         //존재할경우 채팅 메세지 30개를 id 오름차순으로 가져오기
         Page<ChatDto> chatList = chatService.selectChatList(roomId, pageable).map(ChatDto::from);
+        ChatListWithOtherUserInfo chatListWithOtherUserInfo = null;
+
+        if(userInfo.isEmpty()){
+            chatListWithOtherUserInfo = ChatListWithOtherUserInfo.of(null,null,chatList);
+        }else{
+            chatListWithOtherUserInfo = ChatListWithOtherUserInfo.of(userInfo.get().getId(), userInfo.get().getNickname(), chatList);
+        }
 
         return ResponseEntity.ok().body(ResponseDto.<ChatListWithOtherUserInfo>builder()
                 .status("OK")
                 .message("채팅 메세지가 성공적으로 조회되었습니다.")
-                .data(ChatListWithOtherUserInfo.of(userInfo.getId(), userInfo.getNickname(), chatList))
-                .build());
+                .data(chatListWithOtherUserInfo).build());
     }
 }

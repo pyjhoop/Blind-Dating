@@ -29,6 +29,9 @@ public class ChatRoom extends BaseEntity{
     private Long user2;
 
     @Setter
+    private Long leaveId;
+
+    @Setter
     private String recentMessage;
 
     @ToString.Exclude

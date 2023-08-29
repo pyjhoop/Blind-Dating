@@ -39,10 +39,11 @@ public class ChattingRoomService {
      * @param userId
      * @return List<ChatRoomDto></ChatRoomDto>
      */
+    @Transactional
     public List<ChatRoomDto> getRooms(Long userId){
         System.out.println(userId);
 
-        List<ChatRoom> chatRooms = chatRoomRepository.findAllByUser1OrUser2(userId, userId);
+        List<ChatRoom> chatRooms = chatRoomRepository.findCustomQuery(userId, userId, userId);
         System.out.println("=================");
 
         List<ChatRoomDto> rooms = chatRooms.stream().map(room -> {
@@ -83,29 +84,22 @@ public class ChattingRoomService {
 
     }
 
-    public boolean removeRoom(ChatRoom chatRoom){
-
-        if(chatRoom.getUser1() == 0L && chatRoom.getUser2() == 0L){
-            chatRoomRepository.delete(chatRoom);
-            return true;
-        }
-        return false;
-    }
 
     @Transactional
-    public ChatRoom leaveChatRoom(String roomId, String userId){
+    public Boolean leaveChatRoom(String roomId, String userId){
 
         Optional<ChatRoom> chatRoom = chatRoomRepository.findById(Long.valueOf(roomId));
 
         if(chatRoom.isPresent()){
             ChatRoom room = chatRoom.get();
+            if(room.getLeaveId() != null){
+                chatRoomRepository.delete(chatRoom.get());
+                return true;
 
-            if(room.getUser2() == Long.valueOf(userId)){
-                room.setUser2(0L);
-            }else if(room.getUser1() == Long.valueOf(userId)){
-                room.setUser1(0L);
+            }else {
+                room.setLeaveId(Long.valueOf(userId));
+                return false;
             }
-            return room;
         }else {
             throw new RuntimeException(roomId +"에 해당하는 채팅방이 존재하지 않습니다.");
         }

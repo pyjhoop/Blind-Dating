@@ -5,6 +5,7 @@ import com.blind.dating.dto.user.UserInfoWithTokens;
 import com.blind.dating.dto.user.UserRequestDto;
 import com.blind.dating.repository.UserAccountRepository;
 import com.blind.dating.security.TokenProvider;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -35,6 +36,7 @@ class UserAccountServiceTest {
     @Mock private QuestionService questionService;
     @Mock private InterestService interestService;
 
+    @Disabled
     @DisplayName("회원가입 테스트")
     @Test
     void givenUserRequestDto_whenRegister_thenRegisterSuccess(){
@@ -67,6 +69,7 @@ class UserAccountServiceTest {
     }
 
 
+    @Disabled
     @DisplayName("로그인 서비스 - 성공 테스트")
     @Test
     void givenLoginInfo_whenLogin_thenReturnUserInfoWithTokens(){

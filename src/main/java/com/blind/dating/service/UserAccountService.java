@@ -88,7 +88,7 @@ public class UserAccountService {
             String accessToken = tokenProvider.create(user);
             String refreshToken = tokenProvider.refreshToken(user);
             // 기존에 토큰 삭제하기
-            refreshTokenRepository.deleteRefreshToken(String.valueOf(user.getId()));
+            //refreshTokenRepository.deleteRefreshToken(String.valueOf(user.getId()));
             //새로 저장하기
             refreshTokenRepository.save(String.valueOf(user.getId()), refreshToken);
 

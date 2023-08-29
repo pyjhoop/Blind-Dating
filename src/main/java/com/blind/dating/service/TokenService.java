@@ -66,9 +66,7 @@ public class TokenService {
         if(user.isPresent()){
             accessToken = tokenProvider.create(user.get());
             refreshToken = tokenProvider.refreshToken(user.get());
-            // redis에있는 이전 refreshToken 삭제 후 다시 생성
-            refreshTokenRepository.deleteRefreshToken(userId);
-
+            // redis에있는 이전 refreshToken 덮어쓰기
             refreshTokenRepository.save(userId, refreshToken);
         }else{
             throw new RuntimeException(user.get().getId() +"에 해당하는 유저는 존재하지 앖습니다.");

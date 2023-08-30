@@ -2,9 +2,11 @@ package com.blind.dating.dto.user;
 
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 @Data
+@NoArgsConstructor
 @ToString
 public class LoginInputDto {
     private String userId;

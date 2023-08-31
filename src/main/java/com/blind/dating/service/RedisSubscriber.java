@@ -34,7 +34,7 @@ public class RedisSubscriber implements MessageListener {
             if(channel.equals("rooms")){
                 String roomsStr = (String) redisTemplate.getStringSerializer().deserialize(message.getBody());
                 ChatListWithUserId rooms = objectMapper.readValue(roomsStr, ChatListWithUserId.class);
-                messagingTemplate.convertAndSend("/sub/chatroom/"+1, rooms);
+                messagingTemplate.convertAndSend("/sub/chatroom/"+rooms.getUserId(), rooms);
 
             }else{
                 String publishMessage = (String) redisTemplate.getStringSerializer().deserialize(message.getBody());

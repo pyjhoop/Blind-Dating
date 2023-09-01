@@ -40,17 +40,13 @@ public class LikesUnlikesController {
             Authentication authentication
     ){
 
-        ResponseDto<LikesUnlikes> result = likesUnlikesService.likeUser(authentication,userReceiverId.getReceiverId());
+        Boolean result = likesUnlikesService.likeUser(authentication,userReceiverId.getReceiverId());
         String message = "";
-        if(result.getData().getIsLike()== null){
-            message = "좋아요 취소";
-        }else{
-            message = "좋아요 성공";
-        }
+        
         return ResponseEntity.<ResponseDto>status(HttpStatus.OK)
                 .body(ResponseDto.builder().status("OK")
-                        .message(message)
-                        .data(result.getMessage()).build());
+                        .message("좋아요 성공")
+                        .data(result).build());
 
     }
 
@@ -68,16 +64,11 @@ public class LikesUnlikesController {
             Authentication authentication
     ){
 
-        LikesUnlikes result = likesUnlikesService.unlikeUser(authentication,userReceiverId.getReceiverId());
-        String message = "";
-        if(result.getIsLike()== null){
-            message = "싫어요 취소";
-        }else{
-            message = "싫어요 성공";
-        }
+       likesUnlikesService.unlikeUser(authentication,userReceiverId.getReceiverId());
+        
         return ResponseEntity.<ResponseDto>status(HttpStatus.OK)
                 .body(ResponseDto.builder().status("OK")
-                        .message(message).build());
+                        .message("싫어요 성공").build());
     }
 
 }

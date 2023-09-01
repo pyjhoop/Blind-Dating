@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -25,10 +26,7 @@ import java.io.IOException;
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private String alreadyFilteredAttributeName = "JwtAuthenticationFilter_alreadyFiltered";
-
     private final TokenProvider tokenProvider;
-    private final CustomUserDetailsService customUserDetailsService;
     private final String signUpUrl = "/api/signup";
     private final String loginUrl = "/api/login";
     private final String checkIdUrl = "/api/check-userId";
@@ -40,20 +38,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
            }else{
                try{
+                   //엑세스 토큰
                    String token = parseBearerToken(request);
-                   log.warn(token);
 
                    // 토큰 검증하기 JWT이므로 인가 서버에 요청하지 않아도됨
-                   if(token != null || !token.equalsIgnoreCase("null")){
+                   if(token != null && tokenProvider.validateToken(token)){
                        String userId = tokenProvider.validateAndGetUserId(token);
-                       // SecurityContextHolder에 등록해야 인증된 사용자라고 생각한다.
-                       UserDetails userDetails = customUserDetailsService.loadUserByUsername(userId);
-                       AbstractAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                               userDetails, // 인증된 사용자의 정보. 문자열이 아니어도 아무거나 넣을 수 있다. 보통 UserDetails라는 오브젝트 넣는다.
-                               null,
-                               userDetails.getAuthorities()
-                       );
-                       authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
+                       // setContext 에 인증객체 저장하기.
+                       Authentication authentication = new UsernamePasswordAuthenticationToken(userId, "",null);
+
                        SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
                        securityContext.setAuthentication(authentication);
                        SecurityContextHolder.setContext(securityContext);

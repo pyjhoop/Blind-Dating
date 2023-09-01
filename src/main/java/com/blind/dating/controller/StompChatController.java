@@ -53,6 +53,7 @@ public class StompChatController {
         readChatService.updateReadChat(message.getChatRoomId(), chat.getId());
         // 내 채팅방 가져와서 현제 writer외의 다른 사람의 rooms를 가져와서 convert해주기
         ChatRoom room = chattingRoomService.getRoom(message.getChatRoomId()).get();
+
         Long userId = 0L;
         if(room.getUser1() == Long.valueOf(message.getWriterId())){
             userId = room.getUser2();
@@ -81,7 +82,9 @@ public class StompChatController {
 
         if(!check){
             message.setMessage("상대방이 채팅방을 나가셨습니다.");
-            template.convertAndSend("/sub/chat/room/"+message.getChatRoomId(), message);
+            ChatDto dto = ChatDto.from(chatService.saveChat(message));
+            redisPublisher.publish(channelTopic1, dto);
+            //template.convertAndSend("/sub/chat/room/"+message.getChatRoomId(), message);
         }
 
 

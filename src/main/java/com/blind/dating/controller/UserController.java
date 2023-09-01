@@ -49,7 +49,9 @@ public class UserController {
 
         // 이성 추천 유저리스트 가져오기.
         Page<UserAccount> users = userService.getUserList(authentication,pageable);
+
         Page<UserWithInterestAndQuestionDto> pages = users.map(UserWithInterestAndQuestionDto::from);
+
         UserInfoWithPageInfo content = new UserInfoWithPageInfo();
         content.setContent(pages.getContent());
         content.setTotalPages(pages.getTotalPages());
@@ -107,8 +109,6 @@ public class UserController {
                         .message("내 정보가 성공적으로 수정되었습니다.")
                         .data(userInfo)
                         .build());
-
-
     }
 
 }

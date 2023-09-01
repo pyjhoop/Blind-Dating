@@ -1,9 +1,11 @@
 package com.blind.dating.service;
 
 import com.blind.dating.domain.UserAccount;
+import com.blind.dating.dto.user.UserIdWithNickname;
 import com.blind.dating.dto.user.UserInfoWithTokens;
 import com.blind.dating.dto.user.UserRequestDto;
 import com.blind.dating.repository.RefreshTokenRepository;
+import com.blind.dating.repository.UserAccountRedisRepository;
 import com.blind.dating.repository.UserAccountRepository;
 import com.blind.dating.security.TokenProvider;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +34,8 @@ public class UserAccountService {
     private final QuestionService questionService;
     private final InterestService interestService;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final UserAccountRedisRepository userAccountRedisRepository;
+
 
     /**
      * 회원가입 서비스 로직
@@ -85,12 +89,14 @@ public class UserAccountService {
         // 비밀번호 맞는지 확인하기.
         if(bCryptPasswordEncoder.matches(userPassword,user.getUserPassword())){
             //토큰 생성하기
-            String accessToken = tokenProvider.create(user);
-            String refreshToken = tokenProvider.refreshToken(user);
+            String accessToken = tokenProvider.create(String.valueOf(user.getId()));
+            String refreshToken = tokenProvider.refreshToken(String.valueOf(user.getId()));
             // 기존에 토큰 삭제하기
             //refreshTokenRepository.deleteRefreshToken(String.valueOf(user.getId()));
             //새로 저장하기
             refreshTokenRepository.save(String.valueOf(user.getId()), refreshToken);
+            // redis에 유저 정보 저장하기
+            userAccountRedisRepository.saveUser(String.valueOf(user.getId()), new UserIdWithNickname(user.getId(), user.getNickname(), user.getGender()));
 
             return UserInfoWithTokens.builder()
                     .id(user.getId())

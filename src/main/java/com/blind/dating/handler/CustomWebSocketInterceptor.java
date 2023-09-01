@@ -38,6 +38,7 @@ public class CustomWebSocketInterceptor implements ChannelInterceptor {
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
 
+        System.out.println("연결되는지 확인하자.");
         // CONNECT, DISCONNECT 등 상태를 알아내줌
         StompCommand command = accessor.getCommand();
 
@@ -59,6 +60,7 @@ public class CustomWebSocketInterceptor implements ChannelInterceptor {
                 System.out.println("userName: "+username);
                 System.out.println("roomId: "+roomId);
                 System.out.println("userId: "+userId);
+                System.out.println(accessor.getSessionId());
 
                 //방번호로 접속해있는 유저를 찾기 위해 세션에 방번호 저장.
                 accessor.getSessionAttributes().put("roomId",roomId);
@@ -88,8 +90,10 @@ public class CustomWebSocketInterceptor implements ChannelInterceptor {
 
                 // 세션 종료 처리
                 String roomId1 = accessor.getSessionAttributes().get("roomId").toString();
+                System.out.println(roomId1);
                 String sessionId = accessor.getSessionId();
                 sessionHandler.removeSession(roomId1,sessionId);
+                System.out.println("세션 해제");
                 break;
             default:
                 break;

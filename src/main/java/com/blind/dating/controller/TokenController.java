@@ -58,15 +58,18 @@ public class TokenController {
                             .build());
         }
 
-        // 맞는지 확인하고 있으면 리프레쉬 토큰 업데이트 후 access, refresh 반환하기.
-        UserInfoWithTokens dto = null;
+        UserInfoWithTokens dto = tokenService.updateRefreshToken(userId);
 
-        dto = tokenService.updateRefreshToken(userId);
+        // 기존 refreshToken 쿠키 삭제
         cookie.setMaxAge(0);
-        Cookie newCookie = new Cookie("refreshToken",dto.getRefreshToken());
-        newCookie.setMaxAge(60*60*24*7);
-        cookie.setHttpOnly(true);
         response.addCookie(cookie);
+        System.out.println("dto token:"+dto.getRefreshToken());
+
+        // 새로운 refreshToken 쿠키 생성 및 추가
+        Cookie newCookie = new Cookie("refreshToken", dto.getRefreshToken());
+        newCookie.setHttpOnly(true);
+        newCookie.setMaxAge(60*60*24*7);
+        response.addCookie(newCookie);
 
         return ResponseEntity.<ResponseDto<UserResponse>>ok()
                 .body(ResponseDto.<UserResponse>builder()

@@ -53,10 +53,10 @@ public class ChattingRoomController {
     public ResponseEntity<ResponseDto<List<ChatRoomDto>>> getMyMessageList(
             Authentication authentication
     ){
-        UserAccount userAccount = (UserAccount) authentication.getPrincipal();
+        String userId = (String) authentication.getPrincipal();
 
         //나에게 생성된 채팅룸 조회
-        List<ChatRoomDto> rooms = chattingRoomService.getRooms(userAccount.getId());
+        List<ChatRoomDto> rooms = chattingRoomService.getRooms(Long.parseLong(userId));
 
         return ResponseEntity.<ResponseDto<List<ChatRoomDto>>>ok()
                 .body(ResponseDto.<List<ChatRoomDto>>builder()
@@ -81,7 +81,7 @@ public class ChattingRoomController {
             @PageableDefault(size = 30, sort = "id", direction = Sort.Direction.DESC) Pageable pageable,
             Authentication authentication
     ){
-        UserAccount user = (UserAccount)authentication.getPrincipal();
+        String userId = (String) authentication.getPrincipal();
 
         // 해당 방이 있는지 조회해서 없으면 예외 처리 해주기
         Optional<ChatRoom> chatRoom = chattingRoomService.getRoom(roomId);
@@ -92,7 +92,7 @@ public class ChattingRoomController {
 
         //다른 유저 정보 조회하기.
         Long otherId = 0L;
-        if(chatRoom.get().getUser1() == user.getId() || chatRoom.get().getUser1() == 0){
+        if(chatRoom.get().getUser1() == Long.valueOf(userId) || chatRoom.get().getUser1() == 0){
             otherId = chatRoom.get().getUser2();
         }else{
             otherId = chatRoom.get().getUser1();

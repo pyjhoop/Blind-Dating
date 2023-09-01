@@ -1,6 +1,7 @@
 package com.blind.dating.repository;
 
 import com.blind.dating.dto.user.UserIdWithNicknameAndGender;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
@@ -14,10 +15,18 @@ public class UserAccountRedisRepository {
 
     private final RedisTemplate redisTemplate;
 
-    public void saveUser(Long userId, UserIdWithNicknameAndGender dto){
+    public void saveUser(String userId, UserIdWithNicknameAndGender dto){
         ValueOperations<String, UserIdWithNicknameAndGender> value = redisTemplate.opsForValue();
         value.set("user"+userId, dto);
         redisTemplate.expire("user"+userId, 1L, TimeUnit.DAYS);
+    }
+
+    public UserIdWithNicknameAndGender getUserInfo(String userId){
+        System.out.println(userId);
+        ValueOperations<String, UserIdWithNicknameAndGender> value = redisTemplate.opsForValue();
+        ObjectMapper mapper = new ObjectMapper();
+        UserIdWithNicknameAndGender userInfo = mapper.convertValue(value.get("user"+Long.valueOf(userId)), UserIdWithNicknameAndGender.class);
+        return userInfo;
     }
 
 

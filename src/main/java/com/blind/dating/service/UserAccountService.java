@@ -92,7 +92,7 @@ public class UserAccountService {
             String refreshToken = tokenProvider.refreshToken(user);
 
             //UserInfo 캐싱하기
-            userAccountRedisRepository.saveUser(user.getId(), new UserIdWithNicknameAndGender(user.getId(),user.getNickname(), user.getGender()));
+            userAccountRedisRepository.saveUser(String.valueOf(user.getId()), new UserIdWithNicknameAndGender(user.getId(),user.getNickname(), user.getGender()));
 
             //refresh Token 캐싱하기
             refreshTokenRepository.save(String.valueOf(user.getId()), refreshToken);

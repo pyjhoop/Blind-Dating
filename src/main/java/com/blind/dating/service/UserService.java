@@ -2,8 +2,10 @@ package com.blind.dating.service;
 
 import com.blind.dating.domain.Interest;
 import com.blind.dating.domain.UserAccount;
+import com.blind.dating.dto.user.UserIdWithNicknameAndGender;
 import com.blind.dating.dto.user.UserUpdateRequestDto;
 import com.blind.dating.repository.InterestRepository;
+import com.blind.dating.repository.UserAccountRedisRepository;
 import com.blind.dating.repository.UserAccountRepository;
 import com.blind.dating.repository.querydsl.UserAccountRepositoryImpl;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +30,7 @@ public class UserService {
     private final UserAccountRepository userAccountRepository;
     private final UserAccountRepositoryImpl userAccountRepositoryImpl;
     private final InterestRepository interestRepository;
+    private final UserAccountRedisRepository userAccountRedisRepository;
 
     /**
      * 이성 추천리스트 조회
@@ -36,13 +39,15 @@ public class UserService {
      * @return Page<UserAccount>
      */
     public Page<UserAccount> getUserList(Authentication authentication, Pageable pageable){
-        UserAccount user = (UserAccount) authentication.getPrincipal();
-        String gender = user.getGender();
+        String userId = (String) authentication.getPrincipal();
+        UserIdWithNicknameAndGender userInfo = userAccountRedisRepository.getUserInfo(userId);
+        System.out.println(userInfo);
 
-        if(gender.equals("M")){
-            return userAccountRepositoryImpl.findAllByGenderAndNotLikes("W",user.getId(), pageable);
+
+        if(userInfo.getGender().equals("M")){
+            return userAccountRepositoryImpl.findAllByGenderAndNotLikes("W",Long.valueOf(userId), pageable);
         }else{
-            return userAccountRepositoryImpl.findAllByGenderAndNotLikes("M",user.getId(), pageable);
+            return userAccountRepositoryImpl.findAllByGenderAndNotLikes("M",Long.valueOf(userId), pageable);
         }
 
     }
@@ -53,8 +58,14 @@ public class UserService {
      * @return UserAccount
      */
     public UserAccount getMyInfo(Authentication authentication){
-        UserAccount user = (UserAccount) authentication.getPrincipal();
-        return userAccountRepository.findByUserId(user.getUserId());
+        String userId = (String) authentication.getPrincipal();
+        Optional<UserAccount> userAccount = userAccountRepository.findById(Long.valueOf(userId));
+
+        if(userAccount.isPresent()){
+            return userAccount.get();
+        }else{
+            throw new RuntimeException("요청중에 에러가 발생했습니다. 재요청 해주세요");
+        }
     }
 
     /**
@@ -66,13 +77,13 @@ public class UserService {
     @Transactional
     public UserAccount updateMyInfo(Authentication authentication, UserUpdateRequestDto dto){
 
-        UserAccount user = ((UserAccount) authentication.getPrincipal());
+        String userId = (String) authentication.getPrincipal();
 
+        UserAccount user = userAccountRepository.findById(Long.valueOf(userId)).get();
         // 유저 정보 저장하기
         user.setRegion(dto.getRegion());
         user.setMbti(dto.getMbti());
         user.setSelfIntroduction(dto.getSelfIntroduction());
-        userAccountRepository.save(user);
 
         //관심사 리스트 삭제후 다시 저장하기.
         interestRepository.deleteAllByUserAccount(user);

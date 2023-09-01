@@ -26,7 +26,7 @@ public class TokenProvider {
         key = Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
 
         return Jwts.builder()
-                .setSubject(userAccount.getUserId())
+                .setSubject(String.valueOf(userAccount.getId()))
                 .setIssuer("blind dating web")
                 .setIssuedAt(now)
                 .setExpiration(expiredAt)

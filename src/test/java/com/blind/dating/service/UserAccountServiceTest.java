@@ -55,7 +55,7 @@ class UserAccountServiceTest {
         user.setUserPassword(bCryptPasswordEncoder.encode(dto.getUserPassword()));
 
         given(userAccountRepository.existsByUserId(dto.getUserId())).willReturn(false);
-        //given(tokenProvider.create(dto.toEntity())).willReturn(accessToken);
+        given(tokenProvider.create(dto.toEntity())).willReturn(accessToken);
         given(bCryptPasswordEncoder.encode(dto.getUserPassword())).willReturn(password);
         given(userAccountRepository.save(user)).willReturn(user);
 
@@ -69,31 +69,31 @@ class UserAccountServiceTest {
     }
 
 
-//    @Disabled
-//    @DisplayName("로그인 서비스 - 성공 테스트")
-//    @Test
-//    void givenLoginInfo_whenLogin_thenReturnUserInfoWithTokens(){
-//        //given
-//        String userId = "userId";
-//        String password = "asdffsdas123";
-//        String accessToken = "asdffasd";
-//        String encodedPassword = bCryptPasswordEncoder.encode(password);
-//
-//        System.out.println(encodedPassword);
-//        UserAccount user = UserAccount.of(userId,encodedPassword, "nick1","asdf","asdf","M","하이요");
-//
-//
-//        given(userAccountRepository.findByUserId(userId)).willReturn(user);
-//        //given(tokenProvider.create(user)).willReturn(accessToken);
-//
-//        //when
-//        //UserInfoWithTokens userInfo = userAccountService.getLoginInfo(userId, password);
-//
-//        //then
-//        assertThat(userInfo).isNotNull()
-//                .hasFieldOrPropertyWithValue("accessToken", accessToken)
-//                .hasFieldOrPropertyWithValue("nickname",user.getNickname());
-//    }
+    @Disabled
+    @DisplayName("로그인 서비스 - 성공 테스트")
+    @Test
+    void givenLoginInfo_whenLogin_thenReturnUserInfoWithTokens(){
+        //given
+        String userId = "userId";
+        String password = "asdffsdas123";
+        String accessToken = "asdffasd";
+        String encodedPassword = bCryptPasswordEncoder.encode(password);
+
+        System.out.println(encodedPassword);
+        UserAccount user = UserAccount.of(userId,encodedPassword, "nick1","asdf","asdf","M","하이요");
+
+
+        given(userAccountRepository.findByUserId(userId)).willReturn(user);
+        given(tokenProvider.create(user)).willReturn(accessToken);
+
+        //when
+        UserInfoWithTokens userInfo = userAccountService.getLoginInfo(userId, password);
+
+        //then
+        assertThat(userInfo).isNotNull()
+                .hasFieldOrPropertyWithValue("accessToken", accessToken)
+                .hasFieldOrPropertyWithValue("nickname",user.getNickname());
+    }
 
 
     @DisplayName("유저아이디 확인 테스트 - 아이디 존재")

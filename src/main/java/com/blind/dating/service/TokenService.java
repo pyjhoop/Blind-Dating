@@ -3,10 +3,8 @@ package com.blind.dating.service;
 import com.blind.dating.domain.UserAccount;
 import com.blind.dating.dto.user.TokenDto;
 import com.blind.dating.dto.user.UserIdRequestDto;
-import com.blind.dating.dto.user.UserIdWithNickname;
 import com.blind.dating.dto.user.UserInfoWithTokens;
 import com.blind.dating.repository.RefreshTokenRepository;
-import com.blind.dating.repository.UserAccountRedisRepository;
 import com.blind.dating.repository.UserAccountRepository;
 import com.blind.dating.security.TokenProvider;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +23,6 @@ public class TokenService {
     private final UserAccountRepository userAccountRepository;
     private final TokenProvider tokenProvider;
     private final RefreshTokenRepository refreshTokenRepository;
-    private final UserAccountRedisRepository userAccountRedisRepository;
 
 
     /**
@@ -63,19 +60,23 @@ public class TokenService {
      */
     @Transactional
     public UserInfoWithTokens updateRefreshToken(String userId){
-
-        String accessToken = tokenProvider.create(userId);
-        String refreshToken = tokenProvider.refreshToken(userId);
-        // redis에있는 이전 refreshToken 덮어쓰기
-        refreshTokenRepository.save(userId, refreshToken);
-        UserIdWithNickname dto = userAccountRedisRepository.getUser(userId);
-
+        Optional<UserAccount> user = userAccountRepository.findById(Long.valueOf(userId));
+        String accessToken = null;
+        String refreshToken = null;
+        if(user.isPresent()){
+            accessToken = tokenProvider.create(user.get());
+            refreshToken = tokenProvider.refreshToken(user.get());
+            // redis에있는 이전 refreshToken 덮어쓰기
+            refreshTokenRepository.save(userId, refreshToken);
+        }else{
+            throw new RuntimeException(user.get().getId() +"에 해당하는 유저는 존재하지 앖습니다.");
+        }
 
         return UserInfoWithTokens.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
-                .id(Long.valueOf(userId))
-                .nickname(dto.getNickname())
+                .id(user.get().getId())
+                .nickname(user.get().getNickname())
                 .build();
     }
 

@@ -81,8 +81,6 @@ public class StompChatController {
 
         if(!check){
             message.setMessage("상대방이 채팅방을 나가셨습니다.");
-            // 채팅 저장하기
-            Chat chat = chatService.saveChat(message);
             template.convertAndSend("/sub/chat/room/"+message.getChatRoomId(), message);
         }
 

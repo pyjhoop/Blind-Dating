@@ -29,7 +29,7 @@ public class LikesUnlikesService {
 
     @Transactional
     public ResponseDto<LikesUnlikes> likeUser(Authentication authentication, String receiverId){
-        Long userId = Long.valueOf((String) authentication.getPrincipal());
+        UserAccount userAccount = (UserAccount)authentication.getPrincipal();
         Long receiver = Long.parseLong(receiverId);
         boolean bol = false;
 
@@ -44,33 +44,27 @@ public class LikesUnlikesService {
         }
 
         // receiverId를 가진 유저가 나를 이미 좋아요 눌렀는지 확인 후 좋아요 눌렀으면 채팅 방 생성하기.
-        Optional<UserAccount> userAccount = userAccountRepository.findById(userId);
-        List<LikesUnlikes> list = null;
-        if(userAccount.isPresent()){
-            list = likesUnlikesRepositoryImpl.findLikes(receiverAccount.getId(), userAccount.get());
-        }else {
-            throw new RuntimeException(userId + "에 해당하는 유저가 조회되지 않습니다.");
-        }
+        List<LikesUnlikes> list = likesUnlikesRepositoryImpl.findLikes(receiverAccount.getId(), userAccount);
 
-        //상대가 이미 나를 좋아요 했을시 채팅방 생성 및 가각 ReadChat 생성.
+        //ReadChat도 생성해야함.
         ChatRoom chatRoom = null;
         if(list.isEmpty()){
             bol = false;
         }else {
-            chatRoom = chatRoomService.create(userAccount.get(), receiverAccount);
+            chatRoom = chatRoomService.create(userAccount, receiverAccount);
             chatRoom.setStatus(true);
             // 여기서 ReadChat 생성
-            readChatRepository.save(ReadChat.of(chatRoom.getId(),userAccount.get().getId(),0L));
+            readChatRepository.save(ReadChat.of(chatRoom.getId(),userAccount.getId(),0L));
             readChatRepository.save(ReadChat.of(chatRoom.getId(),receiverAccount.getId(),0L));
             bol = true;
         }
 
 
-        // 해당 유저가 존재하면 지내가 이전에 이미 좋아요 또는 싫어요를 했는 확인 후 처리
-        Optional<LikesUnlikes> likesUnlikes = likesUnlikesRepository.findByUserIdAndReceiverId(userAccount.get().getId(), receiver);
+        // 해당 유저가 존재하면 내가 이전에 이미 좋아요 또는 싫어요를 했는지 확인 후 처리
+        Optional<LikesUnlikes> likesUnlikes = likesUnlikesRepository.findByUserIdAndReceiverId(userAccount.getId(), receiver);
         LikesUnlikes result1 = null;
         if(likesUnlikes.isEmpty()){
-            LikesUnlikes like = LikesUnlikes.of(userAccount.get().getId(), receiverAccount, true);
+            LikesUnlikes like = LikesUnlikes.of(userAccount.getId(), receiverAccount, true);
 
             result1 = likesUnlikesRepository.save(like);
             return ResponseDto.<LikesUnlikes>builder()
@@ -98,13 +92,11 @@ public class LikesUnlikesService {
 
     @Transactional
     public LikesUnlikes unlikeUser(Authentication authentication, String receiverId){
-        Long userId = Long.valueOf((String) authentication.getPrincipal());
+        UserAccount userAccount = (UserAccount)authentication.getPrincipal();
         Long receiver = Long.parseLong(receiverId);
 
         // receiverId로 유저 조회
         UserAccount receiverAccount = userAccountRepository.findById(receiver).get();
-        // userId로 유저 조회
-        UserAccount userAccount = userAccountRepository.findById(userId).get();
 
         // 먼저 상태가 어떤지 확인
         Optional<LikesUnlikes> likesUnlikes = likesUnlikesRepository.findByUserIdAndReceiverId(userAccount.getId(), receiver);

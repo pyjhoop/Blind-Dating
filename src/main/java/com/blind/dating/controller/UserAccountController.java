@@ -108,7 +108,6 @@ public class UserAccountController {
 
         UserInfoWithTokens user = userAccountService.getLoginInfo(dto.getUserId(), dto.getUserPassword());
 
-
         if(user == null){
             return ResponseDto.<UserResponse>builder()
                     .status("BAD REQUEST")
@@ -119,7 +118,6 @@ public class UserAccountController {
         }else{
             Cookie cookie = new Cookie("refreshToken", user.getRefreshToken());
             cookie.setHttpOnly(true);
-            cookie.setMaxAge(60*60*24*7);
             response.addCookie(cookie);
 
             return ResponseDto.<UserResponse>builder()

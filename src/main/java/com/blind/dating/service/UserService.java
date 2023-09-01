@@ -2,10 +2,8 @@ package com.blind.dating.service;
 
 import com.blind.dating.domain.Interest;
 import com.blind.dating.domain.UserAccount;
-import com.blind.dating.dto.user.UserIdWithNickname;
 import com.blind.dating.dto.user.UserUpdateRequestDto;
 import com.blind.dating.repository.InterestRepository;
-import com.blind.dating.repository.UserAccountRedisRepository;
 import com.blind.dating.repository.UserAccountRepository;
 import com.blind.dating.repository.querydsl.UserAccountRepositoryImpl;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +28,6 @@ public class UserService {
     private final UserAccountRepository userAccountRepository;
     private final UserAccountRepositoryImpl userAccountRepositoryImpl;
     private final InterestRepository interestRepository;
-    private final UserAccountRedisRepository userAccountRedisRepository;
 
     /**
      * 이성 추천리스트 조회
@@ -39,13 +36,13 @@ public class UserService {
      * @return Page<UserAccount>
      */
     public Page<UserAccount> getUserList(Authentication authentication, Pageable pageable){
-        String userId =  (String)authentication.getPrincipal();
-        UserIdWithNickname userInfo = userAccountRedisRepository.getUser(userId);
+        UserAccount user = (UserAccount) authentication.getPrincipal();
+        String gender = user.getGender();
 
-        if(userInfo.getGender().equals("M")){
-            return userAccountRepositoryImpl.findAllByGenderAndNotLikes("W",userInfo.getId(), pageable);
+        if(gender.equals("M")){
+            return userAccountRepositoryImpl.findAllByGenderAndNotLikes("W",user.getId(), pageable);
         }else{
-            return userAccountRepositoryImpl.findAllByGenderAndNotLikes("M",userInfo.getId(), pageable);
+            return userAccountRepositoryImpl.findAllByGenderAndNotLikes("M",user.getId(), pageable);
         }
 
     }
@@ -56,17 +53,8 @@ public class UserService {
      * @return UserAccount
      */
     public UserAccount getMyInfo(Authentication authentication){
-        String userId = (String) authentication.getPrincipal();
-
-        Optional<UserAccount> user = userAccountRepository.findById(Long.parseLong(userId));
-
-        if(user.isPresent()){
-            return user.get();
-        }else{
-            throw new RuntimeException("내 정보를 찾을 수 없습니다. 다시 조회해 주세요");
-        }
-
-
+        UserAccount user = (UserAccount) authentication.getPrincipal();
+        return userAccountRepository.findByUserId(user.getUserId());
     }
 
     /**
@@ -78,29 +66,24 @@ public class UserService {
     @Transactional
     public UserAccount updateMyInfo(Authentication authentication, UserUpdateRequestDto dto){
 
-        String userId = (String) authentication.getPrincipal();
+        UserAccount user = ((UserAccount) authentication.getPrincipal());
 
-        Optional<UserAccount> user = userAccountRepository.findById(Long.parseLong(userId));
+        // 유저 정보 저장하기
+        user.setRegion(dto.getRegion());
+        user.setMbti(dto.getMbti());
+        user.setSelfIntroduction(dto.getSelfIntroduction());
+        userAccountRepository.save(user);
 
-        if(user.isPresent()){
-            // 유저 정보 수정
-            user.get().setRegion(dto.getRegion());
-            user.get().setMbti(dto.getMbti());
-            user.get().setSelfIntroduction(dto.getSelfIntroduction());
-
-            //
-            interestRepository.deleteAllByUserAccount(user.get());
-            List<Interest> list = new ArrayList<>();
-            for(String s: dto.getInterests()){
-                list.add(Interest.of(user.get(),s));
-            }
-            interestRepository.saveAll(list);
-            return user.get();
-        }else {
-            throw new RuntimeException("정보 수정하는데 에러가 발생했습니다. 다시 요청해주세요");
+        //관심사 리스트 삭제후 다시 저장하기.
+        interestRepository.deleteAllByUserAccount(user);
+        List<Interest> list = new ArrayList<>();
+        for(String s: dto.getInterests()){
+            list.add(Interest.of(user,s));
         }
 
+        interestRepository.saveAll(list);
 
+        return user;
     }
 
     public Optional<UserAccount> getUser(Long otherId) {

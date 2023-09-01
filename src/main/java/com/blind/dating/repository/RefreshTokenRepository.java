@@ -18,7 +18,7 @@ public class RefreshTokenRepository {
     public void save(String userId, String refreshToken){
         ValueOperations<String , String> value = redisTemplate.opsForValue();
         value.set(userId, refreshToken);
-        redisTemplate.expire(userId, 65L, TimeUnit.MINUTES);
+        redisTemplate.expire(userId, 7L, TimeUnit.DAYS);
     }
 
     public String getRefreshToken(String userId){
@@ -30,6 +30,5 @@ public class RefreshTokenRepository {
     public void deleteRefreshToken(String userId){
         redisTemplate.delete(userId);
     }
-
 
 }

@@ -20,7 +20,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
 
 
 
-        setResponse(response, request.getAttribute("error").toString());
+        setResponse(response, authException.getMessage());
     }
 
     /**

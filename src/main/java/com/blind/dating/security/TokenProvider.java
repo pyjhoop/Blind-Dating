@@ -5,11 +5,8 @@ import com.blind.dating.dto.user.UserRequestDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
-import org.apache.tomcat.websocket.AuthenticationException;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
 import java.security.Key;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -77,22 +74,11 @@ public class TokenProvider {
                     .getBody();
             return true;
         }catch (ExpiredJwtException | UnsupportedJwtException | MalformedJwtException | IllegalArgumentException e) {
-            throw new RuntimeException("예외발생");
-
+            // JWT 유효성 검사 중 에러가 발생하면 false 반환
+            return false;
         }
-    }
 
-    public String getRefreshToken(HttpServletRequest request){
 
-        Cookie[] cookies = request.getCookies();
-        String refreshToken = "";
-
-        for(Cookie c: cookies){
-            if(c.getName().equals("refreshToken")){
-                refreshToken = c.getValue();
-            }
-        }
-        return refreshToken;
     }
 
 

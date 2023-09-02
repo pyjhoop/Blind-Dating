@@ -1,6 +1,5 @@
 package com.blind.dating.security;
 
-import com.blind.dating.repository.RefreshTokenRepository;
 import com.blind.dating.service.CustomUserDetailsService;
 import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +15,6 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import javax.security.sasl.AuthenticationException;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -29,7 +27,6 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final TokenProvider tokenProvider;
-    private final RefreshTokenRepository refreshTokenRepository;
     private final String signUpUrl = "/api/signup";
     private final String loginUrl = "/api/login";
     private final String checkIdUrl = "/api/check-userId";
@@ -43,16 +40,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                try{
                    //엑세스 토큰
                    String token = parseBearerToken(request);
-
-                   String refreshToken = tokenProvider.getRefreshToken(request);
-                   String id = tokenProvider.validateAndGetUserId(refreshToken);
-
-                   String storedToken = refreshTokenRepository.getRefreshToken(id);
-                   if(!refreshToken.equals(storedToken)){
-                       request.setAttribute("error","다른 기기에서 로그인하여 현재기기에서 로그아웃 합니다.");
-                       throw new AuthenticationException("다른 기기에서 로그인하여 현재기기에서 로그아웃 합니다.");
-                   }
-
 
                    // 토큰 검증하기 JWT이므로 인가 서버에 요청하지 않아도됨
                    if(token != null && tokenProvider.validateToken(token)){
@@ -68,7 +55,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                        throw new AuthenticationServiceException("Invalid or missing token");
                    }
                }catch (ExpiredJwtException e){
-                   request.setAttribute("error","Jwt 토큰이 만료되었습니다.");
 
                }catch (Exception e){
 

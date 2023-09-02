@@ -9,6 +9,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.filter.CorsFilter;
 
 @RequiredArgsConstructor
@@ -20,14 +21,14 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-        return http.addFilterAfter(jwtAuthenticationFilter, CorsFilter.class)
+        return http.addFilterAfter(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
         .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .csrf().disable()
                 .cors().and()
                 .authorizeRequests(auth->auth
                         .antMatchers("/h2-console/**", "/swagger-ui/**","/v3/api-docs/**").permitAll()
-                        .antMatchers("/api/login","/api/signup","/api/profile","/api/token/refresh", "/api/logout").permitAll()
+                        .antMatchers("/api/login","/api/signup","/api/profile","/api/refresh", "/api/logout").permitAll()
                         .antMatchers("/chat/rooms","/chat/room","/stomp/chat/**","/sub/**","/pub/**","/stomp/chatroom/**").permitAll()
                         .antMatchers("/api/check-nickname/**","/api/check-userId").permitAll()
                         .anyRequest().authenticated())

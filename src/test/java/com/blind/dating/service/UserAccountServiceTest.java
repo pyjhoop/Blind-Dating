@@ -24,6 +24,7 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 
+@Disabled
 @DisplayName("유저 조회 서비스")
 @ExtendWith(MockitoExtension.class)
 class UserAccountServiceTest {

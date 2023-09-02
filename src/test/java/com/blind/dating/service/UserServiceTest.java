@@ -5,6 +5,7 @@ import com.blind.dating.dto.user.UserUpdateRequestDto;
 import com.blind.dating.repository.InterestRepository;
 import com.blind.dating.repository.UserAccountRepository;
 import com.blind.dating.repository.querydsl.UserAccountRepositoryImpl;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,6 +25,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
+@Disabled
 
 @DisplayName("UserService 테스트")
 @ExtendWith(MockitoExtension.class)

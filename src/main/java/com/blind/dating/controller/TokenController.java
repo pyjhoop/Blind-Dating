@@ -31,7 +31,7 @@ public class TokenController {
 
     private final TokenService tokenService;
 
-    @GetMapping ("/token/refresh")
+    @GetMapping ("/refresh")
     @Operation(summary = "AccessToken 재발급", description = "RefreshToken 으로 AccessToken 을 재발급 합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK"),
@@ -65,8 +65,8 @@ public class TokenController {
         cookie.setMaxAge(0);
         Cookie newCookie = new Cookie("refreshToken",dto.getRefreshToken());
         newCookie.setMaxAge(60*60*24*7);
-        cookie.setHttpOnly(true);
-        response.addCookie(cookie);
+        newCookie.setHttpOnly(true);
+        response.addCookie(newCookie);
 
         return ResponseEntity.<ResponseDto<UserResponse>>ok()
                 .body(ResponseDto.<UserResponse>builder()

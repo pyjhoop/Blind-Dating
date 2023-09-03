@@ -56,6 +56,7 @@ public class CustomWebSocketInterceptor implements ChannelInterceptor {
                 String roomId = accessor.getNativeHeader("roomId").get(0);
                 String userId = accessor.getNativeHeader("userId").get(0);
                 System.out.println("============");
+                log.info("userName: "+username);
                 System.out.println("userName: "+username);
                 System.out.println("roomId: "+roomId);
                 System.out.println("userId: "+userId);

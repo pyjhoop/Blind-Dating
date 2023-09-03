@@ -117,7 +117,9 @@ public class UserAccountController {
 
         }else{
             Cookie cookie = new Cookie("refreshToken", user.getRefreshToken());
+            cookie.setMaxAge(60*60*24*7);
             cookie.setHttpOnly(true);
+            cookie.setSecure(true);
             response.addCookie(cookie);
 
             return ResponseDto.<UserResponse>builder()

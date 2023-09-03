@@ -2,6 +2,7 @@ package com.blind.dating.repository;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.SetOperations;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Repository;
 
@@ -21,8 +22,8 @@ public class SessionRedisRepository {
     }
 
     public Set<String> getUsers(String roomId){
-        ValueOperations<String, Set<String>> value = redisTemplate.opsForValue();
-        return value.get("roomId"+roomId);
+        SetOperations<String, String> value = redisTemplate.opsForSet();
+        return value.members("roomId"+roomId);
 
     }
 

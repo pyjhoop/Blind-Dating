@@ -55,11 +55,7 @@ public class CustomWebSocketInterceptor implements ChannelInterceptor {
                 String username = accessor.getNativeHeader("username").get(0);
                 String roomId = accessor.getNativeHeader("roomId").get(0);
                 String userId = accessor.getNativeHeader("userId").get(0);
-                System.out.println("============");
-                log.info("userName: "+username);
-                System.out.println("userName: "+username);
-                System.out.println("roomId: "+roomId);
-                System.out.println("userId: "+userId);
+
 
                 //방번호로 접속해있는 유저를 찾기 위해 세션에 방번호 저장.
                 accessor.getSessionAttributes().put("roomId",roomId);
@@ -84,15 +80,17 @@ public class CustomWebSocketInterceptor implements ChannelInterceptor {
                 UserSession userSession = UserSession.of(username, userId, accessor.getSessionId(), roomId);
                 //유저정보 sessionhandler에 저장하기.
                 sessionHandler.addSession(userSession);
+                System.out.println("============");
+                System.out.println(sessionHandler.getUsers(roomId));
                 break;
             case DISCONNECT:
 
                 // 세션 종료 처리
                 String roomId1 = accessor.getSessionAttributes().get("roomId").toString();
                 String sessionId = accessor.getSessionId();
-                System.out.println("=====================");
-                System.out.println("roomId"+roomId1);
                 sessionHandler.removeSession(roomId1,sessionId);
+                System.out.println("============");
+                System.out.println(sessionHandler.getUsers(roomId1));
                 break;
             default:
                 break;

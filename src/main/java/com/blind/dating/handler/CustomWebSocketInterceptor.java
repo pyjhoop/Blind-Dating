@@ -90,6 +90,8 @@ public class CustomWebSocketInterceptor implements ChannelInterceptor {
                 // 세션 종료 처리
                 String roomId1 = accessor.getSessionAttributes().get("roomId").toString();
                 String sessionId = accessor.getSessionId();
+                System.out.println("=====================");
+                System.out.println("roomId"+roomId1);
                 sessionHandler.removeSession(roomId1,sessionId);
                 break;
             default:

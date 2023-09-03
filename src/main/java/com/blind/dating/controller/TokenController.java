@@ -66,6 +66,7 @@ public class TokenController {
         Cookie newCookie = new Cookie("refreshToken",dto.getRefreshToken());
         newCookie.setMaxAge(60*60*24*7);
         newCookie.setHttpOnly(true);
+        newCookie.setSecure(true);
         response.addCookie(newCookie);
 
         return ResponseEntity.<ResponseDto<UserResponse>>ok()

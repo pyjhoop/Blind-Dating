@@ -6,6 +6,7 @@ import com.blind.dating.dto.user.UserSession;
 import com.blind.dating.handler.SessionHandler;
 import com.blind.dating.repository.ChatRepository;
 import com.blind.dating.repository.ReadChatRepository;
+import com.blind.dating.repository.SessionRedisRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +34,7 @@ public class CustomWebSocketInterceptor implements ChannelInterceptor {
     private final SessionHandler sessionHandler;
     private final ChatRepository chatRepository;
     private final ReadChatRepository readChatRepository;
+    private final SessionRedisRepository sessionRedisRepository;
 
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
@@ -59,6 +61,7 @@ public class CustomWebSocketInterceptor implements ChannelInterceptor {
 
                 //방번호로 접속해있는 유저를 찾기 위해 세션에 방번호 저장.
                 accessor.getSessionAttributes().put("roomId",roomId);
+                accessor.getSessionAttributes().put("userId", userId);
 
                 Optional<Chat> chat = chatRepository.findFirstByChatRoomIdOrderByCreatedAtDesc(Long.valueOf(roomId));
                 Long chatId = 0L;
@@ -74,23 +77,24 @@ public class CustomWebSocketInterceptor implements ChannelInterceptor {
                     readChat = null;
                 }
 
-                System.out.println("과연");
-
                 // 접속중인 유저 정보 인스턴스 생성
                 UserSession userSession = UserSession.of(username, userId, accessor.getSessionId(), roomId);
                 //유저정보 sessionhandler에 저장하기.
-                sessionHandler.addSession(userSession);
-                System.out.println("============");
-                System.out.println(sessionHandler.getUsers(roomId));
+                //sessionHandler.addSession(userSession);
+                sessionRedisRepository.saveUserId(roomId, userId);
+//                System.out.println("============");
+//                System.out.println(sessionHandler.getUsers(roomId));
                 break;
             case DISCONNECT:
 
                 // 세션 종료 처리
                 String roomId1 = accessor.getSessionAttributes().get("roomId").toString();
                 String sessionId = accessor.getSessionId();
-                sessionHandler.removeSession(roomId1,sessionId);
-                System.out.println("============");
-                System.out.println(sessionHandler.getUsers(roomId1));
+                String userId1 = accessor.getSessionAttributes().get("userId").toString();
+                //sessionHandler.removeSession(roomId1,sessionId);
+                sessionRedisRepository.removeUserId(roomId1, userId1);
+//                System.out.println("============");
+//                System.out.println(sessionHandler.getUsers(roomId1));
                 break;
             default:
                 break;

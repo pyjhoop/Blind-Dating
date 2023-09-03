@@ -6,27 +6,27 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 public class SessionHandler {
-    private final ConcurrentHashMap<String, ConcurrentHashMap<String, UserSession>> sessions = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, ConcurrentHashMap<String, String>> sessions = new ConcurrentHashMap<>();
 
 
     public void addSession(UserSession userSession) {
         String roomId = userSession.getRoomId();
         sessions.putIfAbsent(roomId, new ConcurrentHashMap<>());
-        sessions.get(roomId).put(userSession.getSessionId(), userSession);
+        sessions.get(roomId).put(userSession.getUserId(), userSession.getUserId());
     }
 
-    public void removeSession(String roomId, String sessionId) {
+    public void removeSession(String roomId, String userId) {
 
-        ConcurrentHashMap<String, UserSession> userSessions = sessions.get(roomId);
+        ConcurrentHashMap<String, String> userSessions = sessions.get(roomId);
         if(userSessions != null){
-            userSessions.remove(sessionId);
+            userSessions.remove(userId);
             if(userSessions.isEmpty()){
                 sessions.remove(roomId);
             }
         }
     }
 
-    public ConcurrentHashMap<String, UserSession> getUsers(String roomId){
+    public ConcurrentHashMap<String, String> getUsers(String roomId){
 
         return sessions.get(roomId);
     }

@@ -91,7 +91,7 @@ public class CustomWebSocketInterceptor implements ChannelInterceptor {
                 String roomId1 = accessor.getSessionAttributes().get("roomId").toString();
                 String sessionId = accessor.getSessionId();
                 String userId1 = accessor.getSessionAttributes().get("userId").toString();
-                //sessionHandler.removeSession(roomId1,sessionId);
+                //sessionHandler.removeSession(roomId1,userId1);
                 sessionRedisRepository.removeUserId(roomId1, userId1);
 //                System.out.println("============");
 //                System.out.println(sessionHandler.getUsers(roomId1));

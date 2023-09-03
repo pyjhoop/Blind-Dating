@@ -80,8 +80,8 @@ public class CustomWebSocketInterceptor implements ChannelInterceptor {
                 // 접속중인 유저 정보 인스턴스 생성
                 UserSession userSession = UserSession.of(username, userId, accessor.getSessionId(), roomId);
                 //유저정보 sessionhandler에 저장하기.
-                sessionHandler.addSession(userSession);
-                //sessionRedisRepository.saveUserId(roomId, userId);
+                //sessionHandler.addSession(userSession);
+                sessionRedisRepository.saveUserId(roomId, userId);
 //                System.out.println("============");
 //                System.out.println(sessionHandler.getUsers(roomId));
                 break;
@@ -91,8 +91,8 @@ public class CustomWebSocketInterceptor implements ChannelInterceptor {
                 String roomId1 = accessor.getSessionAttributes().get("roomId").toString();
                 String sessionId = accessor.getSessionId();
                 String userId1 = accessor.getSessionAttributes().get("userId").toString();
-                sessionHandler.removeSession(roomId1,sessionId);
-                //sessionRedisRepository.removeUserId(roomId1, userId1);
+                //sessionHandler.removeSession(roomId1,sessionId);
+                sessionRedisRepository.removeUserId(roomId1, userId1);
 //                System.out.println("============");
 //                System.out.println(sessionHandler.getUsers(roomId1));
                 break;

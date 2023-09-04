@@ -1,9 +1,7 @@
 package com.blind.dating.service;
 
 import com.blind.dating.domain.UserAccount;
-import com.blind.dating.dto.user.UserIdWithNicknameAndGender;
-import com.blind.dating.dto.user.UserInfoWithTokens;
-import com.blind.dating.dto.user.UserRequestDto;
+import com.blind.dating.dto.user.*;
 import com.blind.dating.repository.RefreshTokenRepository;
 import com.blind.dating.repository.UserAccountRedisRepository;
 import com.blind.dating.repository.UserAccountRepository;
@@ -75,7 +73,7 @@ public class UserAccountService {
      * @return UserInfoWithTokens
      */
     @Transactional
-    public UserInfoWithTokens getLoginInfo(String userId, String userPassword){
+    public LogInResponse getLoginInfo(String userId, String userPassword){
 
         BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
 
@@ -97,11 +95,12 @@ public class UserAccountService {
             //refresh Token 캐싱하기
             refreshTokenRepository.save(String.valueOf(user.getId()), refreshToken);
 
-            return UserInfoWithTokens.builder()
-                    .id(user.getId())
-                    .nickname(user.getNickname())
-                    .refreshToken(refreshToken)
-                    .accessToken(accessToken).build();
+            LogInResponse response = LogInResponse.from(user);
+            response.setAccessToken(accessToken);
+            response.setRefreshToken(refreshToken);
+
+            return response;
+
         }else{
             return null;
         }

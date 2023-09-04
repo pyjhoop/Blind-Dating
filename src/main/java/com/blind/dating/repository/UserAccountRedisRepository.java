@@ -15,10 +15,11 @@ public class UserAccountRedisRepository {
 
     private final RedisTemplate redisTemplate;
 
-    public void saveUser(String userId, UserIdWithNicknameAndGender dto){
+    public UserIdWithNicknameAndGender saveUser(String userId, UserIdWithNicknameAndGender dto){
         ValueOperations<String, UserIdWithNicknameAndGender> value = redisTemplate.opsForValue();
         value.set("user"+userId, dto);
         redisTemplate.expire("user"+userId, 1L, TimeUnit.DAYS);
+        return dto;
     }
 
     public UserIdWithNicknameAndGender getUserInfo(String userId){

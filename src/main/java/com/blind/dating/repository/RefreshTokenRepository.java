@@ -15,10 +15,11 @@ public class RefreshTokenRepository {
     private final RedisTemplate redisTemplate;
 
 
-    public void save(String userId, String refreshToken){
+    public String save(String userId, String refreshToken){
         ValueOperations<String , String> value = redisTemplate.opsForValue();
         value.set(userId, refreshToken);
         redisTemplate.expire(userId, 7L, TimeUnit.DAYS);
+        return userId;
     }
 
     public String getRefreshToken(String userId){

@@ -101,33 +101,28 @@ public class UserAccountController {
             @Parameter(name = "userId", description = "유저 아이디",example = "user01"),
             @Parameter(name = "userPassword", description = "유저 비밀번호", example = "pass01")
     })
-    public ResponseDto<UserResponse> authenticate(
+    public ResponseEntity<ResponseDto<LogInResponseDto>> authenticate(
             @RequestBody LoginInputDto dto,
             HttpServletResponse response
             ){
 
-        UserInfoWithTokens user = userAccountService.getLoginInfo(dto.getUserId(), dto.getUserPassword());
+        LogInResponse user = userAccountService.getLoginInfo(dto.getUserId(), dto.getUserPassword());
+        LogInResponseDto dt = LogInResponseDto.from(user);
+        dt.setAccessToken(user.getAccessToken());
 
-        if(user == null){
-            return ResponseDto.<UserResponse>builder()
-                    .status("BAD REQUEST")
-                    .message("로그인이 실패했습니다.")
-                    .data(null)
-                    .build();
+        Cookie cookie = new Cookie("refreshToken", user.getRefreshToken());
+        cookie.setMaxAge(60*60*24*7);
+        cookie.setHttpOnly(true);
+        cookie.setSecure(true);
+        response.addCookie(cookie);
 
-        }else{
-            Cookie cookie = new Cookie("refreshToken", user.getRefreshToken());
-            cookie.setMaxAge(60*60*24*7);
-            cookie.setHttpOnly(true);
-            cookie.setSecure(true);
-            response.addCookie(cookie);
+        return ResponseEntity.ok()
+                .body(ResponseDto.<LogInResponseDto>builder()
+                        .status("OK")
+                        .message("로그인이 성공적으로 처리되었습니다.")
+                        .data(dt)
+                        .build());
 
-            return ResponseDto.<UserResponse>builder()
-                    .status("OK")
-                    .message("로그인이 성공적으로 처리되었습니다.")
-                    .data(UserResponse.of(user.getAccessToken(), user.getId(), user.getNickname()))
-                    .build();
-        }
     }
 
     @PostMapping("/logout")

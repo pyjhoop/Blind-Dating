@@ -1,8 +1,6 @@
 package com.blind.dating.service;
 
 import com.blind.dating.domain.ReadChat;
-import com.blind.dating.dto.user.UserSession;
-import com.blind.dating.handler.SessionHandler;
 import com.blind.dating.repository.ReadChatRepository;
 import com.blind.dating.repository.SessionRedisRepository;
 import lombok.RequiredArgsConstructor;
@@ -12,12 +10,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 @RequiredArgsConstructor
 @Service
 public class ReadChatService {
-    private final SessionHandler sessionHandler;
     private final ReadChatRepository readChatRepository;
     private final SessionRedisRepository sessionRedisRepository;
 

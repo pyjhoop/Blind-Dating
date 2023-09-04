@@ -83,6 +83,7 @@ public class StompChatController {
         if(!check){
             message.setMessage("상대방이 채팅방을 나가셨습니다.");
             ChatDto dto = ChatDto.from(chatService.saveChat(message));
+            dto.setStatus(false);
             redisPublisher.publish(channelTopic1, dto);
             //template.convertAndSend("/sub/chat/room/"+message.getChatRoomId(), message);
         }

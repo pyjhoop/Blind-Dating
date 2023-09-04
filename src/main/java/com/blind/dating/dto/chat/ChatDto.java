@@ -19,6 +19,7 @@ public class ChatDto{
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime updatedAt;
     private Long chatRoomId;
+    private Boolean status;
 
     public ChatDto(Long id,Long chatRoomId, Long writerId, String message, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;

@@ -77,27 +77,29 @@ public class StompChatController {
     public void leave(ChatRequestDto message){
         message.setMessage("상대방이 채팅방을 나가셨습니다.");
         Chat chat = chatService.saveChat(message);
-        readChatService.updateReadChat(message.getChatRoomId(), chat.getId());
-
-        ChatRoom room = chattingRoomService.getRoom(message.getChatRoomId()).get();
-
-        Long userId = 0L;
-        if(room.getUser1() == Long.valueOf(message.getWriterId())){
-            userId = room.getUser2();
-        }else{
-            userId = room.getUser1();
-        }
 
         Boolean check = chattingRoomService.leaveChatRoom(message.getChatRoomId(), message.getWriterId());
 
 
-        List<ChatRoomDto> rooms = chattingRoomService.getRooms(userId);
-        ChatListWithUserId chatListWithUserId = new ChatListWithUserId(userId, rooms);
-        redisPublisher.publicRooms(channelTopic2, chatListWithUserId);
-
-
-
         if(!check){
+            ChatDto dto = ChatDto.from(chat);
+            dto.setStatus(false);
+            ChatRoom room = chattingRoomService.getRoom(message.getChatRoomId()).get();
+
+            Long userId = 0L;
+            if(room.getUser1() == Long.valueOf(message.getWriterId())){
+                userId = room.getUser2();
+            }else{
+                userId = room.getUser1();
+            }
+
+            List<ChatRoomDto> rooms = chattingRoomService.getRooms(userId);
+            ChatListWithUserId chatListWithUserId = new ChatListWithUserId(userId, rooms);
+            redisPublisher.publicRooms(channelTopic2, chatListWithUserId);
+
+
+            redisPublisher.publish(channelTopic1, dto);
+        }else{
             ChatDto dto = ChatDto.from(chat);
             dto.setStatus(false);
             redisPublisher.publish(channelTopic1, dto);

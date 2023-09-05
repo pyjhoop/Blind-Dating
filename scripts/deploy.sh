@@ -1,5 +1,5 @@
 #!/bin/bash
-
+ 
 REPOSITORY=/home/ec2-user/project
 PROJECT_NAME=Blind-Dating-BE
 

@@ -45,20 +45,20 @@ public class LikesUnlikesService {
         // like 저장
         likesUnlikesRepository.save(LikesUnlikes.of(Long.valueOf(userId),receiverAccount, true));
 
-        UserAccount userAccount = userAccountRepository.findById(Long.valueOf(userId)).get();
+        Optional<UserAccount> userAccount = userAccountRepository.findById(Long.valueOf(userId));
 
         // receiverId를 가진 유저가 나를 이미 좋아요 눌렀는지 확인 후 좋아요 눌렀으면 채팅 방 생성하기.
-        List<LikesUnlikes> list = likesUnlikesRepositoryImpl.findLikes(receiverAccount.getId(), userAccount);
+        List<LikesUnlikes> list = likesUnlikesRepositoryImpl.findLikes(receiverAccount.getId(), userAccount.get());
 
         //ReadChat도 생성해야함.
         ChatRoom chatRoom = null;
         if(list.isEmpty()){
             return false;
         }else {
-            chatRoom = chatRoomService.create(userAccount, receiverAccount);
+            chatRoom = chatRoomService.create(userAccount.get(), receiverAccount);
             chatRoom.setStatus(true);
             // 여기서 ReadChat 생성
-            readChatRepository.save(ReadChat.of(chatRoom.getId(),userAccount.getId(),0L));
+            readChatRepository.save(ReadChat.of(chatRoom.getId(),userAccount.get().getId(),0L));
             readChatRepository.save(ReadChat.of(chatRoom.getId(),receiverAccount.getId(),0L));
             return true;
         }

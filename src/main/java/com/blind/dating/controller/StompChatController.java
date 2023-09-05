@@ -75,7 +75,7 @@ public class StompChatController {
     @MessageMapping(value = "/chat/disconnect")
     @Operation(summary = "채팅방 나가기", description = "채팅방 나갈시 다른 유저에게 메세지를 전송합니다.")
     public void leave(ChatRequestDto message){
-
+        message.setMessage("상대방이 채팅방을 나가셨습니다.");
         Chat chat = chatService.saveChat(message);
         readChatService.updateReadChat(message.getChatRoomId(), chat.getId());
         Boolean check = chattingRoomService.leaveChatRoom(message.getChatRoomId(), message.getWriterId());
@@ -96,7 +96,6 @@ public class StompChatController {
 
 
         if(!check){
-            message.setMessage("상대방이 채팅방을 나가셨습니다.");
             ChatDto dto = ChatDto.from(chat);
             dto.setStatus(false);
             redisPublisher.publish(channelTopic1, dto);

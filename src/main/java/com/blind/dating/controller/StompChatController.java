@@ -78,7 +78,6 @@ public class StompChatController {
         message.setMessage("상대방이 채팅방을 나가셨습니다.");
         Chat chat = chatService.saveChat(message);
         readChatService.updateReadChat(message.getChatRoomId(), chat.getId());
-        Boolean check = chattingRoomService.leaveChatRoom(message.getChatRoomId(), message.getWriterId());
 
         ChatRoom room = chattingRoomService.getRoom(message.getChatRoomId()).get();
 
@@ -88,6 +87,9 @@ public class StompChatController {
         }else{
             userId = room.getUser1();
         }
+
+        Boolean check = chattingRoomService.leaveChatRoom(message.getChatRoomId(), message.getWriterId());
+
 
         List<ChatRoomDto> rooms = chattingRoomService.getRooms(userId);
         ChatListWithUserId chatListWithUserId = new ChatListWithUserId(userId, rooms);

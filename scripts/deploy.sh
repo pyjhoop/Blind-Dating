@@ -1,6 +1,6 @@
 #!/bin/bash
 
-REPOSITORY=/home/ec2-user/project/step1
+REPOSITORY=/home/ec2-user/project
 PROJECT_NAME=Blind-Dating-BE
 
 echo "> Build 파일 복사"

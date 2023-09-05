@@ -25,7 +25,7 @@ public class Chat extends BaseEntity{
     @Setter
     private String message;
 
-    private Chat(ChatRoom chatRoom, Long writerId, String message) {
+    public Chat(ChatRoom chatRoom, Long writerId, String message) {
         this.chatRoom = chatRoom;
         this.writerId = writerId;
         this.message = message;

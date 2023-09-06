@@ -5,10 +5,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Getter
 @Setter
@@ -21,19 +18,20 @@ public class ReadChat {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long roomId;
+    @ManyToOne
+    private ChatRoom chatRoom;
 
     private Long userId;
 
     private Long chatId;
 
-    private ReadChat(Long roomId, Long userId, Long chatId) {
-        this.roomId = roomId;
+    private ReadChat(ChatRoom chatRoom, Long userId, Long chatId) {
+        this.chatRoom = chatRoom;
         this.userId = userId;
         this.chatId = chatId;
     }
 
-    public static ReadChat of(Long roomId, Long userId, Long chatId) {
-        return new ReadChat(roomId, userId, chatId);
+    public static ReadChat of(ChatRoom chatRoom, Long userId, Long chatId) {
+        return new ReadChat(chatRoom, userId, chatId);
     }
 }

@@ -23,13 +23,17 @@ public class ChatRoom extends BaseEntity{
     private Long id;
 
     @Setter
-    private Long user1;
+   @ManyToMany(fetch = FetchType.EAGER)
+   @JoinTable(
+           name = "user_chat_room",
+           joinColumns = @JoinColumn(name = "chat_room_id"),
+           inverseJoinColumns = @JoinColumn(name = "user_id")
+   )
+   private Set<UserAccount> users = new LinkedHashSet<>();
 
     @Setter
-    private Long user2;
-
-    @Setter
-    private Long leaveId;
+    @OneToMany(mappedBy = "chatRoom")
+    private Set<ReadChat> readChat = new LinkedHashSet<>();
 
     @Setter
     private Boolean status;
@@ -41,10 +45,6 @@ public class ChatRoom extends BaseEntity{
     @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL)
     private final Set<Chat> chats = new LinkedHashSet<>();
 
-    public ChatRoom(Long user1, Long user2) {
-        this.user1 = user1;
-        this.user2 = user2;
-    }
 
     @Override
     public boolean equals(Object o) {

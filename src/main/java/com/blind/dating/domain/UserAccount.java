@@ -72,6 +72,9 @@ public class UserAccount extends BaseEntity implements UserDetails {
     @ToString.Exclude
     private final Set<LikesUnlikes> likesUnlikes = new LinkedHashSet<>();
 
+    @ManyToMany(mappedBy = "users")
+    private final Set<ChatRoom> chatRooms = new LinkedHashSet<>();
+
 
     protected UserAccount(){}
 

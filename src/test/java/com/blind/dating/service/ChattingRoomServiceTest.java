@@ -97,6 +97,7 @@ class ChattingRoomServiceTest {
         Long userId1 = 1L;
         Long userId2 = 2L;
         ChatRoom room = new ChatRoom();
+        room.setStatus(true);
         Optional<ChatRoom> optional = Optional.of(room);
 
         given(chattingRoomRepository.findById(1L)).willReturn(optional);

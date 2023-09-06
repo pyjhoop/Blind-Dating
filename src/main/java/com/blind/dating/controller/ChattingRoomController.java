@@ -84,30 +84,24 @@ public class ChattingRoomController {
         Long userId = Long.valueOf((String)authentication.getPrincipal());
 
         // 해당 방이 있는지 조회해서 없으면 예외 처리 해주기
-        Optional<ChatRoom> chatRoom = chattingRoomService.getRoom(roomId);
-
-        if(chatRoom.isEmpty()){
-            throw new RuntimeException(roomId+"에 해당하는 채팅방이 존재하지 않습니다.");
-        }
+        ChatRoom chatRoom = chattingRoomService.getRoom(roomId)
+                .orElseThrow(() -> new RuntimeException("채팅목록 조회시 예외가 발생했습니다."));
 
         //다른 유저 정보 조회하기.
         Long otherId = 0L;
-        if(chatRoom.get().getUser1() == userId || chatRoom.get().getUser1() == 0){
-            otherId = chatRoom.get().getUser2();
-        }else{
-            otherId = chatRoom.get().getUser1();
+        for(UserAccount userAccount: chatRoom.getUsers()){
+            if(userAccount.getId() != userId){
+                otherId = userAccount.getId();
+                break;
+            }
         }
 
-        Optional<UserAccount> userInfo = userService.getUser(otherId);
+        UserAccount userInfo = userService.getUser(otherId)
+                .orElseThrow(()-> new RuntimeException("채팅목록 조회시 예외가 발생했습니다."));
         //존재할경우 채팅 메세지 30개를 id 오름차순으로 가져오기
-        List<ChatDto> chatList = chatService.selectChatList(roomId, chatId).stream().map(ChatDto::from).limit(30).collect(Collectors.toList());
-        ChatListWithOtherUserInfo chatListWithOtherUserInfo = null;
+        List<ChatDto> chatList = chatService.selectChatList(chatRoom, chatId).stream().map(ChatDto::from).limit(30).collect(Collectors.toList());
+        ChatListWithOtherUserInfo chatListWithOtherUserInfo = ChatListWithOtherUserInfo.of(userInfo.getId(), userInfo.getNickname(),chatRoom.getStatus(), chatList);
 
-        if(userInfo.isEmpty()){
-            chatListWithOtherUserInfo = ChatListWithOtherUserInfo.of(null,null,chatRoom.get().getStatus(),chatList);
-        }else{
-            chatListWithOtherUserInfo = ChatListWithOtherUserInfo.of(userInfo.get().getId(), userInfo.get().getNickname(),chatRoom.get().getStatus(), chatList);
-        }
 
         return ResponseEntity.ok().body(ResponseDto.<ChatListWithOtherUserInfo>builder()
                 .status("OK")

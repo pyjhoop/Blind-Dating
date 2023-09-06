@@ -37,10 +37,11 @@ class ChatServiceTest {
     void givenRoomIdAndChatId_whenSelectChatList_thenReturnChatList(){
         Chat chat = new Chat();
         List<Chat> list = List.of(chat);
+        ChatRoom chatRoom = new ChatRoom();
 
-        given(chatRepository.findByChatRoomIdAndIdLessThanEqualOrderByIdDesc(1L,1L)).willReturn(list);
+        given(chatRepository.findByChatRoomAndIdLessThanEqualOrderByIdDesc(chatRoom,1L)).willReturn(list);
 
-        List<Chat> result = chatService.selectChatList("1","1");
+        List<Chat> result = chatService.selectChatList(chatRoom,"1");
 
         assertThat(result).isNotNull();
     }
@@ -67,13 +68,14 @@ class ChatServiceTest {
         Chat chat = new Chat();
         List<Chat> list = List.of(chat);
         Long listSize = (long) list.size();
-        ReadChat readChat = ReadChat.of(1L,1L,0L);
+        ChatRoom chatRoom = new ChatRoom();
+        ReadChat readChat = ReadChat.of(chatRoom,1L,0L);
         Optional<ReadChat> optional = Optional.of(readChat);
 
-        given(readChatRepository.findByRoomIdAndUserId(anyLong(),anyLong())).willReturn(optional);
+        given(readChatRepository.findByChatRoomAndUserId(any(ChatRoom.class),anyLong())).willReturn(optional);
 
         //When
-        Long result = chatService.unreadChat(1L,1L);
+        Long result = chatService.unreadChat(1L,chatRoom);
 
         //Then
         assertThat(result).isNotNull();

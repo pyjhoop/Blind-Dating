@@ -40,7 +40,7 @@ class ChattingRoomServiceTest {
         Long userId1 = 1L;
         Long userId2 = 2L;
 
-        ChatRoom room = new ChatRoom(userId1, userId2);
+        ChatRoom room = new ChatRoom();
 
         given(chattingRoomRepository.save(room)).willReturn(room);
 
@@ -57,12 +57,13 @@ class ChattingRoomServiceTest {
         //Given
         UserAccount user1 = UserAccount.of("qweeqw","asdfdf", "nickname","asdf","asdf","M","하이요");
         Optional<UserAccount> optional = Optional.of(user1);
+        List<UserAccount> userList = List.of(user1);
 
-        ChatRoom room = new ChatRoom(1L, 2L);
+        ChatRoom room = new ChatRoom();
         List<ChatRoom> list = List.of(room);
-        given(chattingRoomRepository.findCustomQuery(1L,1L,1L)).willReturn(list);
-        given(chatService.unreadChat(1L,null)).willReturn(1L);
-        given(userAccountRepository.findById(2L)).willReturn(optional);
+        given(userAccountRepository.findById(1L)).willReturn(optional);
+        given(chattingRoomRepository.findAllByUsersIn(userList)).willReturn(list);
+        given(chatService.unreadChat(1L,room)).willReturn(1L);
         //When
         List<ChatRoomDto> result = chattingRoomService.getRooms(1L);
 
@@ -77,7 +78,7 @@ class ChattingRoomServiceTest {
         String roomId = "1";
         Long userId1 = 1L;
         Long userId2 = 2L;
-        ChatRoom room = new ChatRoom(userId1, userId2);
+        ChatRoom room = new ChatRoom();
         Optional<ChatRoom> optional = Optional.of(room);
 
         given(chattingRoomRepository.findById(Long.valueOf(roomId))).willReturn(optional);
@@ -95,7 +96,7 @@ class ChattingRoomServiceTest {
         //Given
         Long userId1 = 1L;
         Long userId2 = 2L;
-        ChatRoom room = new ChatRoom(userId1, userId2);
+        ChatRoom room = new ChatRoom();
         Optional<ChatRoom> optional = Optional.of(room);
 
         given(chattingRoomRepository.findById(1L)).willReturn(optional);

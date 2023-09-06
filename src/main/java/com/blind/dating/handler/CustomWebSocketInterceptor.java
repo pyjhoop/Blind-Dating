@@ -1,10 +1,12 @@
 package com.blind.dating.handler;
 
 import com.blind.dating.domain.Chat;
+import com.blind.dating.domain.ChatRoom;
 import com.blind.dating.domain.ReadChat;
 import com.blind.dating.dto.user.UserSession;
 import com.blind.dating.handler.SessionHandler;
 import com.blind.dating.repository.ChatRepository;
+import com.blind.dating.repository.ChattingRoomRepository;
 import com.blind.dating.repository.ReadChatRepository;
 import com.blind.dating.repository.SessionRedisRepository;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +37,7 @@ public class CustomWebSocketInterceptor implements ChannelInterceptor {
     private final ChatRepository chatRepository;
     private final ReadChatRepository readChatRepository;
     private final SessionRedisRepository sessionRedisRepository;
+    private final ChattingRoomRepository chattingRoomRepository;
 
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
@@ -64,37 +67,31 @@ public class CustomWebSocketInterceptor implements ChannelInterceptor {
                 accessor.getSessionAttributes().put("userId", userId);
 
                 Optional<Chat> chat = chatRepository.findFirstByChatRoomIdOrderByCreatedAtDesc(Long.valueOf(roomId));
+
                 Long chatId = 0L;
                 if(chat.isPresent()){
                     chatId = chat.get().getId();
                 }
 
-                Optional<ReadChat> readChat = readChatRepository.findByRoomIdAndUserId(Long.valueOf(roomId), Long.valueOf(userId));
-                if(readChat.isPresent()){
-                    readChat.get().setChatId(chatId);
-                    readChatRepository.save(readChat.get());
-                }else{
-                    readChat = null;
-                }
+                ChatRoom chatRoom = chattingRoomRepository.findById(Long.valueOf(roomId))
+                        .orElseThrow(()-> new RuntimeException("채팅방 소켓 연결중에 예외가 발생했습니다."));
 
-                // 접속중인 유저 정보 인스턴스 생성
-                UserSession userSession = UserSession.of(username, userId, accessor.getSessionId(), roomId);
-                //유저정보 sessionhandler에 저장하기.
-                //sessionHandler.addSession(userSession);
+                ReadChat readChat = readChatRepository.findByChatRoomAndUserId(chatRoom, Long.valueOf(userId))
+                        .orElseThrow(()-> new RuntimeException("채팅방 소켓 연결중에 예외가 발생했습니다."));
+
+                readChat.setChatId(chatId);
+                readChatRepository.save(readChat);
                 sessionRedisRepository.saveUserId(roomId, userId);
-//                System.out.println("============");
-//                System.out.println(sessionHandler.getUsers(roomId));
+
                 break;
             case DISCONNECT:
 
                 // 세션 종료 처리
                 String roomId1 = accessor.getSessionAttributes().get("roomId").toString();
-                String sessionId = accessor.getSessionId();
                 String userId1 = accessor.getSessionAttributes().get("userId").toString();
-                //sessionHandler.removeSession(roomId1,userId1);
+
                 sessionRedisRepository.removeUserId(roomId1, userId1);
-//                System.out.println("============");
-//                System.out.println(sessionHandler.getUsers(roomId1));
+
                 break;
             default:
                 break;

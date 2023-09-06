@@ -25,11 +25,11 @@ public class ChatService {
     private final ReadChatRepository readChatRepository;
 
 
-    public List<Chat> selectChatList(String roomId, String chatId){
+    public List<Chat> selectChatList(ChatRoom chatRoom, String chatId){
         if(Long.parseLong(chatId) == 0){
-            return chatRepository.findAllByChatRoomIdOrderByIdDesc(Long.valueOf(roomId));
+            return chatRepository.findAllByChatRoomOrderByIdDesc(chatRoom);
         }else{
-            return chatRepository.findByChatRoomIdAndIdLessThanEqualOrderByIdDesc(Long.valueOf(roomId), Long.valueOf(chatId));
+            return chatRepository.findByChatRoomAndIdLessThanEqualOrderByIdDesc(chatRoom, Long.valueOf(chatId));
         }
     }
 
@@ -41,17 +41,19 @@ public class ChatService {
         return chatRepository.save(Chat.of(room,Long.valueOf(dto.getWriterId()),dto.getMessage()));
     }
 
-    public Long unreadChat(Long userId, Long roomId){
+    public Long unreadChat(Long userId, ChatRoom chatRoom){
 
-        List<Chat> list = chatRepository.findAllByChatRoomIdOrderByIdDesc(roomId);
+        List<Chat> list = chatRepository.findAllByChatRoomOrderByIdDesc(chatRoom);
         Long listSize = (long) list.size();
 
-        Optional<ReadChat> readChat = readChatRepository.findByRoomIdAndUserId(roomId, userId);
-        if(readChat.get().getChatId() == 0){
+        ReadChat readChat = readChatRepository.findByChatRoomAndUserId(chatRoom, userId)
+                .orElseThrow(()-> new RuntimeException("안읽은 메세지 개수 반환 중에 예외 발생"));
+
+        if(readChat.getChatId() == 0){
             return listSize;
         }else{
 
-            return chatRepository.countByIdBetween(readChat.get().getChatId(), list.get(0).getId()) -1;
+            return chatRepository.countByIdBetween(readChat.getChatId(), list.get(0).getId()) -1;
         }
 
     }

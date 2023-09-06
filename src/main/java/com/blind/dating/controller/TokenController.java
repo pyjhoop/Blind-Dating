@@ -6,6 +6,7 @@ import com.blind.dating.dto.user.UserIdRequestDto;
 import com.blind.dating.dto.user.UserInfoWithTokens;
 import com.blind.dating.dto.user.UserResponse;
 import com.blind.dating.service.TokenService;
+import com.blind.dating.util.CookieUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -30,6 +31,7 @@ import javax.servlet.http.HttpServletResponse;
 public class TokenController {
 
     private final TokenService tokenService;
+    private final CookieUtil cookieUtil;
 
     @GetMapping ("/refresh")
     @Operation(summary = "AccessToken 재발급", description = "RefreshToken 으로 AccessToken 을 재발급 합니다.")
@@ -63,11 +65,8 @@ public class TokenController {
 
         dto = tokenService.updateRefreshToken(userId);
         cookie.setMaxAge(0);
-        Cookie newCookie = new Cookie("refreshToken",dto.getRefreshToken());
-        newCookie.setMaxAge(60*60*24*7);
-        newCookie.setHttpOnly(true);
-        newCookie.setSecure(true);
-        response.addCookie(newCookie);
+
+        cookieUtil.addCookie(response, "refreshToken", dto.getRefreshToken());
 
         return ResponseEntity.<ResponseDto<UserResponse>>ok()
                 .body(ResponseDto.<UserResponse>builder()

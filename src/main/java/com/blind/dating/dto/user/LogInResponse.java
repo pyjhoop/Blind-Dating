@@ -20,13 +20,13 @@ public class LogInResponse {
     private String region;
     private String mbti;
     private String gender;
-    private Set<String> interests;
+    private Set<InterestDto> interests;
     private Set<QuestionDto> questions;
     private String selfIntroduction;
     private String accessToken;
     private String refreshToken;
 
-    private LogInResponse(Long id, String userId, String nickname, String region, String mbti, String gender, Set<String> interests, Set<QuestionDto> questions, String selfIntroduction) {
+    private LogInResponse(Long id, String userId, String nickname, String region, String mbti, String gender, Set<InterestDto> interests, Set<QuestionDto> questions, String selfIntroduction) {
         this.id = id;
         this.userId = userId;
         this.nickname = nickname;
@@ -46,7 +46,7 @@ public class LogInResponse {
                 user.getRegion(),
                 user.getMbti(),
                 user.getGender(),
-                user.getInterests().stream().map(Interest::getInterestName).collect(Collectors.toSet()),
+                user.getInterests().stream().map(InterestDto::from).collect(Collectors.toSet()),
                 user.getQuestions().stream().map(QuestionDto::from).collect(Collectors.toSet()),
                 user.getSelfIntroduction());
     }

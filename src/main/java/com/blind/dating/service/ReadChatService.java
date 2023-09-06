@@ -1,6 +1,8 @@
 package com.blind.dating.service;
 
+import com.blind.dating.domain.ChatRoom;
 import com.blind.dating.domain.ReadChat;
+import com.blind.dating.repository.ChattingRoomRepository;
 import com.blind.dating.repository.ReadChatRepository;
 import com.blind.dating.repository.SessionRedisRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,19 +18,20 @@ import java.util.Set;
 public class ReadChatService {
     private final ReadChatRepository readChatRepository;
     private final SessionRedisRepository sessionRedisRepository;
+    private final ChattingRoomRepository chattingRoomRepository;
 
     @Transactional
     public void updateReadChat(String roomId, Long chatId){
 
         Set<String> users = sessionRedisRepository.getUsers(roomId);
+        ChatRoom chatRoom = chattingRoomRepository.findById(Long.valueOf(roomId))
+                .orElseThrow(()-> new RuntimeException("메세지 전송시 예외가 발생했습니다."));
 
-        ArrayList<String> list = new ArrayList<>(users);
-
-        for(String u: list){
+        for(String u: users){
             // 있는지 확인부터 없으면 생성해주고 있으면 업데이트 해준다.
-            Optional<ReadChat> readChat = readChatRepository.findByRoomIdAndUserId(Long.valueOf(roomId), Long.valueOf(u));
+            Optional<ReadChat> readChat = readChatRepository.findByChatRoomAndUserId(chatRoom, Long.valueOf(u));
             if(readChat.isEmpty()){
-                readChatRepository.save(ReadChat.of(Long.valueOf(roomId),Long.valueOf(u),chatId));
+                readChatRepository.save(ReadChat.of(chatRoom,Long.valueOf(u),chatId));
             }else{
                 readChat.get().setChatId(chatId);
             }

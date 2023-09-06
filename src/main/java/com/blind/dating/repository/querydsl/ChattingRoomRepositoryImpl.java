@@ -33,16 +33,16 @@ public class ChattingRoomRepositoryImpl extends QuerydslRepositorySupport implem
     private EntityManager entityManager;
 
 
-    @Override
-    public List<ChatRoom> findAllByUserId(Long userId1) {
-        JPAQueryFactory queryFactory = new JPAQueryFactory(entityManager);
-        QChatRoom chatRoom = QChatRoom.chatRoom;
-
-        return queryFactory.select(chatRoom)
-                .from(chatRoom)
-                .where(chatRoom.user1.eq(userId1).or(chatRoom.user2.eq(userId1)))
-                .fetch();
-    }
+//    @Override
+//    public List<ChatRoom> findAllByUserId(Long userId1) {
+//        JPAQueryFactory queryFactory = new JPAQueryFactory(entityManager);
+//        QChatRoom chatRoom = QChatRoom.chatRoom;
+//
+//        return queryFactory.select(chatRoom)
+//                .from(chatRoom)
+//                .where(chatRoom.user1.eq(userId1).or(chatRoom.user2.eq(userId1)))
+//                .fetch();
+//    }
 
 
 

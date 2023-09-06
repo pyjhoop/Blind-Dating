@@ -47,18 +47,19 @@ public class StompChatController {
     @MessageMapping(value = "/chat/message")
     @Operation(summary = "메세지를 전송", description = "채팅방에 접속중인 유저에게 메세지를 전송합니다.")
     public void message(ChatRequestDto message){
-        // 일단 채팅방에 메세지 저장하고
+
         Chat chat = chatService.saveChat(message);
-        // 현재 접속중인 사람만 읽은 메세지 update해주기.
+
         readChatService.updateReadChat(message.getChatRoomId(), chat.getId());
         // 내 채팅방 가져와서 현제 writer외의 다른 사람의 rooms를 가져와서 convert해주기
-        ChatRoom room = chattingRoomService.getRoom(message.getChatRoomId()).get();
+        ChatRoom chatRoom = chattingRoomService.getRoom(message.getChatRoomId()).get();
 
         Long userId = 0L;
-        if(room.getUser1() == Long.valueOf(message.getWriterId())){
-            userId = room.getUser2();
-        }else{
-            userId = room.getUser1();
+        for(UserAccount userAccount: chatRoom.getUsers()){
+            if(userAccount.getId() != Long.valueOf(message.getWriterId())){
+                userId = userAccount.getId();
+                break;
+            }
         }
 
         List<ChatRoomDto> rooms = chattingRoomService.getRooms(userId);
@@ -84,13 +85,14 @@ public class StompChatController {
         if(!check){
             ChatDto dto = ChatDto.from(chat);
             dto.setStatus(false);
-            ChatRoom room = chattingRoomService.getRoom(message.getChatRoomId()).get();
+            ChatRoom chatRoom = chattingRoomService.getRoom(message.getChatRoomId()).get();
 
             Long userId = 0L;
-            if(room.getUser1() == Long.valueOf(message.getWriterId())){
-                userId = room.getUser2();
-            }else{
-                userId = room.getUser1();
+            for(UserAccount userAccount: chatRoom.getUsers()){
+                if(userAccount.getId() != Long.valueOf(message.getWriterId())){
+                    userId = userAccount.getId();
+                    break;
+                }
             }
 
             List<ChatRoomDto> rooms = chattingRoomService.getRooms(userId);

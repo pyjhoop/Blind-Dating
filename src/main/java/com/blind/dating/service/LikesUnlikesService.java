@@ -58,8 +58,8 @@ public class LikesUnlikesService {
             chatRoom = chatRoomService.create(userAccount.get(), receiverAccount);
             chatRoom.setStatus(true);
             // 여기서 ReadChat 생성
-            readChatRepository.save(ReadChat.of(chatRoom.getId(),userAccount.get().getId(),0L));
-            readChatRepository.save(ReadChat.of(chatRoom.getId(),receiverAccount.getId(),0L));
+            readChatRepository.save(ReadChat.of(chatRoom,userAccount.get().getId(),0L));
+            readChatRepository.save(ReadChat.of(chatRoom,receiverAccount.getId(),0L));
             return true;
         }
 

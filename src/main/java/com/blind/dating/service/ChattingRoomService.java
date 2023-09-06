@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -29,7 +30,9 @@ public class ChattingRoomService {
     private final UserAccountRepository userAccountRepository;
 
     public ChatRoom create(UserAccount user1, UserAccount user2){
-       ChatRoom room = new ChatRoom(user1.getId(), user2.getId());
+       ChatRoom room = new ChatRoom();
+       room.getUsers().add(user1);
+       room.getUsers().add(user2);
 
         return chatRoomRepository.save(room);
 
@@ -43,20 +46,29 @@ public class ChattingRoomService {
     @Transactional
     public List<ChatRoomDto> getRooms(Long userId){
 
-        List<ChatRoom> chatRooms = chatRoomRepository.findCustomQuery(userId, userId, userId);
+        UserAccount user = userAccountRepository.findById(userId)
+                .orElseThrow(()-> new RuntimeException("채팅방 조회시 내 정보가 제대로 조회되지 않았습니다. 다시 요청해 주세요"));
+
+        List<UserAccount> list = List.of(user);
+
+        List<ChatRoom> chatRooms = chatRoomRepository.findAllByUsersIn(list);
 
         List<ChatRoomDto> rooms = chatRooms.stream().map(room -> {
             ChatRoomDto dto = new ChatRoomDto();
 
             Long otherId = 0L;
             // 조회를 위해 상대방 유저 정보 찾은 후 user2에 저장하기
-            if(room.getUser1() == userId){
-                otherId = room.getUser2();
-            }else{
-                otherId = room.getUser1();
+            Set<UserAccount> users = room.getUsers();
+
+            for(UserAccount userAccount: users){
+                if(userAccount.getId() != userId){
+                    otherId = userAccount.getId();
+                    break;
+                }
             }
+
             // 채팅방에서 읽지 않은 채팅 개수 조회
-            Long unReadCount = chatService.unreadChat(userId, room.getId());
+            Long unReadCount = chatService.unreadChat(userId, room);
             // 상대방 정보 조회하기
 
             Optional<UserAccount> other = userAccountRepository.findById(otherId);
@@ -91,12 +103,11 @@ public class ChattingRoomService {
 
         if(chatRoom.isPresent()){
             ChatRoom room = chatRoom.get();
-            if(room.getLeaveId() != null){
+            if(!room.getStatus()){
                 chatRoomRepository.delete(chatRoom.get());
                 return true;
 
             }else {
-                room.setLeaveId(Long.valueOf(userId));
                 room.setStatus(false);
                 return false;
             }

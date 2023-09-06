@@ -8,6 +8,7 @@ import com.blind.dating.security.TokenProvider;
 import com.blind.dating.service.InterestService;
 import com.blind.dating.service.QuestionService;
 import com.blind.dating.service.UserAccountService;
+import com.blind.dating.util.CookieUtil;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -39,6 +40,7 @@ import java.util.stream.Collectors;
 public class UserAccountController {
 
     private final UserAccountService userAccountService;
+    private final CookieUtil cookieUtil;
 
     @Operation(summary = "회원가입", description = "유저정보를 받아서 회원가입을 진행합니다.")
     @ApiResponses(value = {
@@ -110,11 +112,7 @@ public class UserAccountController {
         LogInResponseDto dt = LogInResponseDto.from(user);
         dt.setAccessToken(user.getAccessToken());
 
-        Cookie cookie = new Cookie("refreshToken", user.getRefreshToken());
-        cookie.setMaxAge(60*60*24*7);
-        cookie.setHttpOnly(true);
-        cookie.setSecure(true);
-        response.addCookie(cookie);
+        cookieUtil.addCookie(response, "refreshToken", user.getRefreshToken());
 
         return ResponseEntity.ok()
                 .body(ResponseDto.<LogInResponseDto>builder()

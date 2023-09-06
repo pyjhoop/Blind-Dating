@@ -7,6 +7,7 @@ import com.blind.dating.security.JwtAuthenticationFilter;
 import com.blind.dating.security.TokenProvider;
 import com.blind.dating.service.CustomUserDetailsService;
 import com.blind.dating.service.UserAccountService;
+import com.blind.dating.util.CookieUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -51,6 +52,7 @@ class UserAccountControllerTest {
     @MockBean private TokenProvider tokenProvider;
     @MockBean private JwtAuthenticationFilter jwtAuthenticationFilter;
     @MockBean private CustomUserDetailsService customUserDetailsService;
+    @MockBean private CookieUtil cookieUtil;
 
     private UserRequestDto dto;
     private UserAccount user;
@@ -65,6 +67,7 @@ class UserAccountControllerTest {
         user.setUserPassword(bCryptPasswordEncoder.encode(dto.getUserPassword()));
     }
 
+    @DisplayName("회원가입 테스트")
     @Test
     void testRegisterUser_WithSuccess() throws Exception {
        UserInfoWithTokens info = UserInfoWithTokens.builder()

@@ -56,7 +56,7 @@ class ChattingRoomServiceTest {
     void givenUserId_whenSelectChatRooms_thenResultChatRoomDtoList(){
         //Given
         UserAccount user1 = UserAccount.of("qweeqw","asdfdf", "nickname","asdf","asdf","M","하이요");
-        Optional<UserAccount> optional = Optional.of(user1);
+        Optional<UserAccount> optional = Optional.of(user1); 
         List<UserAccount> userList = List.of(user1);
 
         ChatRoom room = new ChatRoom();

@@ -62,7 +62,7 @@ class ChattingRoomServiceTest {
         ChatRoom room = new ChatRoom();
         List<ChatRoom> list = List.of(room);
         given(userAccountRepository.findById(1L)).willReturn(optional);
-        given(chattingRoomRepository.findAllByUsersOrderByUpdatedAtDesc(user1)).willReturn(list);
+        given(chattingRoomRepository.findAllByUsersAndStatusOrderByUpdatedAtDesc(user1, true)).willReturn(list);
         given(chatService.unreadChat(1L,room)).willReturn(1L);
         //When
         List<ChatRoomDto> result = chattingRoomService.getRooms(1L);

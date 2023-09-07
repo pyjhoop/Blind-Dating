@@ -49,7 +49,7 @@ public class ChattingRoomService {
         UserAccount user = userAccountRepository.findById(userId)
                 .orElseThrow(()-> new RuntimeException("채팅방 조회시 내 정보가 제대로 조회되지 않았습니다. 다시 요청해 주세요"));
 
-        List<ChatRoom> chatRooms = chatRoomRepository.findAllByUsersOrderByUpdatedAtDesc(user);
+        List<ChatRoom> chatRooms = chatRoomRepository.findAllByUsersAndStatusOrderByUpdatedAtDesc(user, true);
 
 
         List<ChatRoomDto> rooms = chatRooms.stream().map(room -> {

@@ -19,5 +19,5 @@ public interface ChattingRoomRepository extends JpaRepository<ChatRoom, Long> {
 //    @Query("SELECT cr FROM ChatRoom cr WHERE cr.users IN :userList ORDER BY cr.updatedAt DESC")
 //    List<ChatRoom> findAllByUsersInAndOrderByUpdatedAtDesc(Collection<UserAccount> userList);
 
-    List<ChatRoom> findAllByUsersOrderByUpdatedAtDesc(UserAccount userAccount);
+    List<ChatRoom> findAllByUsersAndStatusOrderByUpdatedAtDesc(UserAccount userAccount, Boolean status);
 }

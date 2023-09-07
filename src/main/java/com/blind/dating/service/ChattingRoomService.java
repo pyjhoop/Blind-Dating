@@ -51,7 +51,7 @@ public class ChattingRoomService {
 
         List<UserAccount> list = List.of(user);
 
-        List<ChatRoom> chatRooms = chatRoomRepository.findAllByUsersIn(list);
+        List<ChatRoom> chatRooms = chatRoomRepository.findAllByUsersInAndOrderByUpdatedAtDesc(list);
 
         List<ChatRoomDto> rooms = chatRooms.stream().map(room -> {
             ChatRoomDto dto = new ChatRoomDto();

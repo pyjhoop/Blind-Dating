@@ -23,6 +23,7 @@ public class ChatRoom extends BaseEntity{
     private Long id;
 
     @Setter
+    @ToString.Exclude
    @ManyToMany(fetch = FetchType.EAGER)
    @JoinTable(
            name = "user_chat_room",
@@ -33,6 +34,7 @@ public class ChatRoom extends BaseEntity{
 
     @Setter
     @OneToMany(mappedBy = "chatRoom")
+    @ToString.Exclude
     private Set<ReadChat> readChat = new LinkedHashSet<>();
 
     @Setter

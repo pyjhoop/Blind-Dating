@@ -49,9 +49,8 @@ public class ChattingRoomService {
         UserAccount user = userAccountRepository.findById(userId)
                 .orElseThrow(()-> new RuntimeException("채팅방 조회시 내 정보가 제대로 조회되지 않았습니다. 다시 요청해 주세요"));
 
-        List<UserAccount> list = List.of(user);
+        List<ChatRoom> chatRooms = chatRoomRepository.findAllByUsersOrderByUpdatedAtDesc(user);
 
-        List<ChatRoom> chatRooms = chatRoomRepository.findAllByUsersInAndOrderByUpdatedAtDesc(list);
 
         List<ChatRoomDto> rooms = chatRooms.stream().map(room -> {
             ChatRoomDto dto = new ChatRoomDto();
@@ -59,6 +58,8 @@ public class ChattingRoomService {
             Long otherId = 0L;
             // 조회를 위해 상대방 유저 정보 찾은 후 user2에 저장하기
             Set<UserAccount> users = room.getUsers();
+
+
 
             for(UserAccount userAccount: users){
                 if(userAccount.getId() != userId){

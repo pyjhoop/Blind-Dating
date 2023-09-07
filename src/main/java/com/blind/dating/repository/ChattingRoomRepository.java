@@ -16,6 +16,8 @@ public interface ChattingRoomRepository extends JpaRepository<ChatRoom, Long> {
 //    @Query("SELECT c FROM ChatRoom c WHERE (c.user1 = :user1 OR c.user2 = :user2) AND (c.leaveId <> :leaveId OR c.leaveId is null) order by c.updatedAt DESC ")
 //    List<ChatRoom> findCustomQuery(@Param("user1") Long user1, @Param("user2") Long user2, @Param("leaveId") Long leaveId);
 
-    @Query("SELECT cr FROM ChatRoom cr WHERE cr.users IN :userList ORDER BY cr.updatedAt DESC")
-    List<ChatRoom> findAllByUsersInAndOrderByUpdatedAtDesc(Collection<UserAccount> userList);
+//    @Query("SELECT cr FROM ChatRoom cr WHERE cr.users IN :userList ORDER BY cr.updatedAt DESC")
+//    List<ChatRoom> findAllByUsersInAndOrderByUpdatedAtDesc(Collection<UserAccount> userList);
+
+    List<ChatRoom> findAllByUsersOrderByUpdatedAtDesc(UserAccount userAccount);
 }

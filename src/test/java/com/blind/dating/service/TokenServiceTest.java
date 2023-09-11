@@ -1,6 +1,7 @@
 package com.blind.dating.service;
 
 import com.blind.dating.domain.UserAccount;
+import com.blind.dating.dto.user.LogInResponse;
 import com.blind.dating.dto.user.UserInfoWithTokens;
 import com.blind.dating.repository.RefreshTokenRepository;
 import com.blind.dating.repository.UserAccountRepository;
@@ -63,7 +64,7 @@ class TokenServiceTest {
         given(tokenProvider.refreshToken(user)).willReturn("refresh");
 
         //When
-        UserInfoWithTokens result = tokenService.updateRefreshToken("1");
+        LogInResponse result = tokenService.updateRefreshToken("1");
 
         //Then
         assertThat(result).isNotNull();

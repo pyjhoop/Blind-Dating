@@ -1,5 +1,6 @@
 package com.blind.dating.controller;
 
+import com.blind.dating.dto.user.LogInResponse;
 import com.blind.dating.dto.user.UserInfoWithTokens;
 import com.blind.dating.security.TokenProvider;
 import com.blind.dating.service.TokenService;
@@ -40,20 +41,19 @@ class TokenControllerTest {
         UserInfoWithTokens dto = new UserInfoWithTokens("access","refreshToken",1L,"nick");
         Cookie cookie = new Cookie("refreshToken", "refreshToken");
 
+        LogInResponse response = new LogInResponse();
+
         String userId = "1";
 
         given(tokenService.validRefreshToken(any(Cookie.class))).willReturn(userId);
-        given(tokenService.updateRefreshToken(userId)).willReturn(dto);
+        given(tokenService.updateRefreshToken(userId)).willReturn(response);
 
         //When & Then
         mvc.perform(get("/api/refresh")
                         .cookie(cookie))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("OK"))
-                .andExpect(jsonPath("$.message").value("accessToken 이 성공적으로 생성되었습니다."))
-                .andExpect(jsonPath("$.data.id").value(dto.getId()))
-                .andExpect(jsonPath("$.data.accessToken").value(dto.getAccessToken()))
-                .andExpect(jsonPath("$.data.nickname").value(dto.getNickname()));
+                .andExpect(jsonPath("$.message").value("accessToken 이 성공적으로 생성되었습니다."));
 
         then(tokenService).should().validRefreshToken(cookie);
         then(tokenService).should().updateRefreshToken(userId);

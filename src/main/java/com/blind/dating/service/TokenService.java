@@ -1,6 +1,7 @@
 package com.blind.dating.service;
 
 import com.blind.dating.domain.UserAccount;
+import com.blind.dating.dto.user.LogInResponse;
 import com.blind.dating.dto.user.TokenDto;
 import com.blind.dating.dto.user.UserIdRequestDto;
 import com.blind.dating.dto.user.UserInfoWithTokens;
@@ -59,7 +60,7 @@ public class TokenService {
      * @return
      */
     @Transactional
-    public UserInfoWithTokens updateRefreshToken(String userId){
+    public LogInResponse updateRefreshToken(String userId){
         Optional<UserAccount> user = userAccountRepository.findById(Long.valueOf(userId));
         String accessToken = null;
         String refreshToken = null;
@@ -72,12 +73,13 @@ public class TokenService {
             throw new RuntimeException(user.get().getId() +"에 해당하는 유저는 존재하지 앖습니다.");
         }
 
-        return UserInfoWithTokens.builder()
-                .accessToken(accessToken)
-                .refreshToken(refreshToken)
-                .id(user.get().getId())
-                .nickname(user.get().getNickname())
-                .build();
+        LogInResponse response = LogInResponse.from(user.get());
+        response.setAccessToken(accessToken);
+        response.setRefreshToken(refreshToken);
+
+        return response;
+
+
     }
 
 

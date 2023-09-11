@@ -1,10 +1,7 @@
 package com.blind.dating.controller;
 
 import com.blind.dating.dto.response.ResponseDto;
-import com.blind.dating.dto.user.TokenDto;
-import com.blind.dating.dto.user.UserIdRequestDto;
-import com.blind.dating.dto.user.UserInfoWithTokens;
-import com.blind.dating.dto.user.UserResponse;
+import com.blind.dating.dto.user.*;
 import com.blind.dating.service.TokenService;
 import com.blind.dating.util.CookieUtil;
 import io.swagger.v3.oas.annotations.Operation;
@@ -61,18 +58,18 @@ public class TokenController {
         }
 
         // 맞는지 확인하고 있으면 리프레쉬 토큰 업데이트 후 access, refresh 반환하기.
-        UserInfoWithTokens dto = null;
-
-        dto = tokenService.updateRefreshToken(userId);
+        LogInResponse response1 = tokenService.updateRefreshToken(userId);
+        LogInResponseDto dto = LogInResponseDto.from(response1);
+        dto.setAccessToken(response1.getAccessToken());
         cookie.setMaxAge(0);
 
-        cookieUtil.addCookie(response, "refreshToken", dto.getRefreshToken());
+        cookieUtil.addCookie(response, "refreshToken", response1.getRefreshToken());
 
-        return ResponseEntity.<ResponseDto<UserResponse>>ok()
-                .body(ResponseDto.<UserResponse>builder()
+        return ResponseEntity.<ResponseDto<LogInResponseDto>>ok()
+                .body(ResponseDto.<LogInResponseDto>builder()
                         .status("OK")
                         .message("accessToken 이 성공적으로 생성되었습니다.")
-                        .data(UserResponse.of(dto.getAccessToken(), dto.getId(), dto.getNickname()))
+                        .data(dto)
                         .build());
 
 

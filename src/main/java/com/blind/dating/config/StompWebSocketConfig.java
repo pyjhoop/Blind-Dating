@@ -27,7 +27,7 @@ public class StompWebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/stomp/chat","/stomp/chatroom")
-                .setAllowedOrigins("http://localhost:8081", "http://127.0.0.1:5500", "http://127.0.0.1:5173","https://127.0.0.1:5173", "http://localhost:80","https://fe-zeta.vercel.app")
+                .setAllowedOrigins("http://localhost:8081", "http://127.0.0.1:5500","https://127.0.0.1:5173", "http://localhost:80","https://fe-zeta.vercel.app")
                 .withSockJS();
     }
 

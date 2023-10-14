@@ -10,7 +10,8 @@
 
 ## 🛠프로젝트 아키텍처
 
-![archi](https://github.com/Blind-Dating/Blind-Dating-BE/assets/59335316/ab484f94-9638-4a05-b7c3-bf6ecafd1719)
+![arch](https://github.com/Blind-Dating/Blind-Dating-BE/assets/59335316/7f785b93-487e-48be-b6be-4773f3244f22)
+
 
 ## ⚙기술 스택
 

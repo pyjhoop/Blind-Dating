@@ -42,10 +42,16 @@
 ![image](https://github.com/Blind-Dating/Blind-Dating-BE/assets/59335316/346b2553-ffc7-472b-9cdd-fae6a350bbdb)
 
 
-## API 문서
+## 🪧API 문서
 [👉🏻 API 문서 상세보기](https://blind-dating.site/swagger-ui/index.html)   
 API 문서는 Swagger를 통해 작성되었습니다.
 
+## 💡담당 업무
+ - Github Action을 도입하여 CI/CD를 구현했습니다.
+ - 엑세스 토큰과 리프레시 토큰을 기반으로 한 인증/인가 시스템을 구현했습니다.
+ - 실시간 채팅 기능 구현을 위해 웹소켓을 활용하고 메세지 브로커로 Redis를 도입했습니다.
+ - 채팅방 리스트에서 웹소켓 연결을 통해 새로운 메세지가 도착할 때마다 최신 메세지 내용이 갱신되도록 했습니다.
+ - Swagger를 이용하여 REST API 문서화를 진행하여 협업의 효율성을 높였습니다.
 
 ## 💡주요 기능
 1. 회원가입

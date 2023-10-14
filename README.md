@@ -9,8 +9,9 @@
 [👉🏻블라인드 데이팅 이용해보기 Click](https://fe-zeta.vercel.app)
 
 ## 🛠프로젝트 아키텍처
+![dffd](https://github.com/Blind-Dating/Blind-Dating-BE/assets/59335316/86abd2cb-2bb2-4700-b08f-3e4fa97df224)
 
-![arch](https://github.com/Blind-Dating/Blind-Dating-BE/assets/59335316/7f785b93-487e-48be-b6be-4773f3244f22)
+
 
 
 ## ⚙기술 스택

@@ -34,24 +34,19 @@ public class TokenService {
     public String validRefreshToken(Cookie cookie){
 
         // 유효한지 확인해줘
-        boolean validate = tokenProvider.validateToken(cookie.getValue());
+        //boolean validate = tokenProvider.validateToken(cookie.getValue());
         // id 추출해서 refreshToken 가져오기
 
         String userId = tokenProvider.validateAndGetUserId(cookie.getValue());
 
-
-        if(validate){
-
-            String refreshToken = refreshTokenRepository.getRefreshToken(userId);
-            if(refreshToken != null){
-                return userId;
-            }else{
-                return null;
-            }
-                    //userAccountRepository.existsByRefreshToken(cookie.getValue());
+        String refreshToken = refreshTokenRepository.getRefreshToken(userId);
+        if(refreshToken != null){
+            return userId;
         }else{
             return null;
         }
+                    //userAccountRepository.existsByRefreshToken(cookie.getValue());
+
     }
 
     /**

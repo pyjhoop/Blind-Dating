@@ -1,5 +1,6 @@
 package com.blind.dating.config;
 
+import com.blind.dating.security.CustomAccessDeniedHandler;
 import com.blind.dating.security.CustomAuthenticationEntryPoint;
 import com.blind.dating.security.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +35,7 @@ public class SecurityConfig {
                         .anyRequest().authenticated())
                 .headers().frameOptions().sameOrigin()
                 .and().exceptionHandling()
+                .accessDeniedHandler(new CustomAccessDeniedHandler())
                 .authenticationEntryPoint(new CustomAuthenticationEntryPoint()).and()
                 .build();
     }

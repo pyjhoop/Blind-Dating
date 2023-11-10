@@ -28,24 +28,30 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final TokenProvider tokenProvider;
 
-    String[] singUpRequestUrls = {"/api/signup","/api/login", "/api/check-userId","/api/check-nickname"};
+    String[] singUpRequestUrls = {"/api/signup","/api/login", "/api/check-userId","/api/check-nickname","/swagger-ui"};
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
-        if(!isSignUpRequest(request))
-        {
-            //엑세스 토큰
-            String token = parseBearerToken(request);
+        log.info(request.getRequestURI());
+        try{
+            if(!isSignUpRequest(request))
+            {
+                //엑세스 토큰
+                String token = parseBearerToken(request);
 
-            // 토큰 검증하기 JWT이므로 인가 서버에 요청하지 않아도됨
-            if(token != null && tokenProvider.validateToken(token, request)){
+                // 토큰 검증하기 JWT이므로 인가 서버에 요청하지 않아도됨
+                if(token != null && tokenProvider.validateToken(token, request)){
 
-                // setContext 에 인증객체 저장하기.
-                Authentication authentication = tokenProvider.getAuthentication(token);
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+                    // setContext 에 인증객체 저장하기.
+                    Authentication authentication = tokenProvider.getAuthentication(token);
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
 
+                }
             }
+
+        }catch (Exception e){
+
         }
 
         filterChain.doFilter(request,response);
@@ -66,7 +72,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String requestUri = request.getRequestURI();
 
         for(String uri: singUpRequestUrls){
-            if(uri.equals(requestUri))
+            if(uri.contains(requestUri))
                 return true;
         }
 

@@ -93,8 +93,8 @@ public class UserController {
             @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR", content = @Content(schema = @Schema(implementation = ResponseDto.class)))
     })
     public ResponseEntity<ResponseDto<UserWithInterestAndQuestionDto>> updateMyInfo(
-            Authentication authentication,
-            @RequestBody UserUpdateRequestDto dto
+            Authentication authentication
+            , @RequestBody UserUpdateRequestDto dto
     ){
         //내정보 업데이트
         UserAccount user = userService.updateMyInfo(authentication, dto);

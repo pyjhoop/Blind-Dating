@@ -3,14 +3,15 @@ server:
 
 spring:
   redis:
-    host: localhost
+    host:  ${REDIS-HOST}
     port: 6379
   # 테스트 환경에서의 db
   datasource:
-    driver-class-name: org.h2.Driver
-    url: jdbc:h2:mem:testdb
-    username: sa
-    password:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${DB-URL}
+    username: ${USERNAME}
+    password: ${PASSWORD}
+
 
   h2:
     console:
@@ -18,7 +19,7 @@ spring:
 
   jpa:
     open-in-view: false
-    hibernate.ddl-auto: update
+    hibernate.ddl-auto: create
     #defer-datasource-initialization: true  # 파일로 테스트 데이터 베이스를 만들수 있게 해준다. 리소스안에 data.sql파일 만듬.
     show-sql: true
     properties:
@@ -45,3 +46,7 @@ springdoc:
       enabled: true
   cache:
     disabled: true
+
+jwt:
+  secret_key: ${secret-key}
+

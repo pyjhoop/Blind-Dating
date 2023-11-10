@@ -27,40 +27,26 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final TokenProvider tokenProvider;
-    private final String signUpUrl = "/api/signup";
-    private final String loginUrl = "/api/login";
-    private final String checkIdUrl = "/api/check-userId";
-    private final String checkNicknameUrl = "/api/check-nickname";
+
+    String[] singUpRequestUrls = {"/api/signup","/api/login", "/api/check-userId","/api/check-nickname"};
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-           if(isSignUpRequest(request)){
 
-           }else{
-               try{
-                   //엑세스 토큰
-                   String token = parseBearerToken(request);
+        if(!isSignUpRequest(request))
+        {
+            //엑세스 토큰
+            String token = parseBearerToken(request);
 
-                   // 토큰 검증하기 JWT이므로 인가 서버에 요청하지 않아도됨
-                   if(token != null && tokenProvider.validateToken(token)){
-                       String userId = tokenProvider.validateAndGetUserId(token);
+            // 토큰 검증하기 JWT이므로 인가 서버에 요청하지 않아도됨
+            if(token != null && tokenProvider.validateToken(token, request)){
 
-                       // setContext 에 인증객체 저장하기.
-                       Authentication authentication = new UsernamePasswordAuthenticationToken(userId, "",null);
+                // setContext 에 인증객체 저장하기.
+                Authentication authentication = tokenProvider.getAuthentication(token);
+                SecurityContextHolder.getContext().setAuthentication(authentication);
 
-                       SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
-                       securityContext.setAuthentication(authentication);
-                       SecurityContextHolder.setContext(securityContext);
-                   }else{
-                       throw new AuthenticationServiceException("Invalid or missing token");
-                   }
-               }catch (ExpiredJwtException e){
-
-               }catch (Exception e){
-
-               }
-
-           }
+            }
+        }
 
         filterChain.doFilter(request,response);
 
@@ -76,10 +62,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private boolean isSignUpRequest(HttpServletRequest request) {
-        return request.getRequestURI().equals(signUpUrl) && request.getMethod().equals("POST")
-                || request.getRequestURI().equals(checkIdUrl) && request.getMethod().equals("POST")
-                || request.getRequestURI().equals(loginUrl)&& request.getMethod().equals("POST")
-                || request.getRequestURI().contains(checkNicknameUrl) && request.getMethod().equals("GET");
 
+        String requestUri = request.getRequestURI();
+
+        for(String uri: singUpRequestUrls){
+            if(uri.equals(requestUri))
+                return true;
+        }
+
+        return false;
     }
 }

@@ -33,6 +33,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -74,6 +75,7 @@ class UserControllerTest {
                 .willReturn(pages);
 
         mvc.perform(get("/api/user-list")
+                        .header("Authorization", "Bearer "+"refreshToken")
                         .queryParam("page","0")
                         .queryParam("size","10")) // 첫 번째 페이지 요청
                 .andExpect(status().isOk());
@@ -89,14 +91,15 @@ class UserControllerTest {
         given(userService.getMyInfo(any(Authentication.class))).willReturn(user);
 
         //When && Then
-        mvc.perform(get("/api/user"))
+        mvc.perform(get("/api/user")
+                        .header("Authorization", "Bearer "+"refreshToken"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
 
         then(userService).should().getMyInfo(any(Authentication.class));
     }
 
-    @Disabled
+
     @DisplayName("내정보 수정")
     @Test
     @WithMockUser(username = "1")
@@ -114,12 +117,13 @@ class UserControllerTest {
         UserAccount updatedUser = UserAccount.of("h1","g1","g1","g","gd","gd","fd");
 
 
-
-        given(userService.updateMyInfo(any(Authentication.class), any(UserUpdateRequestDto.class))).willReturn(updatedUser);
-        //given(userService.getMyInfo(any(Authentication.class))).willReturn(updatedUser);
+        given(userService.updateMyInfo(any(Authentication.class), eq(dto))).willReturn(user);
+        given(userService.getMyInfo(any(Authentication.class))).willReturn(user);
 
         mvc.perform(put("/api/user")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", "Bearer "+"refreshToken")
                 .content(obj.writeValueAsString(dto)))
                 .andExpect(status().isOk());
     }

@@ -18,20 +18,18 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException {
 
-        setResponse((response));
-    }
+        String message = request.getAttribute("exception").toString();
 
-    /**
-     * 한글 출력을 위해 getWriter() 사용
-     */
-    private void setResponse(HttpServletResponse response) throws IOException {
         response.setContentType("application/json;charset=UTF-8");
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         ObjectMapper ob = new ObjectMapper();
         ResponseDto dto = ResponseDto.builder().status("ExpiredJwtToken")
-                        .message("jwt 토큰 만료되었습니다.")
-                                .build();
+                .message(message)
+                .build();
         response.getWriter().println(ob.writeValueAsString(dto));
+
     }
+
+
 
 }

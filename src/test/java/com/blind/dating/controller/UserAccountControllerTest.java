@@ -3,6 +3,7 @@ package com.blind.dating.controller;
 import com.blind.dating.config.SecurityConfig;
 import com.blind.dating.domain.UserAccount;
 import com.blind.dating.dto.user.*;
+import com.blind.dating.security.CustomAuthenticationEntryPoint;
 import com.blind.dating.security.JwtAuthenticationFilter;
 import com.blind.dating.security.TokenProvider;
 import com.blind.dating.service.CustomUserDetailsService;
@@ -53,6 +54,7 @@ class UserAccountControllerTest {
     @MockBean private JwtAuthenticationFilter jwtAuthenticationFilter;
     @MockBean private CustomUserDetailsService customUserDetailsService;
     @MockBean private CookieUtil cookieUtil;
+
 
     private UserRequestDto dto;
     private UserAccount user;

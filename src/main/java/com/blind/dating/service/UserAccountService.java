@@ -1,5 +1,6 @@
 package com.blind.dating.service;
 
+import com.blind.dating.domain.Role;
 import com.blind.dating.domain.UserAccount;
 import com.blind.dating.dto.user.*;
 import com.blind.dating.repository.RefreshTokenRepository;
@@ -42,10 +43,6 @@ public class UserAccountService {
     @Transactional
     public UserAccount register(UserRequestDto dto){
 
-        if(dto == null || dto.getUserId() == null){
-            throw new RuntimeException("Invalid arguments");
-        }
-
         // 아이디 존재하는지 체크
         String userId = dto.getUserId();
         if(userAccountRepository.existsByUserId(userId)){
@@ -57,6 +54,7 @@ public class UserAccountService {
         user.setRecentLogin(LocalDateTime.now());
         user.setDeleted(false);
         user.setUserPassword(bCryptPasswordEncoder.encode(dto.getUserPassword()));
+        user.setRole(Role.USER.getValue());
 
         UserAccount resultUser =  userAccountRepository.save(user);
         //questions 저장하기

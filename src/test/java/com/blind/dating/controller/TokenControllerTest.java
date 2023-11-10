@@ -50,7 +50,8 @@ class TokenControllerTest {
 
         //When & Then
         mvc.perform(get("/api/refresh")
-                        .cookie(cookie))
+                        .cookie(cookie)
+                        .header("Authorization", "Bearer "+"refreshToken"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("OK"))
                 .andExpect(jsonPath("$.message").value("accessToken 이 성공적으로 생성되었습니다."));

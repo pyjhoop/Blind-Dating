@@ -38,7 +38,7 @@ class TokenServiceTest {
         //Given
         Cookie cookie = new Cookie("refreshToken","refreshToken");
 
-        given(tokenProvider.validateToken(cookie.getValue())).willReturn(true);
+        //given(tokenProvider.validateToken(cookie.getValue())).willReturn(true);
         given(tokenProvider.validateAndGetUserId(cookie.getValue())).willReturn("1");
         given(refreshTokenRepository.getRefreshToken("1")).willReturn("refreshToken");
 

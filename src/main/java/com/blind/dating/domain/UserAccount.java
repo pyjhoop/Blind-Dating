@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
@@ -29,11 +30,10 @@ public class UserAccount extends BaseEntity implements UserDetails {
     private String userId;
 
     @Setter
-    @Column(nullable = false, length = 255)
     private String userPassword;
 
     @Setter
-    @Column(nullable = false, unique = true, length = 255)
+    @Column(nullable = false, unique = true)
     private String nickname;
 
     @Setter
@@ -42,7 +42,7 @@ public class UserAccount extends BaseEntity implements UserDetails {
 
 
     @Setter
-    @Column(nullable = true, length = 20)
+    @Column(length = 20)
     private String mbti;
 
     @Setter
@@ -50,7 +50,6 @@ public class UserAccount extends BaseEntity implements UserDetails {
     private String gender;
 
     @Setter
-    @Column(nullable = true)
     private Boolean deleted;
 
     @Setter
@@ -59,6 +58,11 @@ public class UserAccount extends BaseEntity implements UserDetails {
     @Setter
     private LocalDateTime recentLogin;
 
+    @Setter
+    private String role;
+
+    @Setter
+    private String social;
 
     @OneToMany(mappedBy = "userAccount", fetch = FetchType.EAGER)
     @ToString.Exclude
@@ -92,6 +96,10 @@ public class UserAccount extends BaseEntity implements UserDetails {
     }
 
 
+
+
+
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -107,7 +115,9 @@ public class UserAccount extends BaseEntity implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+        Collection<GrantedAuthority> authorities = new ArrayList<>();
+        authorities.add(new SimpleGrantedAuthority(role));
+        return authorities;
     }
 
     @Override

@@ -73,8 +73,8 @@ API 문서는 Swagger를 통해 작성되었습니다.
 ### :mag: 채팅방 리스트
 ![image](https://github.com/Blind-Dating/Blind-Dating-BE/assets/59335316/dbbb15db-1ee5-45db-8e43-851dfb833501)    
 - 내가 참여한 채팅방 리스트를 확인할 수 있습니다.
-- 웹 소켓을 연결해 상대방이 문자를 보내면 실시간으로 메지를 미리 볼 수 있습니다.
-- 또한, 읽지 않은 메시지 개수를 실시간으로 업데이트해줍니다.
+- 웹 소켓을 연결해 상대방이 문자를 보내면 실시간으로 메세지를 미리 볼 수 있습니다.
+- 읽지 않은 메세지 개수를 실시간으로 업데이트해줍니다.
 
 ### :mag: 채팅방
 ![image](https://github.com/Blind-Dating/Blind-Dating-BE/assets/59335316/d5b78490-1169-4b50-a1a6-0ef9fbfe9f42)

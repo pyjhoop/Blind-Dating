@@ -100,7 +100,7 @@ class UserAccountControllerTest {
         String userPassword = "userPwd";
         LoginInputDto dto = LoginInputDto.builder().userId(userId).userPassword(userPassword).build();
 
-        LogInResponse response = LogInResponse.from(user);
+        LogInResponse response = LogInResponse.from(user, "accessToken", "refreshToken");
         UserInfoWithTokens userInfo = UserInfoWithTokens.builder()
                 .accessToken("accessToken")
                 .refreshToken("refreshToken")

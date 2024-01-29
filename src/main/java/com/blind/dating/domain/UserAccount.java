@@ -1,5 +1,6 @@
 package com.blind.dating.domain;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -19,6 +20,7 @@ import java.util.*;
         @Index(columnList = "gender")
 })
 @Entity
+@AllArgsConstructor
 public class UserAccount extends BaseEntity implements UserDetails {
 
     @Id

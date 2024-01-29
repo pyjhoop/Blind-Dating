@@ -71,7 +71,8 @@ public class LikesUnlikesService {
         Long receiver = Long.parseLong(receiverId);
 
         // receiverId로 유저 조회
-        UserAccount receiverAccount = userAccountRepository.findById(receiver).get();
+        UserAccount receiverAccount = userAccountRepository.findById(receiver)
+                        .orElseThrow(() -> new RuntimeException("잘못된 요청입니다."));
 
         likesUnlikesRepository.save(LikesUnlikes.of(Long.valueOf(userId), receiverAccount, false));
 

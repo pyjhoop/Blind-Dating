@@ -1,6 +1,7 @@
 package com.blind.dating.service;
 
 import com.blind.dating.domain.ChatRoom;
+import com.blind.dating.domain.ReadChat;
 import com.blind.dating.repository.ChattingRoomRepository;
 import com.blind.dating.repository.ReadChatRepository;
 import com.blind.dating.repository.SessionRedisRepository;
@@ -17,7 +18,10 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.*;
 
 @DisplayName("ReadChatService - 테스트")
 @ExtendWith(MockitoExtension.class)
@@ -32,15 +36,36 @@ class ReadChatServiceTest {
     @Test
     void givenRoomIdANdChatId_whenUpdateReadChat_thenUpdate(){
 
-        Set<String> users = new LinkedHashSet<>();
-        users.add("1");
-        users.add("2");
+        // Given
+        Set<String> users = Set.of("1","2");
         ChatRoom chatRoom = new ChatRoom();
         Optional<ChatRoom> optional = Optional.of(chatRoom);
+        ReadChat readChat1 = ReadChat.of(chatRoom, 1L, 1L);
+        ReadChat readChat2 = ReadChat.of(chatRoom,2L, 1L);
+
         given(sessionRedisRepository.getUsers("1")).willReturn(users);
         given(chattingRoomRepository.findById(1L)).willReturn(optional);
+        given(readChatRepository.findByChatRoomAndUserId(any(ChatRoom.class), anyLong())).willReturn(Optional.of(readChat1));
 
         //When
         readChatService.updateReadChat("1",1L);
+
+        // Then
+        verify(readChatRepository, times(2)).findByChatRoomAndUserId(any(ChatRoom.class), anyLong());
+    }
+
+    @DisplayName("읽은 채팅 업데이트시 예외 발생 - 테스트")
+    @Test
+    void givenRoomIdANdChatId_whenUpdateReadChat_thenThrowException() {
+        Set<String> users = Set.of("1","2");
+
+        given(sessionRedisRepository.getUsers("1")).willReturn(users);
+        given(chattingRoomRepository.findById(anyLong())).willReturn(Optional.empty());
+
+        RuntimeException exception = assertThrows(RuntimeException.class, ()-> {
+            readChatService.updateReadChat("1", anyLong());
+        });
+
+        assertThat(exception.getMessage()).isEqualTo("메세지 전송시 예외가 발생했습니다.");
     }
 }

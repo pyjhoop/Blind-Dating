@@ -37,8 +37,6 @@ class TokenServiceTest {
     void givenCookie_whenValidateRefreshToken_thenReturnUserId(){
         //Given
         Cookie cookie = new Cookie("refreshToken","refreshToken");
-
-        //given(tokenProvider.validateToken(cookie.getValue())).willReturn(true);
         given(tokenProvider.validateAndGetUserId(cookie.getValue())).willReturn("1");
         given(refreshTokenRepository.getRefreshToken("1")).willReturn("refreshToken");
 
@@ -49,17 +47,27 @@ class TokenServiceTest {
         assertThat(userId).isEqualTo("1");
     }
 
-    @DisplayName("리프래시 토큰 업데이트 - 테스트")
+    @DisplayName("리프레시 토큰 예외 발생 - 테스트")
+    @Test
+    void givenCookie_whenValidateRefreshToken_thenThrowException() {
+        Cookie cookie = new Cookie("refreshToken","refreshToken");
+        given(tokenProvider.validateAndGetUserId(cookie.getValue())).willReturn("1");
+        given(refreshTokenRepository.getRefreshToken("1")).willReturn(null);
+
+        RuntimeException exception = assertThrows(RuntimeException.class, ()->{
+            tokenService.validRefreshToken(cookie);
+        });
+
+        assertThat(exception.getMessage()).isEqualTo("조회된 리프레쉬 토큰이 없습니다.");
+    }
+
+
+    @DisplayName("리프레시 토큰 업데이트 - 테스트")
     @Test
     void givenUserId_whenUpdateRefreshToken_thenReturnUserInfoWithTokens(){
         //Given
         UserAccount user = UserAccount.of("qweeqw","asdfdf", "nickname","asdf","asdf","M","하이요");
-        Optional<UserAccount> opUser = Optional.of(user);
-
-        UserInfoWithTokens userInfo = UserInfoWithTokens.builder()
-                        .accessToken("access").refreshToken("refresh")
-                        .id(1L).nickname("nick").build();
-        given(userAccountRepository.findById(1L)).willReturn(opUser);
+        given(userAccountRepository.findById(1L)).willReturn(Optional.of(user));
         given(tokenProvider.create(user)).willReturn("access");
         given(tokenProvider.refreshToken(user)).willReturn("refresh");
 
@@ -71,6 +79,20 @@ class TokenServiceTest {
         assertThat(result).hasFieldOrPropertyWithValue("accessToken","access");
         assertThat(result).hasFieldOrPropertyWithValue("refreshToken","refresh");
         assertThat(result).hasFieldOrPropertyWithValue("nickname","nickname");
+    }
+
+    @DisplayName("리프레시 토큰 업데이트시 예외 발생 - 테스트")
+    @Test
+    void givenUserId_whenUpdateRefreshToken_thenThrowException() {
+        // Given
+        given(userAccountRepository.findById(1L)).willReturn(Optional.empty());
+
+        // When
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+            tokenService.updateRefreshToken("1");
+        });
+
+        assertThat(exception.getMessage()).isEqualTo("1에 해당하는 유저는 존재하지 않습니다.");
     }
 
 

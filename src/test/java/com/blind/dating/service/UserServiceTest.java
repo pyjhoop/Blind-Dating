@@ -27,7 +27,9 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 
 
@@ -43,22 +45,24 @@ public class UserServiceTest {
     @Mock private UserAccountRedisRepository userAccountRedisRepository;
 
     private UserAccount user;
+    private UserAccount user2;
     private Authentication authentication;
 
     @BeforeEach
     void setUp(){
-        user = UserAccount.of("qweeqw","asdfdf", "nickname","asdf","asdf","M","하이요");
+        user = UserAccount.of("user01","pass01", "nickname1","서울","intp","M","하이요");
+        user2 = UserAccount.of("user02","pass02", "nickname2","서울","intp","W","하이요");
         authentication = new UsernamePasswordAuthenticationToken("1",user.getPassword());
     }
 
 
-    @DisplayName("추천리스트 테스트")
+    @DisplayName("남성 추천 리스트 - 테스트")
     @Test
     @WithMockUser(username = "1")
-    void givenRequireData_whenSelectList_thenReturnUserList(){
+    void givenRequireData_whenSelectWomanList_thenReturnUserList(){
         //Given
         Pageable pageable = Pageable.ofSize(10);
-        List<UserAccount> list = List.of(user);
+        List<UserAccount> list = List.of(user2);
         Page<UserAccount> pages = new PageImpl<>(list, pageable, 10);
 
         UserIdWithNicknameAndGender userInfo = new UserIdWithNicknameAndGender(1L,"fd","M");
@@ -75,24 +79,64 @@ public class UserServiceTest {
 
     }
 
-    @DisplayName("내정보 조회 테스트")
+    @DisplayName("남성 추천 리스트 - 테스트")
+    @Test
+    @WithMockUser(username = "1")
+    void givenRequireData_whenSelectManList_thenReturnUserList(){
+        //Given
+        Pageable pageable = Pageable.ofSize(10);
+        List<UserAccount> list = List.of(user);
+        Page<UserAccount> pages = new PageImpl<>(list, pageable, 10);
+
+        UserIdWithNicknameAndGender userInfo = new UserIdWithNicknameAndGender(2L,"nickname2","W");
+
+        given(userAccountRedisRepository.getUserInfo(anyString())).willReturn(userInfo);
+        given(userAccountRepositoryImpl.findAllByGenderAndNotLikes("M",1L, pageable)).willReturn(pages);
+
+        //When
+        Page<UserAccount> result = userService.getUserList(authentication, pageable);
+
+        //Then
+        assertThat(result).isNotNull();
+        assertThat(result.getTotalPages()).isEqualTo(1);
+
+    }
+
+    @DisplayName("내정보 조회 - 테스트")
     @Test
     @WithMockUser(username = "1")
     void givenUser_whenGetMyInfo_thenReturnUserInfo(){
         //Given
-        Optional<UserAccount> opUser = Optional.of(user);
-        Authentication authentication = new UsernamePasswordAuthenticationToken("1",user.getPassword());
-        given(userAccountRepository.findById(1L)).willReturn(opUser);
+        given(userAccountRepository.findById(1L)).willReturn(Optional.of(user));
 
         //When
         UserAccount result = userService.getMyInfo(authentication);
 
         //Then
         assertThat(result).isNotNull();
-        assertThat(result).hasFieldOrPropertyWithValue("username","qweeqw");
+        assertThat(result).hasFieldOrPropertyWithValue("username","user01");
+        assertThat(result).hasFieldOrPropertyWithValue("userPassword","pass01");
     }
 
-    @DisplayName("내 정보 수정하기")
+    @DisplayName("내정보 조회 - 테스트")
+    @Test
+    @WithMockUser(username = "1")
+    void givenUser_whenGetMyInfo_thenThrowException(){
+        //Given
+        given(userAccountRepository.findById(1L)).willReturn(Optional.empty());
+
+        //When
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+            UserAccount result = userService.getMyInfo(authentication);
+        });
+
+        //Then
+        assertThat(exception.getMessage()).isEqualTo("내정보 조회에 실패했습니다.");
+    }
+
+
+
+    @DisplayName("내 정보 수정하기 - 테스트")
     @Test
     @WithMockUser(username = "1")
     void givenUser_whenUpdateMyInfo_thenReturnUserInfo(){
@@ -114,10 +158,28 @@ public class UserServiceTest {
 
         //Then
         assertThat(result).isNotNull();
-        assertThat(result).hasFieldOrPropertyWithValue("username","qweeqw");
+        assertThat(result).hasFieldOrPropertyWithValue("username","user01");
     }
 
-    @DisplayName("특정 유저 조회하기")
+    @DisplayName("내 정보 수정중에 예외 발생 - 테스트")
+    @Test
+    @WithMockUser(username = "1")
+    void givenUser_whenUpdateMyInfo_thenThrowException(){
+        //Given
+        given(userAccountRepository.findById(1L)).willReturn(Optional.empty());
+        UserUpdateRequestDto dto = new UserUpdateRequestDto();
+
+        //When
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+            UserAccount result = userService.updateMyInfo(authentication, dto);
+        });
+
+        //Then
+        assertThat(exception.getMessage()).isEqualTo("유저정보 조회중에 예외가 발생했습니다.");
+    }
+
+
+    @DisplayName("특정 유저 조회하기 - 테스트")
     @Test
     @WithMockUser(username = "1")
     void givenUserId_whenSelectUserAccount_thenReturnUserAccount(){
@@ -130,6 +192,6 @@ public class UserServiceTest {
 
         //Then
         assertThat(result).isNotNull();
-        assertThat(result.get()).hasFieldOrPropertyWithValue("username","qweeqw");
+        assertThat(result.get()).hasFieldOrPropertyWithValue("username","user01");
     }
 }

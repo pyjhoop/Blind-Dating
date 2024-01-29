@@ -38,7 +38,6 @@ class TokenControllerTest {
     @WithMockUser(username = "1")
     void givenRefreshToken_whenRegenerateRefreshToken_thenReturnRefreshToken() throws Exception {
         //Given
-        UserInfoWithTokens dto = new UserInfoWithTokens("access","refreshToken",1L,"nick");
         Cookie cookie = new Cookie("refreshToken", "refreshToken");
 
         LogInResponse response = new LogInResponse();

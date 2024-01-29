@@ -2,10 +2,15 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '2.7.14'
 	id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+	id 'jacoco'
+}
+jacoco {
+	toolVersion = "0.8.7"
 }
 
 group = 'com.blind'
 version = '0.0.1-SNAPSHOT'
+
 
 java {
 	sourceCompatibility = '11'
@@ -20,6 +25,7 @@ configurations {
 repositories {
 	mavenCentral()
 }
+
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
@@ -84,4 +90,49 @@ clean {
 
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+jacocoTestReport {
+	reports {
+		xml.required = true
+		csv.required = true
+		html.required = true
+
+		xml.destination file("${buildDir}/jacoco/index.xml")
+		csv.destination file("${buildDir}/jacoco/index.csv")
+		html.destination file("${buildDir}/jacoco/index.html")
+	}
+	afterEvaluate {
+		classDirectories.setFrom(
+				files(classDirectories.files.collect {
+					fileTree(dir: it, excludes: [
+							'**/*Application*',
+							'**/*Exception*',
+							'**/dto/**',
+							'**/domain/**'
+							// ...
+					])
+				})
+		)
+	}
+}
+
+test {
+	finalizedBy 'jacocoTestReport'
+}
+
+jacocoTestCoverageVerification {
+	violationRules {
+		rule {
+			enabled = true;
+			element = 'CLASS'
+
+			limit {
+				counter = 'METHOD'
+				value = 'COVEREDRATIO'
+				minimum = 0.5
+			}
+		}
+
+	}
 }

@@ -25,7 +25,7 @@ public class LogInResponseDto {
     private String selfIntroduction;
     private String accessToken;
 
-    private LogInResponseDto(Long id, String userId, String nickname, String region, String mbti, String gender, Set<InterestDto> interests, Set<QuestionDto> questions, String selfIntroduction) {
+    private LogInResponseDto(Long id, String userId, String nickname, String region, String mbti, String gender, Set<InterestDto> interests, Set<QuestionDto> questions, String selfIntroduction, String accessToken) {
         this.id = id;
         this.userId = userId;
         this.nickname = nickname;
@@ -35,6 +35,7 @@ public class LogInResponseDto {
         this.interests = interests;
         this.questions = questions;
         this.selfIntroduction = selfIntroduction;
+        this.accessToken = accessToken;
     }
 
     public static LogInResponseDto from(LogInResponse response) {
@@ -47,6 +48,8 @@ public class LogInResponseDto {
                 response.getGender(),
                 response.getInterests(),
                 response.getQuestions(),
-                response.getSelfIntroduction());
+                response.getSelfIntroduction(),
+                response.getAccessToken()
+        );
     }
 }

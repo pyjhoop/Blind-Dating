@@ -73,8 +73,6 @@ public class UserAccountService {
     @Transactional
     public LogInResponse getLoginInfo(String userId, String userPassword){
 
-        BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
-
         //userId로 유저 정보 가져오기
         UserAccount user = userAccountRepository.findByUserId(userId);
         //userAccountId로 refreshToken 가져오기
@@ -93,14 +91,11 @@ public class UserAccountService {
             //refresh Token 캐싱하기
             refreshTokenRepository.save(String.valueOf(user.getId()), refreshToken);
 
-            LogInResponse response = LogInResponse.from(user);
-            response.setAccessToken(accessToken);
-            response.setRefreshToken(refreshToken);
-
+            LogInResponse response = LogInResponse.from(user, accessToken, refreshToken);
             return response;
 
         }else{
-            return null;
+            throw new RuntimeException("Not Found UserInfo");
         }
     }
 

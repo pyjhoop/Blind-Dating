@@ -1,5 +1,6 @@
 package com.blind.dating.security;
 
+import com.blind.dating.domain.CustomUserDetails;
 import com.blind.dating.domain.UserAccount;
 import com.blind.dating.dto.user.UserRequestDto;
 import com.blind.dating.util.ErrorCode;
@@ -38,7 +39,7 @@ public class TokenProvider {
         Date expiredAt = Date.from(LocalDateTime.now().plusHours(1).atZone(ZoneId.systemDefault()).toInstant());
         key = Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
 
-        String authorities = userAccount.getAuthorities().stream()
+        String authorities = new CustomUserDetails(userAccount).getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(","));
 

@@ -11,6 +11,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
+import java.util.Optional;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
@@ -27,10 +29,10 @@ class CustomUserDetailsServiceTest {
     void givenUsername_whenSelectUser_thenReturnUserAccount(){
         //Given
         UserAccount user = UserAccount.of("user01","pass01", "nickname","서울","infp","M","하이요");
-        given(userAccountRepository.findByUserId(user.getUsername())).willReturn(user);
+        given(userAccountRepository.findByUserId(user.getUserId())).willReturn(Optional.of(user));
 
         //When
-        UserDetails result = customUserDetailsService.loadUserByUsername(user.getUsername());
+        UserDetails result = customUserDetailsService.loadUserByUsername(user.getUserId());
 
         assertThat(result).isNotNull();
         assertThat(result).hasFieldOrPropertyWithValue("username","user01");
@@ -40,15 +42,15 @@ class CustomUserDetailsServiceTest {
     void givenUsername_whenSelectUser_thenThrowException(){
         //Given
         UserAccount user = UserAccount.of("user01","pass01", "nickname","서울","infp","M","하이요");
-        given(userAccountRepository.findByUserId(user.getUsername())).willReturn(null);
+        given(userAccountRepository.findByUserId(user.getUserId())).willReturn(Optional.empty());
 
         //When
         RuntimeException exception = assertThrows(RuntimeException.class, () ->{
-            customUserDetailsService.loadUserByUsername(user.getUsername());
+            customUserDetailsService.loadUserByUsername(user.getUserId());
         });
 
         //Then
-        assertThat(exception.getMessage()).isEqualTo("User not found with username:user01");
+        assertThat(exception.getMessage()).isEqualTo("존재하지 않는 유저입니다.");
     }
 
 

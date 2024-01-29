@@ -74,7 +74,8 @@ public class UserAccountService {
     public LogInResponse getLoginInfo(String userId, String userPassword){
 
         //userId로 유저 정보 가져오기
-        UserAccount user = userAccountRepository.findByUserId(userId);
+        UserAccount user = userAccountRepository.findByUserId(userId)
+                .orElseThrow(()-> new RuntimeException("유저정보를 조회할 수 없습니다."));
         //userAccountId로 refreshToken 가져오기
 
         user.setRecentLogin(LocalDateTime.now());
@@ -105,9 +106,10 @@ public class UserAccountService {
      * @return boolean
      */
     public boolean checkUserId(String userId){
-        UserAccount user = userAccountRepository.findByUserId(userId);
+        UserAccount user = userAccountRepository.findByUserId(userId)
+                .orElseThrow(() -> new RuntimeException("유저정보를 조회할 수 없습니다."));
 
-        return user != null;
+        return true;
 
     }
 

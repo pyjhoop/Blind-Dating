@@ -24,7 +24,12 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.Errors;
+import org.springframework.validation.FieldError;
 
+import javax.servlet.http.Cookie;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -60,7 +65,7 @@ class UserAccountControllerTest {
     private UserAccount user;
     @BeforeEach
     void setting(){
-        dto = UserRequestDto.of("userId","userPass01","userNickname","서울","INFP","M","안녕하세요");
+        dto = UserRequestDto.of("user01","userPass01","userNickname","서울","INFP","M","안녕하세요");
         dto.setInterests(List.of("자전거타기","놀기","게임하기"));
         dto.setQuestions(List.of(true, false, true));
         user = dto.toEntity();
@@ -71,7 +76,7 @@ class UserAccountControllerTest {
 
     @DisplayName("회원가입 테스트")
     @Test
-    void testRegisterUser_WithSuccess() throws Exception {
+    void givenUserRequest_whenRegister_thenSuccess() throws Exception {
        UserInfoWithTokens info = UserInfoWithTokens.builder()
                .id(1L)
                .accessToken("accessToken")
@@ -92,6 +97,22 @@ class UserAccountControllerTest {
                .andExpect(status().isOk());
 
     }
+    @DisplayName("회원가입 테스트")
+    @Test
+    void givenUserRequest_whenRegister_thenErrors() throws Exception {
+        // Given
+        dto.setUserId("use");
+        BindingResult bindingResult = new BeanPropertyBindingResult(dto, "userRequestDto");
+        bindingResult.addError(new FieldError("userRequestDto", "password", "Password is too weak"));
+
+        // When
+        mvc.perform(post("/api/signup")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isBadRequest());
+
+    }
+
 
     @DisplayName("로그인 기능 테스트 - 로그인 성공")
     @Test
@@ -176,22 +197,15 @@ class UserAccountControllerTest {
                 .andExpect(status().isOk());
     }
 
+    @DisplayName("로그아웃 - 테스트")
+    @Test
+    void givenCookie_whenLogout_thenSuccess() throws Exception {
+        Cookie cookie = new Cookie("refreshToken", "refreshToken");
 
-
-    private Map<String, String> getValidatorResult() {
-        Map<String, String> validatorResult = new HashMap<>();
-        validatorResult.put("field1", "에러 메시지 1");
-        validatorResult.put("field2", "에러 메시지 2");
-        return validatorResult;
+        mvc.perform(post("/api/logout")
+                .contentType(MediaType.APPLICATION_JSON)
+                .cookie(cookie))
+                .andExpect(status().isOk());
     }
-    private UserInfoWithTokens getUserInfoWithTokens() {
-        return UserInfoWithTokens.builder()
-                .id(1L)
-                .accessToken("accessToken")
-                .refreshToken("refreshToken")
-                .nickname("nickname")
-                .build();
-    }
-
 
 }

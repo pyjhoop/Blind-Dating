@@ -26,7 +26,7 @@ public interface UserAccountRepository extends
         //bindings.bind(root.title).first(StringExpression::likeIgnoreCase);     // like '{value}'
     };
 
-    UserAccount findByUserId(String username);
+    Optional<UserAccount> findByUserId(String userId);
     Boolean existsByUserId(String userId);
     UserAccount findByNickname(String nickname);
 

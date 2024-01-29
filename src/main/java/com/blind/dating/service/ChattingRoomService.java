@@ -5,12 +5,8 @@ import com.blind.dating.domain.UserAccount;
 import com.blind.dating.dto.chat.ChatRoomDto;
 import com.blind.dating.repository.ChattingRoomRepository;
 import com.blind.dating.repository.UserAccountRepository;
-import com.blind.dating.repository.querydsl.ChattingRoomRepositoryImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,7 +21,6 @@ import java.util.stream.Collectors;
 public class ChattingRoomService {
 
     private final ChattingRoomRepository chatRoomRepository;
-    private final ChattingRoomRepositoryImpl chattingRoomRepositoryImpl;
     private final ChatService chatService;
     private final UserAccountRepository userAccountRepository;
 

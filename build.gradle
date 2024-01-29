@@ -109,7 +109,12 @@ jacocoTestReport {
 							'**/*Application*',
 							'**/*Exception*',
 							'**/dto/**',
-							'**/domain/**'
+							'**/controller/*Stomp*',
+							'**/config/**',
+							'**/security/**',
+							'**/util/**',
+							'**/handler/**',
+							'**/repository/querydsl/**'
 							// ...
 					])
 				})

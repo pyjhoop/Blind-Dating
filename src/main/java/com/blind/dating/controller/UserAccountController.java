@@ -23,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.Errors;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.Cookie;
@@ -64,21 +65,12 @@ public class UserAccountController {
     @PostMapping("/signup")
     public ResponseEntity<ResponseDto> registerUser(
             @RequestBody @Valid UserRequestDto dto,
-            Errors errors,
+            BindingResult bindingResult,
             HttpServletResponse response
-            ){
-
+            ) throws MethodArgumentNotValidException {
         // validation 에서 에러가 발생할 때 사용.
-        if (errors.hasErrors()) {
-            // 유효성 통과 못한 필드와 메시지를 핸들링
-            Map<String, String> validatorResult = userAccountService.validateHandling(errors);
-            return ResponseEntity.<ResponseDto>badRequest()
-                    .body(ResponseDto.builder()
-                            .status("BAD REQUEST")
-                            .message("회원가입에 실패했습니다.")
-                            .data(validatorResult)
-                            .build());
-
+        if (bindingResult.hasErrors()) {
+            throw new MethodArgumentNotValidException(null, bindingResult);
         }
 
         UserAccount userInfo = userAccountService.register(dto);

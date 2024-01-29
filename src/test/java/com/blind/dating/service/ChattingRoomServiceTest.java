@@ -1,12 +1,10 @@
 package com.blind.dating.service;
 
 import com.blind.dating.domain.ChatRoom;
-import com.blind.dating.domain.Role;
 import com.blind.dating.domain.UserAccount;
 import com.blind.dating.dto.chat.ChatRoomDto;
 import com.blind.dating.repository.ChattingRoomRepository;
 import com.blind.dating.repository.UserAccountRepository;
-import com.blind.dating.repository.querydsl.ChattingRoomRepositoryImpl;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,7 +12,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -23,7 +20,6 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 
 @DisplayName("ChattingRoomService - 테스트")
@@ -31,7 +27,6 @@ import static org.mockito.BDDMockito.given;
 class ChattingRoomServiceTest {
 
     @Mock private ChattingRoomRepository chattingRoomRepository;
-    @Mock private ChattingRoomRepositoryImpl chattingRoomRepositoryImpl;
     @Mock private ChatService chatService;
     @Mock private UserAccountRepository userAccountRepository;
     @InjectMocks private ChattingRoomService chattingRoomService;
@@ -60,8 +55,6 @@ class ChattingRoomServiceTest {
     @Test
     void givenUserId_whenSelectChatRooms_thenResultChatRoomDtoList(){
         //Given
-        UserAccount user1 = UserAccount.of("user01","pass01", "nickname1","서울","intp","M","하이요");
-        UserAccount user2 = UserAccount.of("user02","pass02", "nickname2","서울","intp","W","하이요");
         UserAccount user3 = new UserAccount(1L, "user01", "pass01", "nick01","서울","intp","M", false, "안녕", LocalDateTime.now(), null, "kakao");
         UserAccount user4 = new UserAccount(2L, "user02", "pass02", "nick02","서울","intp","W", false, "안녕", LocalDateTime.now(), null, "kakao");
 

@@ -88,19 +88,14 @@ public class ChattingRoomController {
                 .orElseThrow(() -> new RuntimeException("채팅목록 조회시 예외가 발생했습니다."));
 
         //다른 유저 정보 조회하기.
-        Long otherId = 0L;
-        for(UserAccount userAccount: chatRoom.getUsers()){
-            if(userAccount.getId() != userId){
-                otherId = userAccount.getId();
-                break;
-            }
-        }
+        UserAccount otherUser = chatRoom.getUsers().stream().filter(
+               it -> it.getId() != userId
+        ).collect(Collectors.toList())
+                .get(0);
 
-        UserAccount userInfo = userService.getUser(otherId)
-                .orElseThrow(()-> new RuntimeException("채팅목록 조회시 예외가 발생했습니다."));
         //존재할경우 채팅 메세지 30개를 id 오름차순으로 가져오기
         List<ChatDto> chatList = chatService.selectChatList(chatRoom, chatId).stream().map(ChatDto::from).limit(30).collect(Collectors.toList());
-        ChatListWithOtherUserInfo chatListWithOtherUserInfo = ChatListWithOtherUserInfo.of(userInfo.getId(), userInfo.getNickname(),chatRoom.getStatus(), chatList);
+        ChatListWithOtherUserInfo chatListWithOtherUserInfo = ChatListWithOtherUserInfo.of(otherUser.getId(), otherUser.getNickname(),chatRoom.getStatus(), chatList);
 
 
         return ResponseEntity.ok().body(ResponseDto.<ChatListWithOtherUserInfo>builder()

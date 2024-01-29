@@ -58,7 +58,7 @@ class UserControllerTest {
     @BeforeEach
     void setUp(){
         user = UserAccount.of("qweeqw","asdfdf", "nickname","asdf","asdf","M","하이요");
-        authentication = new UsernamePasswordAuthenticationToken("1",user.getPassword());
+        authentication = new UsernamePasswordAuthenticationToken("1",user.getUserPassword());
     }
 
     @DisplayName("추천 유저 조회")

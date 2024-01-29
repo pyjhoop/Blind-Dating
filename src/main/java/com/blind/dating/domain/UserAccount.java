@@ -21,7 +21,7 @@ import java.util.*;
 })
 @Entity
 @AllArgsConstructor
-public class UserAccount extends BaseEntity implements UserDetails {
+public class UserAccount extends BaseEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -97,15 +97,10 @@ public class UserAccount extends BaseEntity implements UserDetails {
         return new UserAccount(userId, userPassword, nickname, region, mbti, gender, selfIntroduction);
     }
 
-
-
-
-
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof UserAccount)) return false;
+        if (o == null || getClass() != o.getClass()) return false;
         UserAccount that = (UserAccount) o;
         return Objects.equals(id, that.id);
     }
@@ -113,42 +108,5 @@ public class UserAccount extends BaseEntity implements UserDetails {
     @Override
     public int hashCode() {
         return Objects.hash(id);
-    }
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        Collection<GrantedAuthority> authorities = new ArrayList<>();
-        authorities.add(new SimpleGrantedAuthority(role));
-        return authorities;
-    }
-
-    @Override
-    public String getPassword() {
-        return userPassword;
-    }
-
-    @Override
-    public String getUsername() {
-        return userId;
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return true;
     }
 }

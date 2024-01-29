@@ -26,10 +26,7 @@ import org.springframework.validation.Errors;
 import org.springframework.validation.FieldError;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static junit.framework.TestCase.assertEquals;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -126,7 +123,7 @@ class UserAccountServiceTest {
         String password = "userPass01";
         LogInResponse response = LogInResponse.from(user,"accessToken","refreshToken");
 
-        given(userAccountRepository.findByUserId(userId)).willReturn(user);
+        given(userAccountRepository.findByUserId(userId)).willReturn(Optional.of(user));
         // When
         LogInResponse user1 = userAccountService.getLoginInfo(userId, password);
 
@@ -142,8 +139,8 @@ class UserAccountServiceTest {
         String password = "userPass01";
         LogInResponse response = LogInResponse.from(user,"accessToken","refreshToken");
 
-        given(userAccountRepository.findByUserId(userId)).willReturn(user);
-        given(bCryptPasswordEncoder.matches(password, user.getPassword())).willReturn(false);
+        given(userAccountRepository.findByUserId(userId)).willReturn(Optional.of(user));
+        given(bCryptPasswordEncoder.matches(password, user.getUserPassword())).willReturn(false);
         // When
         RuntimeException exception = assertThrows(RuntimeException.class, ()->{
             LogInResponse user1 = userAccountService.getLoginInfo(userId, password);
@@ -154,6 +151,25 @@ class UserAccountServiceTest {
         verify(tokenProvider, never()).create(user);
     }
 
+    @DisplayName("유저정보 조회 실패로 로그인 실패 - 테스트")
+    @Test
+    void givenLoginInfo_whenLoginFail_thenReturnLogInThrowException() {
+        // Given
+        given(userAccountRepository.findByUserId(anyString())).willReturn(Optional.empty());
+
+        // When
+        RuntimeException exception = assertThrows(RuntimeException.class, ()-> {
+            userAccountService.getLoginInfo("user01", "pass01");
+        });
+
+        // Then
+        assertThat(exception.getMessage()).isEqualTo("유저정보를 조회할 수 없습니다.");
+
+
+    }
+
+
+
 
 
     @DisplayName("유저아이디 확인 테스트 - 아이디 존재")
@@ -162,7 +178,7 @@ class UserAccountServiceTest {
         //given
         String userId = "userId";
         UserAccount user = UserAccount.of(userId,"asdfdf", "nick1","asdf","asdf","M","하이요");
-        given(userAccountRepository.findByUserId(userId)).willReturn(user);
+        given(userAccountRepository.findByUserId(userId)).willReturn(Optional.of(user));
 
         //when
         boolean result = userAccountService.checkUserId(userId);
@@ -178,13 +194,15 @@ class UserAccountServiceTest {
         //given
         String userId = "userId";
         UserAccount user = UserAccount.of(userId,"asdfdf", "nick1","asdf","asdf","M","하이요");
-        given(userAccountRepository.findByUserId(userId)).willReturn(null);
+        given(userAccountRepository.findByUserId(userId)).willReturn(Optional.empty());
 
         //when
-        boolean result = userAccountService.checkUserId(userId);
+        RuntimeException exception = assertThrows(RuntimeException.class, ()-> {
+            boolean result = userAccountService.checkUserId(userId);
+        });
 
         //then
-        assertThat(result).isFalse();
+        assertThat(exception.getMessage()).isEqualTo("유저정보를 조회할 수 없습니다.");
 
     }
 

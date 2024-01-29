@@ -52,7 +52,7 @@ public class UserServiceTest {
     void setUp(){
         user = UserAccount.of("user01","pass01", "nickname1","서울","intp","M","하이요");
         user2 = UserAccount.of("user02","pass02", "nickname2","서울","intp","W","하이요");
-        authentication = new UsernamePasswordAuthenticationToken("1",user.getPassword());
+        authentication = new UsernamePasswordAuthenticationToken("1",user.getUserPassword());
     }
 
 
@@ -114,7 +114,7 @@ public class UserServiceTest {
 
         //Then
         assertThat(result).isNotNull();
-        assertThat(result).hasFieldOrPropertyWithValue("username","user01");
+        assertThat(result).hasFieldOrPropertyWithValue("userId","user01");
         assertThat(result).hasFieldOrPropertyWithValue("userPassword","pass01");
     }
 
@@ -158,7 +158,7 @@ public class UserServiceTest {
 
         //Then
         assertThat(result).isNotNull();
-        assertThat(result).hasFieldOrPropertyWithValue("username","user01");
+        assertThat(result).hasFieldOrPropertyWithValue("userId","user01");
     }
 
     @DisplayName("내 정보 수정중에 예외 발생 - 테스트")
@@ -192,6 +192,6 @@ public class UserServiceTest {
 
         //Then
         assertThat(result).isNotNull();
-        assertThat(result.get()).hasFieldOrPropertyWithValue("username","user01");
+        assertThat(result.get()).hasFieldOrPropertyWithValue("userId","user01");
     }
 }

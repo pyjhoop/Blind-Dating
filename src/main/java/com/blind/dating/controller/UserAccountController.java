@@ -112,7 +112,7 @@ public class UserAccountController {
         LogInResponseDto dt = LogInResponseDto.from(user);
         dt.setAccessToken(user.getAccessToken());
 
-        cookieUtil.addCookie(response, "refreshToken", user.getRefreshToken());
+        CookieUtil.addCookie(response, "refreshToken", user.getRefreshToken());
 
         return ResponseEntity.ok()
                 .body(ResponseDto.<LogInResponseDto>builder()

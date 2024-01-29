@@ -4,6 +4,7 @@ import com.blind.dating.domain.Interest;
 import com.blind.dating.domain.UserAccount;
 import com.blind.dating.dto.interest.InterestDto;
 import com.blind.dating.dto.question.QuestionDto;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -12,6 +13,7 @@ import java.util.stream.Collectors;
 
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 public class LogInResponse {
 
     private Long id;
@@ -38,7 +40,7 @@ public class LogInResponse {
         this.selfIntroduction = selfIntroduction;
     }
 
-    public static LogInResponse from(UserAccount user) {
+    public static LogInResponse from(UserAccount user, String accessToken, String refreshToken) {
         return new LogInResponse(
                 user.getId(),
                 user.getUserId(),
@@ -48,6 +50,9 @@ public class LogInResponse {
                 user.getGender(),
                 user.getInterests().stream().map(InterestDto::from).collect(Collectors.toSet()),
                 user.getQuestions().stream().map(QuestionDto::from).collect(Collectors.toSet()),
-                user.getSelfIntroduction());
+                user.getSelfIntroduction(),
+                accessToken,
+                refreshToken
+        );
     }
 }

@@ -28,7 +28,6 @@ import javax.servlet.http.HttpServletResponse;
 public class TokenController {
 
     private final TokenService tokenService;
-    private final CookieUtil cookieUtil;
 
     @GetMapping ("/refresh")
     @Operation(summary = "AccessToken 재발급", description = "RefreshToken 으로 AccessToken 을 재발급 합니다.")
@@ -43,27 +42,14 @@ public class TokenController {
             HttpServletResponse response
     ){
 
-        //리프레쉬 토큰이 해당 유저에 저장된 데이터가 맞는지 확인
         String userId = tokenService.validRefreshToken(cookie);
 
-        if(userId == null){
-            //쿠키 삭제해라.
-            cookie.setMaxAge(0);
-            response.addCookie(cookie);
-            return ResponseEntity.<ResponseDto>badRequest()
-                    .body(ResponseDto.builder().status("Bad Request")
-                            .message("토큰 정보가 일치하지 않습니다.")
-                            .data(null)
-                            .build());
-        }
-
         // 맞는지 확인하고 있으면 리프레쉬 토큰 업데이트 후 access, refresh 반환하기.
-        LogInResponse response1 = tokenService.updateRefreshToken(userId);
-        LogInResponseDto dto = LogInResponseDto.from(response1);
-        dto.setAccessToken(response1.getAccessToken());
-        cookie.setMaxAge(0);
+        LogInResponse logInResponse = tokenService.updateRefreshToken(userId);
+        LogInResponseDto dto = LogInResponseDto.from(logInResponse);
 
-        cookieUtil.addCookie(response, "refreshToken", response1.getRefreshToken());
+        cookie.setMaxAge(0);
+        CookieUtil.addCookie(response, "refreshToken", logInResponse.getRefreshToken());
 
         return ResponseEntity.<ResponseDto<LogInResponseDto>>ok()
                 .body(ResponseDto.<LogInResponseDto>builder()
@@ -71,7 +57,5 @@ public class TokenController {
                         .message("accessToken 이 성공적으로 생성되었습니다.")
                         .data(dto)
                         .build());
-
-
     }
 }

@@ -30,6 +30,8 @@ public interface UserAccountRepository extends
     Boolean existsByUserId(String userId);
     UserAccount findByNickname(String nickname);
 
+    Page<UserAccount> findAllByUserIdAndGender(String userId, String gender, Pageable pageable);
+
 
 //    @Query("SELECT u FROM UserAccount u " +
 //            "LEFT JOIN u.likesUnlikes lu " +

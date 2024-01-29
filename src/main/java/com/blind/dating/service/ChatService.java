@@ -52,7 +52,6 @@ public class ChatService {
         if(readChat.getChatId() == 0){
             return listSize;
         }else{
-
             return chatRepository.countByIdBetween(readChat.getChatId(), list.get(0).getId()) -1;
         }
 

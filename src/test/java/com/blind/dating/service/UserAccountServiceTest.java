@@ -23,15 +23,22 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.Errors;
+import org.springframework.validation.FieldError;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static junit.framework.TestCase.assertEquals;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 
 @DisplayName("유저 조회 서비스")
 @ExtendWith(MockitoExtension.class)
@@ -46,6 +53,7 @@ class UserAccountServiceTest {
     @Mock private RefreshTokenRepository refreshTokenRepository;
     @Mock private QuestionService questionService;
     @Mock private InterestService interestService;
+    @Mock private Errors errors;
 
     private UserRequestDto dto;
     private UserAccount user;
@@ -63,7 +71,7 @@ class UserAccountServiceTest {
 
 
 
-    @DisplayName("회원가입 테스트")
+    @DisplayName("회원가입 - 테스트")
     @Test
     void givenUserRequestDto_whenRegister_thenRegisterSuccess(){
         //given
@@ -78,13 +86,33 @@ class UserAccountServiceTest {
         given(questionService.saveQuestions(user, dto.getQuestions())).willReturn(list);
         given(interestService.saveInterest(user, dto.getInterests())).willReturn(list1);
 
-
         //when
         UserAccount info = userAccountService.register(dto);
 
         //then
         assertThat(info).isNotNull()
                 .hasFieldOrPropertyWithValue("id",info.getId());
+
+    }
+
+    @DisplayName("회원가입시 예외 발생 - 테스트")
+    @Test
+    void givenUserRequestDto_whenRegister_thenThrowException(){
+        //given
+        String accessToken = "asdffqwerqwerdfgscvASDF";
+        String password = "hashPass";
+        List<Question> list = List.of();
+        List<Interest> list1 = List.of();
+
+        given(userAccountRepository.existsByUserId(dto.getUserId())).willReturn(true);// 존재 x
+
+        //when
+        RuntimeException exception = assertThrows(RuntimeException.class, ()-> {
+            UserAccount info = userAccountService.register(dto);
+        });
+
+        //then
+        assertThat(exception.getMessage()).isEqualTo("UserId already exists");
 
     }
 
@@ -96,16 +124,34 @@ class UserAccountServiceTest {
         //given
         String userId = "userId";
         String password = "userPass01";
-        String accessToken = "asdffasd";
+        LogInResponse response = LogInResponse.from(user,"accessToken","refreshToken");
 
-        LogInResponse response = LogInResponse.from(user);
-
-       given(userAccountRepository.findByUserId(userId)).willReturn(user);
-       // When
+        given(userAccountRepository.findByUserId(userId)).willReturn(user);
+        // When
         LogInResponse user1 = userAccountService.getLoginInfo(userId, password);
 
+        // Then
         assertThat(user1.getUserId()).isEqualTo(userId);
+    }
 
+    @DisplayName("로그인 서비스실패 후 예외 - 테스트")
+    @Test
+    void givenLoginInfo_whenLogin_thenReturnLogInThrowException(){
+        //given
+        String userId = "userId";
+        String password = "userPass01";
+        LogInResponse response = LogInResponse.from(user,"accessToken","refreshToken");
+
+        given(userAccountRepository.findByUserId(userId)).willReturn(user);
+        given(bCryptPasswordEncoder.matches(password, user.getPassword())).willReturn(false);
+        // When
+        RuntimeException exception = assertThrows(RuntimeException.class, ()->{
+            LogInResponse user1 = userAccountService.getLoginInfo(userId, password);
+        });
+
+        // Then
+        assertThat(exception.getMessage()).isEqualTo("Not Found UserInfo");
+        verify(tokenProvider, never()).create(user);
     }
 
 
@@ -171,6 +217,23 @@ class UserAccountServiceTest {
         //then
         assertThat(result).isTrue();
 
+    }
+
+    @DisplayName("회원가입 validation - 테스트")
+    @Test
+    void givenErrors_whenCheckErrors_thenReturnValidatorResult() {
+        FieldError fieldError1 = new FieldError("objectName", "fieldName1", "errorMessage1");
+        FieldError fieldError2 = new FieldError("objectName", "fieldName2", "errorMessage2");
+        given(errors.getFieldErrors()).willReturn(Arrays.asList(fieldError1, fieldError2));
+
+        // validateHandling 메소드 실행
+        Map<String, String> result = userAccountService.validateHandling(errors);
+
+        // 결과 확인
+        Map<String, String> expected = new HashMap<>();
+        expected.put("valid_fieldName1", "errorMessage1");
+        expected.put("valid_fieldName2", "errorMessage2");
+        assertEquals(expected, result);
     }
 
 }

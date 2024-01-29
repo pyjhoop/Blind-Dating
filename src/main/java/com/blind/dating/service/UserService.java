@@ -41,8 +41,6 @@ public class UserService {
     public Page<UserAccount> getUserList(Authentication authentication, Pageable pageable){
         String userId = (String) authentication.getPrincipal();
         UserIdWithNicknameAndGender userInfo = userAccountRedisRepository.getUserInfo(userId);
-        System.out.println(userInfo);
-
 
         if(userInfo.getGender().equals("M")){
             return userAccountRepositoryImpl.findAllByGenderAndNotLikes("W",Long.valueOf(userId), pageable);
@@ -59,13 +57,9 @@ public class UserService {
      */
     public UserAccount getMyInfo(Authentication authentication){
         String userId = (String) authentication.getPrincipal();
-        Optional<UserAccount> userAccount = userAccountRepository.findById(Long.valueOf(userId));
 
-        if(userAccount.isPresent()){
-            return userAccount.get();
-        }else{
-            throw new RuntimeException("요청중에 에러가 발생했습니다. 재요청 해주세요");
-        }
+        return userAccountRepository.findById(Long.valueOf(userId))
+                .orElseThrow(()-> new RuntimeException("내정보 조회에 실패했습니다."));
     }
 
     /**
@@ -79,7 +73,8 @@ public class UserService {
 
         String userId = (String) authentication.getPrincipal();
 
-        UserAccount user = userAccountRepository.findById(Long.valueOf(userId)).get();
+        UserAccount user = userAccountRepository.findById(Long.valueOf(userId))
+                .orElseThrow(() -> new RuntimeException("유저정보 조회중에 예외가 발생했습니다."));
         // 유저 정보 저장하기
         user.setRegion(dto.getRegion());
         user.setMbti(dto.getMbti());

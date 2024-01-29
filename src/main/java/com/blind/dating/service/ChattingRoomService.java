@@ -53,38 +53,17 @@ public class ChattingRoomService {
 
 
         List<ChatRoomDto> rooms = chatRooms.stream().map(room -> {
-            ChatRoomDto dto = new ChatRoomDto();
-
             Long otherId = 0L;
             // 조회를 위해 상대방 유저 정보 찾은 후 user2에 저장하기
             Set<UserAccount> users = room.getUsers();
-
-
-
-            for(UserAccount userAccount: users){
-                if(userAccount.getId() != userId){
-                    otherId = userAccount.getId();
-                    break;
-                }
-            }
+            UserAccount other = users.stream().filter(
+                    it -> !it.equals(user)
+            ).collect(Collectors.toList()).get(0);
 
             // 채팅방에서 읽지 않은 채팅 개수 조회
             Long unReadCount = chatService.unreadChat(userId, room);
             // 상대방 정보 조회하기
-
-            Optional<UserAccount> other = userAccountRepository.findById(otherId);
-            if(other.isPresent()){
-                dto.setOtherUserid(other.get().getId());
-                dto.setOtherUserNickname(other.get().getNickname());
-            }
-
-            // 응답 데이터를 보여주기 위해 ChatRoom -> ChatRoomDto 로 변환
-            dto.setRoomId(room.getId());
-            dto.setUpdatedAt(room.getUpdatedAt());
-            dto.setRecentMessage(room.getRecentMessage());
-            dto.setUnReadCount(unReadCount);
-
-            return dto;
+            return ChatRoomDto.From(other, room, unReadCount);
         }).collect(Collectors.toList());
 
         return rooms;
@@ -100,20 +79,17 @@ public class ChattingRoomService {
     @Transactional
     public Boolean leaveChatRoom(String roomId, String userId){
 
-        Optional<ChatRoom> chatRoom = chatRoomRepository.findById(Long.valueOf(roomId));
+        ChatRoom chatRoom = chatRoomRepository.findById(Long.valueOf(roomId))
+                .orElseThrow(()-> new RuntimeException("채팅방 조회중 예외가 발생했습니다."));
 
-        if(chatRoom.isPresent()){
-            ChatRoom room = chatRoom.get();
-            if(!room.getStatus()){
-                chatRoomRepository.delete(chatRoom.get());
-                return true;
+        if(!chatRoom.getStatus()){
+            chatRoomRepository.delete(chatRoom);
+            return true;
 
-            }else {
-                room.setStatus(false);
-                return false;
-            }
         }else {
-            throw new RuntimeException(roomId +"에 해당하는 채팅방이 존재하지 않습니다.");
+            chatRoom.setStatus(false);
+            return false;
         }
+
     }
 }

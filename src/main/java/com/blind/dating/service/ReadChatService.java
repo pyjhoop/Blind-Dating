@@ -29,12 +29,9 @@ public class ReadChatService {
 
         for(String u: users){
             // 있는지 확인부터 없으면 생성해주고 있으면 업데이트 해준다.
-            Optional<ReadChat> readChat = readChatRepository.findByChatRoomAndUserId(chatRoom, Long.valueOf(u));
-            if(readChat.isEmpty()){
-                readChatRepository.save(ReadChat.of(chatRoom,Long.valueOf(u),chatId));
-            }else{
-                readChat.get().setChatId(chatId);
-            }
+            ReadChat readChat = readChatRepository.findByChatRoomAndUserId(chatRoom, Long.valueOf(u))
+                    .orElse(readChatRepository.save(ReadChat.of(chatRoom, Long.valueOf(u), chatId)));
+            readChat.setChatId(chatId);
         }
 
     }

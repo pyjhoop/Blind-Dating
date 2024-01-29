@@ -41,14 +41,13 @@ public class RedisSubscriber implements MessageListener {
 
                 ChatDto chatMessage = objectMapper.readValue(publishMessage, ChatDto.class);
                 //웹소켓 구독자에게 메세지 send
-                System.out.println(chatMessage.getMessage());
                 messagingTemplate.convertAndSend("/sub/chat/room/" + chatMessage.getChatRoomId(), chatMessage);
 
             }
 
 
         }catch (Exception e){
-
+            throw new RuntimeException("메세지 전송중 예외 발생");
         }
     }
 }

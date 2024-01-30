@@ -4,11 +4,9 @@ import com.blind.dating.domain.ChatRoom;
 import com.blind.dating.domain.LikesUnlikes;
 import com.blind.dating.domain.ReadChat;
 import com.blind.dating.domain.UserAccount;
-import com.blind.dating.dto.response.ResponseDto;
 import com.blind.dating.repository.LikesUnlikesRepository;
 import com.blind.dating.repository.ReadChatRepository;
 import com.blind.dating.repository.UserAccountRepository;
-import com.blind.dating.repository.querydsl.LikesUnlikesRepositoryImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
@@ -23,7 +21,6 @@ public class LikesUnlikesService {
 
     private final LikesUnlikesRepository likesUnlikesRepository;
     private final UserAccountRepository userAccountRepository;
-    private final LikesUnlikesRepositoryImpl likesUnlikesRepositoryImpl;
     private final ChattingRoomService chatRoomService;
     private final ReadChatRepository readChatRepository;
 
@@ -48,7 +45,7 @@ public class LikesUnlikesService {
         Optional<UserAccount> userAccount = userAccountRepository.findById(Long.valueOf(userId));
 
         // receiverId를 가진 유저가 나를 이미 좋아요 눌렀는지 확인 후 좋아요 눌렀으면 채팅 방 생성하기.
-        List<LikesUnlikes> list = likesUnlikesRepositoryImpl.findLikes(receiverAccount.getId(), userAccount.get());
+        List<LikesUnlikes> list = likesUnlikesRepository.findLikes(receiverAccount.getId(), userAccount.get());
 
         //ReadChat도 생성해야함.
         ChatRoom chatRoom = null;

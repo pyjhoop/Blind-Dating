@@ -6,9 +6,7 @@ import com.blind.dating.dto.user.UserUpdateRequestDto;
 import com.blind.dating.repository.InterestRepository;
 import com.blind.dating.repository.UserAccountRedisRepository;
 import com.blind.dating.repository.UserAccountRepository;
-import com.blind.dating.repository.querydsl.UserAccountRepositoryImpl;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -39,7 +37,6 @@ public class UserServiceTest {
 
     @InjectMocks private UserService userService;
     @Mock private UserAccountRepository userAccountRepository;
-    @Mock private UserAccountRepositoryImpl userAccountRepositoryImpl;
     @Mock private InterestRepository interestRepository;
 
     @Mock private UserAccountRedisRepository userAccountRedisRepository;
@@ -68,7 +65,7 @@ public class UserServiceTest {
         UserIdWithNicknameAndGender userInfo = new UserIdWithNicknameAndGender(1L,"fd","M");
 
         given(userAccountRedisRepository.getUserInfo("1")).willReturn(userInfo);
-        given(userAccountRepositoryImpl.findAllByGenderAndNotLikes("W",1L, pageable)).willReturn(pages);
+        given(userAccountRepository.recommendUser("W",1L, pageable)).willReturn(pages);
 
         //When
         Page<UserAccount> result = userService.getUserList(authentication, pageable);
@@ -91,7 +88,7 @@ public class UserServiceTest {
         UserIdWithNicknameAndGender userInfo = new UserIdWithNicknameAndGender(2L,"nickname2","W");
 
         given(userAccountRedisRepository.getUserInfo(anyString())).willReturn(userInfo);
-        given(userAccountRepositoryImpl.findAllByGenderAndNotLikes("M",1L, pageable)).willReturn(pages);
+        given(userAccountRepository.recommendUser("M",1L, pageable)).willReturn(pages);
 
         //When
         Page<UserAccount> result = userService.getUserList(authentication, pageable);

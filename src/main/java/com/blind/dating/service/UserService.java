@@ -7,14 +7,11 @@ import com.blind.dating.dto.user.UserUpdateRequestDto;
 import com.blind.dating.repository.InterestRepository;
 import com.blind.dating.repository.UserAccountRedisRepository;
 import com.blind.dating.repository.UserAccountRepository;
-import com.blind.dating.repository.querydsl.UserAccountRepositoryImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,7 +25,6 @@ import java.util.Optional;
 public class UserService {
 
     private final UserAccountRepository userAccountRepository;
-    private final UserAccountRepositoryImpl userAccountRepositoryImpl;
     private final InterestRepository interestRepository;
     private final UserAccountRedisRepository userAccountRedisRepository;
 
@@ -43,9 +39,9 @@ public class UserService {
         UserIdWithNicknameAndGender userInfo = userAccountRedisRepository.getUserInfo(userId);
 
         if(userInfo.getGender().equals("M")){
-            return userAccountRepositoryImpl.findAllByGenderAndNotLikes("W",Long.valueOf(userId), pageable);
+            return userAccountRepository.recommendUser("W",Long.valueOf(userId), pageable);
         }else{
-            return userAccountRepositoryImpl.findAllByGenderAndNotLikes("M",Long.valueOf(userId), pageable);
+            return userAccountRepository.recommendUser("M",Long.valueOf(userId), pageable);
         }
 
     }

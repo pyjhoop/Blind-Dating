@@ -22,12 +22,12 @@ public class ChatRoom extends BaseEntity{
 
     @Setter
     @ToString.Exclude
-   @ManyToMany(fetch = FetchType.EAGER)
-   @JoinTable(
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
            name = "user_chat_room",
            joinColumns = @JoinColumn(name = "chat_room_id"),
            inverseJoinColumns = @JoinColumn(name = "user_id")
-   )
+    )
    private Set<UserAccount> users = new LinkedHashSet<>();
 
     @Setter

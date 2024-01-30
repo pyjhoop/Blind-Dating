@@ -1,6 +1,6 @@
 package com.blind.dating.security;
 
-import com.blind.dating.dto.response.ResponseDto;
+import com.blind.dating.common.Api;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandler;
@@ -18,7 +18,7 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
         response.setContentType("application/json;charset=UTF-8");
         response.setStatus(HttpServletResponse.SC_FORBIDDEN);
         ObjectMapper ob = new ObjectMapper();
-        ResponseDto dto = ResponseDto.builder().status("Forbidden")
+        Api dto = Api.builder().status("Forbidden")
                 .message("접근권한이 없습니다.")
                 .build();
         response.getWriter().println(ob.writeValueAsString(dto));

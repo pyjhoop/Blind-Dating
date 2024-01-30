@@ -1,18 +1,18 @@
 package com.blind.dating.controller;
 
+import com.blind.dating.common.code.UserResponseCode;
 import com.blind.dating.config.SecurityConfig;
+import com.blind.dating.domain.Interest;
+import com.blind.dating.domain.Question;
 import com.blind.dating.domain.UserAccount;
 import com.blind.dating.dto.user.*;
-import com.blind.dating.security.CustomAuthenticationEntryPoint;
 import com.blind.dating.security.JwtAuthenticationFilter;
 import com.blind.dating.security.TokenProvider;
 import com.blind.dating.service.CustomUserDetailsService;
 import com.blind.dating.service.UserAccountService;
 import com.blind.dating.util.CookieUtil;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Spy;
@@ -26,14 +26,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.Errors;
 import org.springframework.validation.FieldError;
 
 import javax.servlet.http.Cookie;
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -72,6 +69,8 @@ class UserAccountControllerTest {
         user.setRecentLogin(LocalDateTime.now());
         user.setDeleted(false);
         user.setUserPassword(bCryptPasswordEncoder.encode(dto.getUserPassword()));
+        user.setInterests(List.of(new Interest()));
+        user.setQuestions(List.of(new Question()));
     }
 
     @DisplayName("회원가입 테스트")
@@ -144,7 +143,7 @@ class UserAccountControllerTest {
         UserIdRequestDto dto = new UserIdRequestDto();
         dto.setUserId(userId);
 
-        given(userAccountService.checkUserId(userId)).willReturn(false);
+        given(userAccountService.checkUserId(userId)).willReturn(UserResponseCode.NOT_EXIST_USER_ID);
 
         mvc.perform(post("/api/check-userId")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -159,7 +158,7 @@ class UserAccountControllerTest {
         UserIdRequestDto dto = new UserIdRequestDto();
         dto.setUserId(userId);
 
-        given(userAccountService.checkUserId(userId)).willReturn(true);
+        given(userAccountService.checkUserId(userId)).willReturn(UserResponseCode.EXIST_USER_ID);
 
         mvc.perform(post("/api/check-userId")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -174,7 +173,7 @@ class UserAccountControllerTest {
         UserNicknameRequestDto dto = new UserNicknameRequestDto();
         dto.setNickname(nickname);
 
-        given(userAccountService.checkNickname(nickname)).willReturn(false);
+        given(userAccountService.checkNickname(nickname)).willReturn(UserResponseCode.NOT_EXIST_NICKNAME);
 
         mvc.perform(post("/api/check-nickname")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -189,7 +188,7 @@ class UserAccountControllerTest {
         UserNicknameRequestDto dto = new UserNicknameRequestDto();
         dto.setNickname(nickname);
 
-        given(userAccountService.checkNickname(nickname)).willReturn(true);
+        given(userAccountService.checkNickname(nickname)).willReturn(UserResponseCode.EXIST_NICKNAME);
 
         mvc.perform(post("/api/check-nickname")
                         .contentType(MediaType.APPLICATION_JSON)

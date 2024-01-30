@@ -53,7 +53,7 @@ class TokenControllerTest {
                         .header("Authorization", "Bearer "+"refreshToken"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("OK"))
-                .andExpect(jsonPath("$.message").value("accessToken 이 성공적으로 생성되었습니다."));
+                .andExpect(jsonPath("$.message").value("accessToken이 성공적으로 생성되었습니다."));
 
         then(tokenService).should().validRefreshToken(cookie);
         then(tokenService).should().updateRefreshToken(userId);

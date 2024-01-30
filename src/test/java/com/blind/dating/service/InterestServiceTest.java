@@ -34,8 +34,6 @@ class InterestServiceTest {
         list.add(Interest.of(user,"잠자기"));
         List<String> list2 = List.of("놀기","잠자기");
 
-        given(interestRepository.saveAll(list)).willReturn(list);
-
         //When
         List<Interest> result = interestService.saveInterest(user,list2);
 

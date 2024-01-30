@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.hibernate.annotations.BatchSize;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -66,23 +67,40 @@ public class UserAccount extends BaseEntity{
     @Setter
     private String social;
 
-    @OneToMany(mappedBy = "userAccount", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "userAccount", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @ToString.Exclude @Setter
-    private final Set<Interest> interests = new LinkedHashSet<>();
+    private List<Interest> interests;
 
-    @OneToMany(mappedBy = "userAccount",fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "userAccount",fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ToString.Exclude @Setter
+    private List<Question> questions;
+
+    @OneToMany(mappedBy = "receiver",fetch = FetchType.LAZY)
     @ToString.Exclude
-    private final Set<Question> questions = new LinkedHashSet<>();
+    private List<LikesUnlikes> likesUnlikes;
 
-    @OneToMany(mappedBy = "receiver",fetch = FetchType.EAGER)
-    @ToString.Exclude
-    private final Set<LikesUnlikes> likesUnlikes = new LinkedHashSet<>();
-
-    @ManyToMany(mappedBy = "users")
-    private final Set<ChatRoom> chatRooms = new LinkedHashSet<>();
+    @ManyToMany(mappedBy = "users", fetch = FetchType.LAZY)
+    private List<ChatRoom> chatRooms;
 
 
     protected UserAccount(){}
+
+    private UserAccount(String userId, String userPassword, String nickname, String region, String mbti, String gender,Boolean deleted, String selfIntroduction, LocalDateTime recentLogin, String role) {
+        this.userId = userId;
+        this.userPassword = userPassword;
+        this.nickname = nickname;
+        this.region = region;
+        this.mbti = mbti;
+        this.gender = gender;
+        this.deleted = deleted;
+        this.selfIntroduction = selfIntroduction;
+        this.recentLogin = recentLogin;
+        this.role = role;
+    }
+
+    public static UserAccount of(String userId, String userPassword, String nickname, String region, String mbti, String gender, Boolean deleted, String selfIntroduction, LocalDateTime recentLogin, String role) {
+        return new UserAccount(userId, userPassword, nickname, region, mbti, gender,deleted, selfIntroduction, recentLogin, role);
+    }
 
     private UserAccount(String userId, String userPassword, String nickname, String region, String mbti, String gender, String selfIntroduction) {
         this.userId = userId;

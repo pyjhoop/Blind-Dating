@@ -6,6 +6,7 @@ import com.blind.dating.dto.question.QuestionDto;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -19,11 +20,11 @@ public class UserWithInterestAndQuestionDto {
     private String region;
     private String mbti;
     private String gender;
-    private Set<InterestDto> interests;
-    private Set<QuestionDto> questions;
+    private List<InterestDto> interests;
+    private List<QuestionDto> questions;
     private String selfIntroduction;
 
-private UserWithInterestAndQuestionDto(Long id, String userId, String nickname, String region, String mbti, String gender, Set<InterestDto> interests, Set<QuestionDto> questions, String selfIntroduction) {
+private UserWithInterestAndQuestionDto(Long id, String userId, String nickname, String region, String mbti, String gender, List<InterestDto> interests, List<QuestionDto> questions, String selfIntroduction) {
         this.id = id;
         this.userId = userId;
         this.nickname = nickname;
@@ -34,7 +35,7 @@ private UserWithInterestAndQuestionDto(Long id, String userId, String nickname, 
         this.questions = questions;
         this.selfIntroduction = selfIntroduction;
     }
-    public static UserWithInterestAndQuestionDto of(Long id, String userId, String nickname, String region, String mbti, String gender, Set<InterestDto> interests, Set<QuestionDto> questions, String selfIntroduction) {
+    public static UserWithInterestAndQuestionDto of(Long id, String userId, String nickname, String region, String mbti, String gender, List<InterestDto> interests, List<QuestionDto> questions, String selfIntroduction) {
         return new UserWithInterestAndQuestionDto(id, userId, nickname, region, mbti, gender, interests, questions, selfIntroduction);
     }
 
@@ -46,8 +47,8 @@ private UserWithInterestAndQuestionDto(Long id, String userId, String nickname, 
                 user.getRegion(),
                 user.getMbti(),
                 user.getGender(),
-                user.getInterests().stream().map(InterestDto::from).collect(Collectors.toSet()),
-                user.getQuestions().stream().map(QuestionDto::from).collect(Collectors.toSet()),
+                user.getInterests().stream().map(InterestDto::from).collect(Collectors.toList()),
+                user.getQuestions().stream().map(QuestionDto::from).collect(Collectors.toList()),
                 user.getSelfIntroduction()
         );
 

@@ -25,6 +25,7 @@ public class ChatService {
     private final ReadChatRepository readChatRepository;
 
 
+    @Transactional(readOnly = true)
     public List<Chat> selectChatList(ChatRoom chatRoom, String chatId){
         if(Long.parseLong(chatId) == 0){
             return chatRepository.findAllByChatRoomOrderByIdDesc(chatRoom);
@@ -41,6 +42,7 @@ public class ChatService {
         return chatRepository.save(Chat.of(room,Long.valueOf(dto.getWriterId()),dto.getMessage()));
     }
 
+    @Transactional(readOnly = true)
     public Long unreadChat(Long userId, ChatRoom chatRoom){
 
         List<Chat> list = chatRepository.findAllByChatRoomOrderByIdDesc(chatRoom);

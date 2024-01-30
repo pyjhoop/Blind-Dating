@@ -1,8 +1,11 @@
 package com.blind.dating.controller;
 
+import com.blind.dating.domain.Interest;
+import com.blind.dating.domain.Question;
 import com.blind.dating.domain.UserAccount;
 import com.blind.dating.dto.user.UserIdWithNicknameAndGender;
 import com.blind.dating.dto.user.UserUpdateRequestDto;
+import com.blind.dating.dto.user.UserWithInterestAndQuestionDto;
 import com.blind.dating.repository.UserAccountRedisRepository;
 import com.blind.dating.security.TokenProvider;
 import com.blind.dating.service.UserService;
@@ -58,6 +61,8 @@ class UserControllerTest {
     @BeforeEach
     void setUp(){
         user = UserAccount.of("qweeqw","asdfdf", "nickname","asdf","asdf","M","하이요");
+        user.setInterests(List.of(new Interest()));
+        user.setQuestions(List.of(new Question()));
         authentication = new UsernamePasswordAuthenticationToken("1",user.getUserPassword());
     }
 
@@ -68,8 +73,8 @@ class UserControllerTest {
 
         //Given
         Pageable pageable = Pageable.ofSize(10);
-        List<UserAccount> list = List.of(user);
-        Page<UserAccount> pages = new PageImpl<>(list, pageable, 1);
+        List<UserWithInterestAndQuestionDto> list = List.of(UserWithInterestAndQuestionDto.from(user));
+        Page<UserWithInterestAndQuestionDto> pages = new PageImpl<>(list, pageable, 1);
 
         given(userService.getUserList(any(Authentication.class), any(Pageable.class)))
                 .willReturn(pages);
@@ -88,7 +93,7 @@ class UserControllerTest {
     @WithMockUser(username = "1")
     public void givenUserInfo_WhenSelectMyInfo_ThenReturnMyInfo() throws Exception {
         //Given
-        given(userService.getMyInfo(any(Authentication.class))).willReturn(user);
+        given(userService.getMyInfo(any(Authentication.class))).willReturn(UserWithInterestAndQuestionDto.from(user));
 
         //When && Then
         mvc.perform(get("/api/user")
@@ -118,7 +123,7 @@ class UserControllerTest {
 
 
         given(userService.updateMyInfo(any(Authentication.class), eq(dto))).willReturn(user);
-        given(userService.getMyInfo(any(Authentication.class))).willReturn(user);
+        given(userService.getMyInfo(any(Authentication.class))).willReturn(UserWithInterestAndQuestionDto.from(user));
 
         mvc.perform(put("/api/user")
                         .with(csrf())

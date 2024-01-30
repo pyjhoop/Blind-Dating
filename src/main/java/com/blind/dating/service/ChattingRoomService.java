@@ -46,10 +46,7 @@ public class ChattingRoomService {
 
         List<ChatRoom> chatRooms = chatRoomRepository.findAllByUsersAndStatusOrderByUpdatedAtDesc(user, true);
 
-
-        List<ChatRoomDto> rooms = chatRooms.stream().map(room -> {
-            Long otherId = 0L;
-            // 조회를 위해 상대방 유저 정보 찾은 후 user2에 저장하기
+        return chatRooms.stream().map(room -> {
             Set<UserAccount> users = room.getUsers();
             UserAccount other = users.stream().filter(
                     it -> !it.equals(user)
@@ -60,8 +57,6 @@ public class ChattingRoomService {
             // 상대방 정보 조회하기
             return ChatRoomDto.From(other, room, unReadCount);
         }).collect(Collectors.toList());
-
-        return rooms;
     }
 
     public Optional<ChatRoom> getRoom(String roomId){

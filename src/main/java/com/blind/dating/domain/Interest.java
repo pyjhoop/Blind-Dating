@@ -1,15 +1,15 @@
 package com.blind.dating.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.Objects;
 
 @Getter
 @ToString
+@AllArgsConstructor
+@NoArgsConstructor
 @Table
 @Entity
 public class Interest {
@@ -17,14 +17,13 @@ public class Interest {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne()
+    @ManyToOne
     private UserAccount userAccount;
 
     @Setter
     @Column(nullable = false, length = 50)
     private String interestName;
 
-    protected Interest() {}
 
     private Interest(UserAccount userAccount, String interestName) {
         this.userAccount = userAccount;

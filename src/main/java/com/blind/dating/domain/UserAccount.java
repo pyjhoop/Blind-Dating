@@ -67,7 +67,7 @@ public class UserAccount extends BaseEntity{
     private String social;
 
     @OneToMany(mappedBy = "userAccount", fetch = FetchType.EAGER)
-    @ToString.Exclude
+    @ToString.Exclude @Setter
     private final Set<Interest> interests = new LinkedHashSet<>();
 
     @OneToMany(mappedBy = "userAccount",fetch = FetchType.EAGER)

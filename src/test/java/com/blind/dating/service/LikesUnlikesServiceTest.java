@@ -6,7 +6,6 @@ import com.blind.dating.domain.UserAccount;
 import com.blind.dating.repository.LikesUnlikesRepository;
 import com.blind.dating.repository.ReadChatRepository;
 import com.blind.dating.repository.UserAccountRepository;
-import com.blind.dating.repository.querydsl.LikesUnlikesRepositoryImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -33,7 +32,6 @@ class LikesUnlikesServiceTest {
 
     @Mock private LikesUnlikesRepository likesUnlikesRepository;
     @Mock private UserAccountRepository userAccountRepository;
-    @Mock private LikesUnlikesRepositoryImpl likesUnlikesRepositoryImpl;
     @Mock private ChattingRoomService chatRoomService;
     @Mock private ReadChatRepository readChatRepository;
     @InjectMocks private LikesUnlikesService likesUnlikesService;
@@ -60,7 +58,7 @@ class LikesUnlikesServiceTest {
         given(likesUnlikesRepository.save(any(LikesUnlikes.class))).willReturn(new LikesUnlikes());
         given(userAccountRepository.findById(Long.parseLong(userId))).willReturn(Optional.of(senderAccount));
 
-        given(likesUnlikesRepositoryImpl.findLikes(receiverAccount.getId(), senderAccount)).willReturn(new ArrayList<>());
+        given(likesUnlikesRepository.findLikes(receiverAccount.getId(), senderAccount)).willReturn(new ArrayList<>());
 
         // When
         Boolean result = likesUnlikesService.likeUser(authentication, receiverId);
@@ -76,7 +74,7 @@ class LikesUnlikesServiceTest {
         given(userAccountRepository.findById(2L)).willReturn(Optional.of(receiverAccount));
         given(likesUnlikesRepository.save(any(LikesUnlikes.class))).willReturn(new LikesUnlikes());
         given(userAccountRepository.findById(1L)).willReturn(Optional.of(senderAccount));
-        given(likesUnlikesRepositoryImpl.findLikes(receiverAccount.getId(), senderAccount)).willReturn(List.of(new LikesUnlikes()));
+        given(likesUnlikesRepository.findLikes(receiverAccount.getId(), senderAccount)).willReturn(List.of(new LikesUnlikes()));
 
         ChatRoom chatRoom = new ChatRoom();
         given(chatRoomService.create(senderAccount, receiverAccount)).willReturn(chatRoom);

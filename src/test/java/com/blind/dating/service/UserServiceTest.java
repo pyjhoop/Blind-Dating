@@ -1,8 +1,11 @@
 package com.blind.dating.service;
 
+import com.blind.dating.domain.Interest;
+import com.blind.dating.domain.Question;
 import com.blind.dating.domain.UserAccount;
 import com.blind.dating.dto.user.UserIdWithNicknameAndGender;
 import com.blind.dating.dto.user.UserUpdateRequestDto;
+import com.blind.dating.dto.user.UserWithInterestAndQuestionDto;
 import com.blind.dating.repository.InterestRepository;
 import com.blind.dating.repository.UserAccountRedisRepository;
 import com.blind.dating.repository.UserAccountRepository;
@@ -26,8 +29,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 
 
@@ -48,7 +50,11 @@ public class UserServiceTest {
     @BeforeEach
     void setUp(){
         user = UserAccount.of("user01","pass01", "nickname1","서울","intp","M","하이요");
+        user.setInterests(List.of(new Interest()));
+        user.setQuestions(List.of(new Question()));
         user2 = UserAccount.of("user02","pass02", "nickname2","서울","intp","W","하이요");
+        user2.setInterests(List.of(new Interest()));
+        user2.setQuestions(List.of(new Question()));
         authentication = new UsernamePasswordAuthenticationToken("1",user.getUserPassword());
     }
 
@@ -64,11 +70,11 @@ public class UserServiceTest {
 
         UserIdWithNicknameAndGender userInfo = new UserIdWithNicknameAndGender(1L,"fd","M");
 
-        given(userAccountRedisRepository.getUserInfo("1")).willReturn(userInfo);
+        given(userAccountRepository.findById(1L)).willReturn(Optional.of(user));
         given(userAccountRepository.recommendUser("W",1L, pageable)).willReturn(pages);
 
         //When
-        Page<UserAccount> result = userService.getUserList(authentication, pageable);
+        Page<UserWithInterestAndQuestionDto> result = userService.getUserList(authentication, pageable);
 
         //Then
         assertThat(result).isNotNull();
@@ -87,11 +93,11 @@ public class UserServiceTest {
 
         UserIdWithNicknameAndGender userInfo = new UserIdWithNicknameAndGender(2L,"nickname2","W");
 
-        given(userAccountRedisRepository.getUserInfo(anyString())).willReturn(userInfo);
+        given(userAccountRepository.findById(anyLong())).willReturn(Optional.of(user2));
         given(userAccountRepository.recommendUser("M",1L, pageable)).willReturn(pages);
 
         //When
-        Page<UserAccount> result = userService.getUserList(authentication, pageable);
+        Page<UserWithInterestAndQuestionDto> result = userService.getUserList(authentication, pageable);
 
         //Then
         assertThat(result).isNotNull();
@@ -107,12 +113,11 @@ public class UserServiceTest {
         given(userAccountRepository.findById(1L)).willReturn(Optional.of(user));
 
         //When
-        UserAccount result = userService.getMyInfo(authentication);
+        UserWithInterestAndQuestionDto result = userService.getMyInfo(authentication);
 
         //Then
         assertThat(result).isNotNull();
         assertThat(result).hasFieldOrPropertyWithValue("userId","user01");
-        assertThat(result).hasFieldOrPropertyWithValue("userPassword","pass01");
     }
 
     @DisplayName("내정보 조회 - 테스트")
@@ -124,7 +129,7 @@ public class UserServiceTest {
 
         //When
         RuntimeException exception = assertThrows(RuntimeException.class, () -> {
-            UserAccount result = userService.getMyInfo(authentication);
+            userService.getMyInfo(authentication);
         });
 
         //Then

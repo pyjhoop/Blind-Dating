@@ -1,15 +1,11 @@
 package com.blind.dating.controller;
 
-import com.blind.dating.domain.UserAccount;
-import com.blind.dating.dto.interest.InterestResponse;
+import com.blind.dating.common.code.ResponseCode;
 import com.blind.dating.dto.user.*;
-import com.blind.dating.dto.response.ResponseDto;
-import com.blind.dating.security.TokenProvider;
-import com.blind.dating.service.InterestService;
-import com.blind.dating.service.QuestionService;
+import com.blind.dating.common.Api;
 import com.blind.dating.service.UserAccountService;
 import com.blind.dating.util.CookieUtil;
-import io.jsonwebtoken.ExpiredJwtException;
+import com.blind.dating.common.code.UserResponseCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -22,16 +18,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.Errors;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Tag(name = "UserAccount Info", description = "인증 관련 서비스")
@@ -41,14 +33,13 @@ import java.util.stream.Collectors;
 public class UserAccountController {
 
     private final UserAccountService userAccountService;
-    private final CookieUtil cookieUtil;
 
     @Operation(summary = "회원가입", description = "유저정보를 받아서 회원가입을 진행합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK"),
-            @ApiResponse(responseCode = "400", description = "BAD REQUEST",content = @Content(schema = @Schema(implementation = ResponseDto.class))),
-            @ApiResponse(responseCode = "404", description = "NOT FOUND", content = @Content(schema = @Schema(implementation = ResponseDto.class))),
-            @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR", content = @Content(schema = @Schema(implementation = ResponseDto.class)))
+            @ApiResponse(responseCode = "400", description = "BAD REQUEST",content = @Content(schema = @Schema(implementation = Api.class))),
+            @ApiResponse(responseCode = "404", description = "NOT FOUND", content = @Content(schema = @Schema(implementation = Api.class))),
+            @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR", content = @Content(schema = @Schema(implementation = Api.class)))
 
     })
     @Parameters({
@@ -63,132 +54,97 @@ public class UserAccountController {
             @Parameter(name = "selfIntroduction", description = "자기소개", example = "hello")
     })
     @PostMapping("/signup")
-    public ResponseEntity<ResponseDto> registerUser(
+    public ResponseEntity<Api> registerUser(
             @RequestBody @Valid UserRequestDto dto,
-            BindingResult bindingResult,
-            HttpServletResponse response
+            BindingResult bindingResult
             ) throws MethodArgumentNotValidException {
-        // validation 에서 에러가 발생할 때 사용.
         if (bindingResult.hasErrors()) {
             throw new MethodArgumentNotValidException(null, bindingResult);
         }
 
-        UserAccount userInfo = userAccountService.register(dto);
-
+        userAccountService.register(dto);
         return ResponseEntity.ok()
-                .body(ResponseDto.builder()
-                        .status("OK")
-                        .message("회원가입이 성공적으로 완료되었습니다.")
-                        .build());
+                .body(Api.OK(UserResponseCode.REGISTER_SUCCESS,null));
     }
 
     @PostMapping("/login")
     @Operation(summary = "로그인", description = "아이디와 비밀번호를 받아서 로그인을 합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK"),
-            @ApiResponse(responseCode = "400", description = "BAD REQUEST",content = @Content(schema = @Schema(implementation = ResponseDto.class))),
-            @ApiResponse(responseCode = "404", description = "NOT FOUND", content = @Content(schema = @Schema(implementation = ResponseDto.class))),
-            @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR", content = @Content(schema = @Schema(implementation = ResponseDto.class)))
+            @ApiResponse(responseCode = "400", description = "BAD REQUEST",content = @Content(schema = @Schema(implementation = Api.class))),
+            @ApiResponse(responseCode = "404", description = "NOT FOUND", content = @Content(schema = @Schema(implementation = Api.class))),
+            @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR", content = @Content(schema = @Schema(implementation = Api.class)))
 
     })
     @Parameters({
             @Parameter(name = "userId", description = "유저 아이디",example = "user01"),
             @Parameter(name = "userPassword", description = "유저 비밀번호", example = "pass01")
     })
-    public ResponseEntity<ResponseDto<LogInResponseDto>> authenticate(
+    public ResponseEntity<Api<?>> authenticate(
             @RequestBody LoginInputDto dto,
             HttpServletResponse response
             ){
 
         LogInResponse user = userAccountService.getLoginInfo(dto.getUserId(), dto.getUserPassword());
-        LogInResponseDto dt = LogInResponseDto.from(user);
-        dt.setAccessToken(user.getAccessToken());
+        LogInResponseDto userInfo = LogInResponseDto.from(user);
+        userInfo.setAccessToken(user.getAccessToken());
 
         CookieUtil.addCookie(response, "refreshToken", user.getRefreshToken());
 
         return ResponseEntity.ok()
-                .body(ResponseDto.<LogInResponseDto>builder()
-                        .status("OK")
-                        .message("로그인이 성공적으로 처리되었습니다.")
-                        .data(dt)
-                        .build());
-
+                .body(Api.OK(UserResponseCode.LOGIN_SUCCESS, userInfo));
     }
 
     @PostMapping("/logout")
     @Operation(summary = "로그아웃", description = "로그아웃을 진행합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK"),
-            @ApiResponse(responseCode = "400", description = "BAD REQUEST",content = @Content(schema = @Schema(implementation = ResponseDto.class))),
-            @ApiResponse(responseCode = "404", description = "NOT FOUND", content = @Content(schema = @Schema(implementation = ResponseDto.class))),
-            @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR", content = @Content(schema = @Schema(implementation = ResponseDto.class)))
+            @ApiResponse(responseCode = "400", description = "BAD REQUEST",content = @Content(schema = @Schema(implementation = Api.class))),
+            @ApiResponse(responseCode = "404", description = "NOT FOUND", content = @Content(schema = @Schema(implementation = Api.class))),
+            @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR", content = @Content(schema = @Schema(implementation = Api.class)))
 
     })
-    public ResponseEntity<ResponseDto> logOut(
+    public ResponseEntity<Api> logOut(
             @CookieValue(name = "refreshToken") Cookie cookie,
             HttpServletResponse response){
 
         cookie.setMaxAge(0);
         response.addCookie(cookie);
 
-        return ResponseEntity.<ResponseDto>ok()
-                .body(ResponseDto.builder()
-                        .status("OK")
-                        .message("로그아웃이 성공적으로 실행되었습니다.")
-                        .build());
-
+        return ResponseEntity.ok()
+                .body(Api.OK(UserResponseCode.LOGOUT_SUCCESS, null));
     }
 
     @PostMapping("/check-userId")
     @Operation(summary = "아이디 중복 체크", description = "아이디 중복을 체크합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK"),
-            @ApiResponse(responseCode = "400", description = "BAD REQUEST",content = @Content(schema = @Schema(implementation = ResponseDto.class))),
-            @ApiResponse(responseCode = "404", description = "NOT FOUND", content = @Content(schema = @Schema(implementation = ResponseDto.class))),
-            @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR", content = @Content(schema = @Schema(implementation = ResponseDto.class)))
+            @ApiResponse(responseCode = "400", description = "BAD REQUEST",content = @Content(schema = @Schema(implementation = Api.class))),
+            @ApiResponse(responseCode = "404", description = "NOT FOUND", content = @Content(schema = @Schema(implementation = Api.class))),
+            @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR", content = @Content(schema = @Schema(implementation = Api.class)))
     })
     @Parameter(name = "userId", description = "유저 아이디", example = "user01")
-    public ResponseDto<Boolean> checkUserId(@RequestBody UserIdRequestDto dto){
+    public ResponseEntity<Api> checkUserId(@RequestBody UserIdRequestDto dto){
 
-        boolean check = userAccountService.checkUserId(dto.getUserId());
-
-        if(check){
-            return ResponseDto.<Boolean>builder()
-                    .status("OK")
-                    .message("아이디가 존재합니다.")
-                    .data(false).build();
-        }else{
-            return ResponseDto.<Boolean>builder()
-                    .status("OK")
-                    .message("아이디가 존재하지 않습니다.")
-                    .data(true).build();
-        }
+        UserResponseCode code = userAccountService.checkUserId(dto.getUserId());
+        return ResponseEntity.ok()
+                .body(Api.OK(code, code.getStatus()));
     }
 
     @PostMapping("/check-nickname")
     @Operation(summary = "닉네임 중복 체크", description = "닉네임 중복 체크")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK"),
-            @ApiResponse(responseCode = "400", description = "BAD REQUEST",content = @Content(schema = @Schema(implementation = ResponseDto.class))),
-            @ApiResponse(responseCode = "404", description = "NOT FOUND", content = @Content(schema = @Schema(implementation = ResponseDto.class))),
-            @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR", content = @Content(schema = @Schema(implementation = ResponseDto.class)))
+            @ApiResponse(responseCode = "400", description = "BAD REQUEST",content = @Content(schema = @Schema(implementation = Api.class))),
+            @ApiResponse(responseCode = "404", description = "NOT FOUND", content = @Content(schema = @Schema(implementation = Api.class))),
+            @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR", content = @Content(schema = @Schema(implementation = Api.class)))
     })
     @Parameter(name = "nickname", description = "닉네임", example = "nick01")
-    public ResponseDto<Boolean> checkNickname(@RequestBody UserNicknameRequestDto dto){
-        boolean check = userAccountService.checkNickname(dto.getNickname());
+    public ResponseEntity<?> checkNickname(@RequestBody UserNicknameRequestDto dto){
+        ResponseCode code = userAccountService.checkNickname(dto.getNickname());
 
-        if(check){
-            return ResponseDto.<Boolean>builder()
-                    .status("OK")
-                    .message("닉네임이 존재합니다.")
-                    .data(false).build();
-        }else{
-            return ResponseDto.<Boolean>builder()
-                    .status("OK")
-                    .message("닉네임이 존재하지 않습니다.")
-                    .data(true).build();
-        }
-
+        return ResponseEntity.ok()
+                .body(Api.OK(code, code.getStatus()));
     }
 
 

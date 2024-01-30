@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -22,13 +23,13 @@ public class LogInResponse {
     private String region;
     private String mbti;
     private String gender;
-    private Set<InterestDto> interests;
-    private Set<QuestionDto> questions;
+    private List<InterestDto> interests;
+    private List<QuestionDto> questions;
     private String selfIntroduction;
     private String accessToken;
     private String refreshToken;
 
-    private LogInResponse(Long id, String userId, String nickname, String region, String mbti, String gender, Set<InterestDto> interests, Set<QuestionDto> questions, String selfIntroduction) {
+    private LogInResponse(Long id, String userId, String nickname, String region, String mbti, String gender, List<InterestDto> interests, List<QuestionDto> questions, String selfIntroduction) {
         this.id = id;
         this.userId = userId;
         this.nickname = nickname;
@@ -48,8 +49,8 @@ public class LogInResponse {
                 user.getRegion(),
                 user.getMbti(),
                 user.getGender(),
-                user.getInterests().stream().map(InterestDto::from).collect(Collectors.toSet()),
-                user.getQuestions().stream().map(QuestionDto::from).collect(Collectors.toSet()),
+                user.getInterests().stream().map(InterestDto::from).collect(Collectors.toList()),
+                user.getQuestions().stream().map(QuestionDto::from).collect(Collectors.toList()),
                 user.getSelfIntroduction(),
                 accessToken,
                 refreshToken

@@ -1,5 +1,7 @@
 package com.blind.dating.service;
 
+import com.blind.dating.domain.Interest;
+import com.blind.dating.domain.Question;
 import com.blind.dating.domain.UserAccount;
 import com.blind.dating.dto.user.LogInResponse;
 import com.blind.dating.dto.user.UserInfoWithTokens;
@@ -16,6 +18,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 
 import javax.servlet.http.Cookie;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -67,6 +70,8 @@ class TokenServiceTest {
     void givenUserId_whenUpdateRefreshToken_thenReturnUserInfoWithTokens(){
         //Given
         UserAccount user = UserAccount.of("qweeqw","asdfdf", "nickname","asdf","asdf","M","하이요");
+        user.setInterests(List.of(new Interest()));
+        user.setQuestions(List.of(new Question()));
         given(userAccountRepository.findById(1L)).willReturn(Optional.of(user));
         given(tokenProvider.create(user)).willReturn("access");
         given(tokenProvider.refreshToken(user)).willReturn("refresh");

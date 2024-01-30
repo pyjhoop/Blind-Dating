@@ -55,15 +55,14 @@ class ChattingRoomServiceTest {
     @Test
     void givenUserId_whenSelectChatRooms_thenResultChatRoomDtoList(){
         //Given
-        UserAccount user3 = new UserAccount(1L, "user01", "pass01", "nick01","서울","intp","M", false, "안녕", LocalDateTime.now(), null, "kakao");
-        UserAccount user4 = new UserAccount(2L, "user02", "pass02", "nick02","서울","intp","W", false, "안녕", LocalDateTime.now(), null, "kakao");
-
+        UserAccount user1 = new UserAccount(1L, "user01", "pass01", "nick01","서울","intp","M", false, "안녕", LocalDateTime.now(), null, "kakao",null,null,null,null);
+        UserAccount user2 = new UserAccount(2L, "user02", "pass02", "nick02","서울","intp","W", false, "안녕", LocalDateTime.now(), null, "kakao",null,null,null,null);
         ChatRoom room = new ChatRoom();
-        room.setUsers(Set.of(user3, user4));
+        room.setUsers(Set.of(user1, user2));
         List<ChatRoom> list = List.of(room);
 
-        given(userAccountRepository.findById(anyLong())).willReturn(Optional.of(user3));
-        given(chattingRoomRepository.findAllByUsersAndStatusOrderByUpdatedAtDesc(user3, true)).willReturn(list);
+        given(userAccountRepository.findById(anyLong())).willReturn(Optional.of(user1));
+        given(chattingRoomRepository.findAllByUsersAndStatusOrderByUpdatedAtDesc(user1, true)).willReturn(list);
         given(chatService.unreadChat(1L,room)).willReturn(1L);
         //When
         List<ChatRoomDto> result = chattingRoomService.getRooms(1L);

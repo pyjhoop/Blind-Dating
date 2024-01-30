@@ -4,7 +4,6 @@ import com.blind.dating.domain.Chat;
 import com.blind.dating.domain.ChatRoom;
 import com.blind.dating.domain.UserAccount;
 import com.blind.dating.dto.chat.*;
-import com.blind.dating.dto.response.ResponseDto;
 import com.blind.dating.handler.SessionHandler;
 import com.blind.dating.service.ChatService;
 import com.blind.dating.service.ChattingRoomService;
@@ -13,17 +12,12 @@ import com.blind.dating.service.RedisPublisher;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
-import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Tag(name = "Stomp Info", description = "STOMP 관련 서비스")
 @Controller

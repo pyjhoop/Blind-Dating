@@ -37,7 +37,6 @@ class QuestionServiceTest {
         list.add(q1);
         list.add(q2);
 
-        given(questionRepository.saveAll(list)).willReturn(list);
 
         //When
         List<Question> result = questionService.saveQuestions(user, bList);

@@ -25,7 +25,7 @@ public class QuestionService {
             list.add(Question.of(userAccount, b));
         }
 
-        return questionRepository.saveAll(list);
+        return list;
 
     }
 }

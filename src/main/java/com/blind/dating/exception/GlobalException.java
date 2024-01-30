@@ -1,6 +1,6 @@
 package com.blind.dating.exception;
 
-import com.blind.dating.dto.response.ResponseDto;
+import com.blind.dating.common.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,12 +19,12 @@ import java.util.Map;
 public class GlobalException {
 
     @ExceptionHandler(value = RuntimeException.class)
-    public ResponseEntity<ResponseDto> runtimeException(Exception e){
+    public ResponseEntity<Api> runtimeException(Exception e){
 
         log.error(e+"");
 
-        return ResponseEntity.<ResponseDto>badRequest()
-                .body(ResponseDto.builder()
+        return ResponseEntity.<Api>badRequest()
+                .body(Api.builder()
                         .status("Bad request")
                         .message(e.getMessage())
                         .build());
@@ -32,13 +32,13 @@ public class GlobalException {
 
     @ExceptionHandler(value = MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<ResponseDto> handleValidationException(MethodArgumentNotValidException  e) {
+    public ResponseEntity<Api> handleValidationException(MethodArgumentNotValidException  e) {
         BindingResult bindingResult = e.getBindingResult();
         Map<String, String> errors = new HashMap<>();
         for (FieldError fieldError : bindingResult.getFieldErrors()) {
             errors.put(fieldError.getField(), fieldError.getDefaultMessage());
         }
-        return ResponseEntity.badRequest().body(ResponseDto.builder()
+        return ResponseEntity.badRequest().body(Api.builder()
                 .status("BAD REQUEST")
                 .message("회원가입에 실패했습니다.")
                 .data(errors)

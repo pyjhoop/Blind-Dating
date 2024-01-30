@@ -34,6 +34,6 @@ public class InterestService {
             list.add(Interest.of(userAccount,s));
         }
 
-        return interestRepository.saveAll(list);
+        return list;
     }
 }

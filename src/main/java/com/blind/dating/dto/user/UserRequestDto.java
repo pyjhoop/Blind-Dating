@@ -1,11 +1,13 @@
 package com.blind.dating.dto.user;
 
+import com.blind.dating.domain.Role;
 import com.blind.dating.domain.UserAccount;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -78,6 +80,21 @@ public class UserRequestDto {
                 mbti,
                 gender,
                 selfIntroduction
+        );
+    }
+
+    public UserAccount toRegisterEntity(String password){
+        return UserAccount.of(
+                userId,
+                password,
+                nickname,
+                region,
+                mbti,
+                gender,
+                false,
+                selfIntroduction,
+                LocalDateTime.now(),
+                Role.USER.getValue()
         );
     }
 

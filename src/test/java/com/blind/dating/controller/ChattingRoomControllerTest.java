@@ -86,8 +86,8 @@ class ChattingRoomControllerTest {
     @WithMockUser(username = "1")
     void givenRoomIdAndChatId_whenEnterRoom_thenReturnChatList() throws Exception {
         Authentication authentication = new UsernamePasswordAuthenticationToken("1",null);
-        UserAccount user1 = new UserAccount(1L, "user01", "pass01", "nick01","서울","intp","M", false, "안녕", LocalDateTime.now(), null, "kakao");
-        UserAccount user2 = new UserAccount(2L, "user02", "pass02", "nick02","서울","intp","W", false, "안녕", LocalDateTime.now(), null, "kakao");
+        UserAccount user1 = new UserAccount(1L, "user01", "pass01", "nick01","서울","intp","M", false, "안녕", LocalDateTime.now(), null, "kakao",null,null,null,null);
+        UserAccount user2 = new UserAccount(2L, "user02", "pass02", "nick02","서울","intp","W", false, "안녕", LocalDateTime.now(), null, "kakao",null,null,null,null);
         ChatRoom chatRoom = new ChatRoom();
         chatRoom.setUsers(Set.of(user1, user2));
         given(chattingRoomService.getRoom(anyString())).willReturn(Optional.of(chatRoom));

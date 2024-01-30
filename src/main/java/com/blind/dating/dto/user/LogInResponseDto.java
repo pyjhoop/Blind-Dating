@@ -7,6 +7,7 @@ import com.blind.dating.dto.question.QuestionDto;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -20,12 +21,12 @@ public class LogInResponseDto {
     private String region;
     private String mbti;
     private String gender;
-    private Set<InterestDto> interests;
-    private Set<QuestionDto> questions;
+    private List<InterestDto> interests;
+    private List<QuestionDto> questions;
     private String selfIntroduction;
     private String accessToken;
 
-    private LogInResponseDto(Long id, String userId, String nickname, String region, String mbti, String gender, Set<InterestDto> interests, Set<QuestionDto> questions, String selfIntroduction, String accessToken) {
+    private LogInResponseDto(Long id, String userId, String nickname, String region, String mbti, String gender, List<InterestDto> interests, List<QuestionDto> questions, String selfIntroduction, String accessToken) {
         this.id = id;
         this.userId = userId;
         this.nickname = nickname;

@@ -30,36 +30,28 @@ public class LikesUnlikesService {
         Long receiver = Long.parseLong(receiverId);
 
         // receiverId로 유저가 존재하는지 조회
-        Optional<UserAccount> result = userAccountRepository.findById(receiver);
-        UserAccount receiverAccount = null;
-        // receiverId에 해당하는 유저 존재유무에 따른 예외 처리
-        if(result.isPresent()){
-            receiverAccount = result.get();
-        }else{
-            throw new RuntimeException("존재하지 않는 계정입니다.");
-        }
+        UserAccount receiverAccount = userAccountRepository.findById(receiver)
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 계정입니다."));
 
         // like 저장
         likesUnlikesRepository.save(LikesUnlikes.of(Long.valueOf(userId),receiverAccount, true));
 
-        Optional<UserAccount> userAccount = userAccountRepository.findById(Long.valueOf(userId));
+        UserAccount userAccount = userAccountRepository.findById(Long.valueOf(userId))
+                .orElseThrow(()-> new RuntimeException("존재하지 않는 계정입니다."));
 
         // receiverId를 가진 유저가 나를 이미 좋아요 눌렀는지 확인 후 좋아요 눌렀으면 채팅 방 생성하기.
-        List<LikesUnlikes> list = likesUnlikesRepository.findLikes(receiverAccount.getId(), userAccount.get());
+        List<LikesUnlikes> list = likesUnlikesRepository.findLikes(receiverAccount.getId(), userAccount);
 
-        //ReadChat도 생성해야함.
-        ChatRoom chatRoom = null;
         if(list.isEmpty()){
             return false;
         }else {
-            chatRoom = chatRoomService.create(userAccount.get(), receiverAccount);
+            ChatRoom chatRoom = chatRoomService.create(userAccount, receiverAccount);
             chatRoom.setStatus(true);
             // 여기서 ReadChat 생성
-            readChatRepository.save(ReadChat.of(chatRoom,userAccount.get().getId(),0L));
+            readChatRepository.save(ReadChat.of(chatRoom,userAccount.getId(),0L));
             readChatRepository.save(ReadChat.of(chatRoom,receiverAccount.getId(),0L));
             return true;
         }
-
     }
 
     @Transactional

@@ -1,6 +1,7 @@
 package com.blind.dating.controller;
 
-import com.blind.dating.dto.response.ResponseDto;
+import com.blind.dating.common.Api;
+import com.blind.dating.common.code.TokenResponseCode;
 import com.blind.dating.dto.user.*;
 import com.blind.dating.service.TokenService;
 import com.blind.dating.util.CookieUtil;
@@ -13,11 +14,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 @Tag(name = "Token Info", description = "토큰 재발급 서비스")
@@ -33,11 +32,11 @@ public class TokenController {
     @Operation(summary = "AccessToken 재발급", description = "RefreshToken 으로 AccessToken 을 재발급 합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK"),
-            @ApiResponse(responseCode = "400", description = "BAD REQUEST",content = @Content(schema = @Schema(implementation = ResponseDto.class))),
-            @ApiResponse(responseCode = "404", description = "NOT FOUND", content = @Content(schema = @Schema(implementation = ResponseDto.class))),
-            @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR", content = @Content(schema = @Schema(implementation = ResponseDto.class)))
+            @ApiResponse(responseCode = "400", description = "BAD REQUEST",content = @Content(schema = @Schema(implementation = Api.class))),
+            @ApiResponse(responseCode = "404", description = "NOT FOUND", content = @Content(schema = @Schema(implementation = Api.class))),
+            @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR", content = @Content(schema = @Schema(implementation = Api.class)))
     })
-    public ResponseEntity<ResponseDto> newAccessToken(
+    public ResponseEntity<Api> newAccessToken(
             @CookieValue(name = "refreshToken") Cookie cookie,
             HttpServletResponse response
     ){
@@ -51,11 +50,7 @@ public class TokenController {
         cookie.setMaxAge(0);
         CookieUtil.addCookie(response, "refreshToken", logInResponse.getRefreshToken());
 
-        return ResponseEntity.<ResponseDto<LogInResponseDto>>ok()
-                .body(ResponseDto.<LogInResponseDto>builder()
-                        .status("OK")
-                        .message("accessToken 이 성공적으로 생성되었습니다.")
-                        .data(dto)
-                        .build());
+        return ResponseEntity.ok()
+                .body(Api.OK(TokenResponseCode.ISSUE_ACCESS_TOKEN_SUCCESS, dto));
     }
 }

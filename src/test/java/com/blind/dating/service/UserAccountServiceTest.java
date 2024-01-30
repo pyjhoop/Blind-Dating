@@ -1,18 +1,17 @@
 package com.blind.dating.service;
 
+import com.blind.dating.common.code.ResponseCode;
+import com.blind.dating.common.code.UserResponseCode;
 import com.blind.dating.domain.Interest;
 import com.blind.dating.domain.Question;
 import com.blind.dating.domain.UserAccount;
 import com.blind.dating.dto.user.LogInResponse;
-import com.blind.dating.dto.user.UserIdWithNicknameAndGender;
-import com.blind.dating.dto.user.UserInfoWithTokens;
 import com.blind.dating.dto.user.UserRequestDto;
 import com.blind.dating.repository.RefreshTokenRepository;
 import com.blind.dating.repository.UserAccountRedisRepository;
 import com.blind.dating.repository.UserAccountRepository;
 import com.blind.dating.security.TokenProvider;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,7 +20,6 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.Errors;
 import org.springframework.validation.FieldError;
 
@@ -64,6 +62,8 @@ class UserAccountServiceTest {
         user.setRecentLogin(LocalDateTime.now());
         user.setDeleted(false);
         user.setUserPassword(bCryptPasswordEncoder.encode(dto.getUserPassword()));
+        user.setInterests(List.of(new Interest()));
+        user.setQuestions(List.of(new Question()));
     }
 
 
@@ -178,13 +178,13 @@ class UserAccountServiceTest {
         //given
         String userId = "userId";
         UserAccount user = UserAccount.of(userId,"asdfdf", "nick1","asdf","asdf","M","하이요");
-        given(userAccountRepository.findByUserId(userId)).willReturn(Optional.of(user));
+        given(userAccountRepository.existsByUserId(userId)).willReturn(false);
 
         //when
-        boolean result = userAccountService.checkUserId(userId);
+        ResponseCode result = userAccountService.checkUserId(userId);
 
         //then
-        assertThat(result).isTrue();
+        assertThat(result).isEqualTo(UserResponseCode.NOT_EXIST_USER_ID);
 
     }
 
@@ -194,46 +194,45 @@ class UserAccountServiceTest {
         //given
         String userId = "userId";
         UserAccount user = UserAccount.of(userId,"asdfdf", "nick1","asdf","asdf","M","하이요");
-        given(userAccountRepository.findByUserId(userId)).willReturn(Optional.empty());
+        given(userAccountRepository.existsByUserId(userId)).willReturn(true);
 
-        //when
-        RuntimeException exception = assertThrows(RuntimeException.class, ()-> {
-            boolean result = userAccountService.checkUserId(userId);
-        });
+
+        ResponseCode result = userAccountService.checkUserId(userId);
+
 
         //then
-        assertThat(exception.getMessage()).isEqualTo("유저정보를 조회할 수 없습니다.");
+        assertThat(result).isEqualTo(UserResponseCode.EXIST_USER_ID);
 
     }
 
-    @DisplayName("유저 닉네임 확인 테스트 - 닉네임 없음.")
+    @DisplayName("유저 닉네임 확인 테스트 - 닉네임 있음.")
     @Test
     void givenUserNickname_whenCheckUserNickname_thenReturnFalse(){
         //given
         String userNickname = "nick11";
         UserAccount user = UserAccount.of("qweeqw","asdfdf", userNickname,"asdf","asdf","M","하이요");
-        given(userAccountRepository.findByNickname(userNickname)).willReturn(null);
+        given(userAccountRepository.existsByNickname(userNickname)).willReturn(true);
 
         //when
-        boolean result = userAccountService.checkNickname(userNickname);
+        ResponseCode result = userAccountService.checkNickname(userNickname);
 
         //then
-        assertThat(result).isFalse();
+        assertThat(result).isEqualTo(UserResponseCode.EXIST_NICKNAME);
 
     }
-    @DisplayName("유저 닉네임 확인 테스트 - 닉네임 없음.")
+    @DisplayName("유저 닉네임 확인 테스트 - 닉네임 있음.")
     @Test
     void givenUserNickname_whenCheckUserNickname_thenReturnTrue(){
         //given
         String userNickname = "nick11";
         UserAccount user = UserAccount.of("qweeqw","asdfdf", userNickname,"asdf","asdf","M","하이요");
-        given(userAccountRepository.findByNickname(userNickname)).willReturn(user);
+        given(userAccountRepository.existsByNickname(userNickname)).willReturn(false);
 
         //when
-        boolean result = userAccountService.checkNickname(userNickname);
+        ResponseCode result = userAccountService.checkNickname(userNickname);
 
         //then
-        assertThat(result).isTrue();
+        assertThat(result).isEqualTo(UserResponseCode.NOT_EXIST_NICKNAME);
 
     }
 

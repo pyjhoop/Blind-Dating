@@ -75,9 +75,13 @@ dependencies {
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2'
 }
 openapi3 {
-	server = "http://localhost"
-	title = "카카오인증 관리자 서버 API 문서"
-	description = "Spring REST Docs with SwaggerUI."
+	servers = [
+			{url = "http://localhost:8081"},
+			{url = "https://blind-dating.site"}
+			]
+
+	title = "Blind Dating REST API"
+	description = "블라인드 데이팅 API 명세서입니다."
 	version = "0.0.1"
 	outputFileNamePrefix = 'open-api-3.0.1'
 	format = 'json'
@@ -89,6 +93,7 @@ openapi3 {
 // GenerateSwaggerUI 태스크가, openapi3 task 를 의존하도록 설정
 tasks.withType(GenerateSwaggerUI).configureEach {
 	dependsOn 'openapi3'
+
 
 //    기존 파일 삭제했다가, build 에 출력한 json 정적파일 복사 (안해도 됨 → local 확인용)
 	delete file('src/main/resources/static/docs/')

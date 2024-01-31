@@ -57,8 +57,7 @@ public class ChattingRoomController {
         //다른 유저 정보 조회하기.
         UserAccount otherUser = chatRoom.getUsers().stream().filter(
                it -> it.getId() != userId
-        ).collect(Collectors.toList())
-                .get(0);
+        ).toList().get(0);
 
         //존재할경우 채팅 메세지 30개를 id 오름차순으로 가져오기
         List<ChatDto> chatList = chatService.selectChatList(chatRoom, chatId)

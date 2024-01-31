@@ -1,10 +1,7 @@
 package com.blind.dating.domain;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import java.util.Objects;
 
@@ -12,6 +9,7 @@ import java.util.Objects;
 @ToString
 @Entity
 @NoArgsConstructor
+@AllArgsConstructor
 public class Question {
 
     @Id

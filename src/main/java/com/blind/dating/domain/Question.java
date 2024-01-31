@@ -1,12 +1,11 @@
 package com.blind.dating.domain;
 
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import org.hibernate.annotations.BatchSize;
 
-import javax.persistence.*;
 import java.util.Objects;
 
 @Getter
@@ -19,7 +18,7 @@ public class Question {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne()
+    @ManyToOne
     private UserAccount userAccount;
 
     @Setter

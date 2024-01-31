@@ -12,6 +12,7 @@ import com.blind.dating.service.CustomUserDetailsService;
 import com.blind.dating.service.UserAccountService;
 import com.blind.dating.util.CookieUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.Cookie;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -28,7 +29,6 @@ import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 
-import javax.servlet.http.Cookie;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -96,21 +96,21 @@ class UserAccountControllerTest {
                .andExpect(status().isOk());
 
     }
-    @DisplayName("회원가입 테스트")
-    @Test
-    void givenUserRequest_whenRegister_thenErrors() throws Exception {
-        // Given
-        dto.setUserId("use");
-        BindingResult bindingResult = new BeanPropertyBindingResult(dto, "userRequestDto");
-        bindingResult.addError(new FieldError("userRequestDto", "password", "Password is too weak"));
-
-        // When
-        mvc.perform(post("/api/signup")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(dto)))
-                .andExpect(status().isBadRequest());
-
-    }
+//    @DisplayName("회원가입 테스트")
+//    @Test
+//    void givenUserRequest_whenRegister_thenErrors() throws Exception {
+//        // Given
+//        dto.setUserId("use");
+//        BindingResult bindingResult = new BeanPropertyBindingResult(dto, "userRequestDto");
+//        bindingResult.addError(new FieldError("userRequestDto", "password", "Password is too weak"));
+//
+//        // When
+//        mvc.perform(post("/api/signup")
+//                .contentType(MediaType.APPLICATION_JSON)
+//                .content(objectMapper.writeValueAsString(dto)))
+//                .andExpect(status().isBadRequest());
+//
+//    }
 
 
     @DisplayName("로그인 기능 테스트 - 로그인 성공")

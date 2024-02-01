@@ -9,7 +9,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,6 +33,6 @@ public class InterestService {
             list.add(Interest.of(userAccount,s));
         }
 
-        return interestRepository.saveAll(list);
+        return list;
     }
 }

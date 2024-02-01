@@ -1,14 +1,29 @@
+import org.hidetake.gradle.swagger.generator.GenerateSwaggerUI
+buildscript {
+	ext {
+		restdocsApiSpecVersion = '0.17.1'
+	}
+}
 plugins {
 	id 'java'
-	id 'org.springframework.boot' version '2.7.14'
-	id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+	id 'org.springframework.boot' version '3.1.5'
+	id 'io.spring.dependency-management' version '1.1.3'
+	id 'jacoco'
+	// 3. openAPI 플러그인 추가
+	id 'com.epages.restdocs-api-spec' version "${restdocsApiSpecVersion}"
+	// 4. swaggerUI 플러그인 추가
+	id 'org.hidetake.swagger.generator' version '2.19.2'
+}
+jacoco {
+	toolVersion = "0.8.7"
 }
 
 group = 'com.blind'
 version = '0.0.1-SNAPSHOT'
 
+
 java {
-	sourceCompatibility = '11'
+	sourceCompatibility = '17'
 }
 
 configurations {
@@ -38,7 +53,7 @@ dependencies {
 	runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.11.5'
 
 	// swagger ui
-	implementation 'org.springdoc:springdoc-openapi-ui:1.6.6'
+//	implementation 'org.springdoc:springdoc-openapi-ui:1.6.6'
 
 	runtimeOnly 'com.mysql:mysql-connector-j'
 
@@ -46,14 +61,7 @@ dependencies {
 	implementation group: 'org.webjars', name: 'stomp-websocket', version: '2.3.3-1'
 
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
-	implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity5'
-	// queryDSL 설정
-	implementation "com.querydsl:querydsl-jpa"
-	implementation "com.querydsl:querydsl-core"
-	implementation "com.querydsl:querydsl-collections"
-	annotationProcessor "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jpa" // querydsl JPAAnnotationProcessor 사용 지정
-	annotationProcessor "jakarta.annotation:jakarta.annotation-api" // java.lang.NoClassDefFoundError (javax.annotation.Generated) 대응 코드
-	annotationProcessor "jakarta.persistence:jakarta.persistence-api" // java.lang.NoClassDefFoundError (javax.annotation.Entity) 대응 코드
+	implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
 
 	//Validation
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
@@ -62,26 +70,110 @@ dependencies {
 
 	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
 	implementation 'com.fasterxml.jackson.core:jackson-databind'
-}
 
-// Querydsl 설정부
-def generated = 'src/main/generated'
+	//spring rest docs
+	testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
 
-// querydsl QClass 파일 생성 위치를 지정
-tasks.withType(JavaCompile) {
-	options.getGeneratedSourceOutputDirectory().set(file(generated))
-}
-
-// java source set 에 querydsl QClass 위치 추가
-sourceSets {
-	main.java.srcDirs += [ generated ]
-}
-
-// gradle clean 시에 QClass 디렉토리 삭제
-clean {
-	delete file(generated)
+	//restdocs-api-spec 의존성 추가
+	// RestDoc을 OpenApi(Swagger 3.0)의 결과로 만들어주는 오픈소스 라이브러리입니다.
+	testImplementation 'com.epages:restdocs-api-spec-mockmvc:' + restdocsApiSpecVersion
+	// swagger
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2'
 }
 
 tasks.named('test') {
 	useJUnitPlatform()
 }
+
+test {
+	finalizedBy 'jacocoTestReport'
+}
+
+jacocoTestReport {
+	reports {
+		xml.required = true
+		csv.required = true
+		html.required = true
+
+		xml.destination file("${buildDir}/jacoco/index.xml")
+		csv.destination file("${buildDir}/jacoco/index.csv")
+		html.destination file("${buildDir}/jacoco/index.html")
+	}
+	afterEvaluate {
+		classDirectories.setFrom(
+				files(classDirectories.files.collect {
+					fileTree(dir: it, excludes: [
+							'**/*Application*',
+							'**/*Exception*',
+							'**/dto/**',
+							'**/controller/*Stomp*',
+							'**/config/**',
+							'**/security/**',
+							'**/util/**',
+							'**/handler/**',
+							'**/repository/**',
+							'**/domain/**',
+							'**/common/**'
+					])
+				})
+		)
+		executionData.setFrom(fileTree(dir: "${buildDir}/jacoco/test.exec"))
+	}
+}
+
+jacocoTestCoverageVerification {
+	violationRules {
+		rule {
+			enabled = true;
+			element = 'CLASS'
+
+			limit {
+				counter = 'METHOD'
+				value = 'COVEREDRATIO'
+				minimum = 0.5
+			}
+
+		}
+
+	}
+}
+
+
+// Task 및 설정 추가
+// GenerateSwaggerUI 태스크가, openapi3 task 를 의존하도록 설정
+tasks.withType(GenerateSwaggerUI) {
+	dependsOn 'openapi3'
+
+	//기존 파일 삭제했다가, build 에 출력한 json 정적파일 복사 (안해도 됨 → local 확인용)
+	delete file('src/main/resources/static/docs/')
+	copy {
+		from "build/resources/main/static/docs"
+		into "src/main/resources/static/docs/"
+
+	}
+}
+
+
+bootJar{
+	dependsOn(':openapi3')
+}
+
+openapi3 {
+	servers = [
+			{url = "http://localhost:8081"}
+	]
+	title = 'Blind-Dating API 문서'
+	description = '블라인드 데이팅 API 문서입니다.'
+	version = '0.0.1'
+	format = 'json'
+	outputFileNamePrefix = 'open-api-3.0.1'
+
+	outputDirectory = 'build/resources/main/static/docs'
+}
+
+
+
+
+
+
+

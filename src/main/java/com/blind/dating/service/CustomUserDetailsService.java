@@ -1,6 +1,7 @@
 package com.blind.dating.service;
 
 
+import com.blind.dating.domain.CustomUserDetails;
 import com.blind.dating.domain.UserAccount;
 import com.blind.dating.repository.UserAccountRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,11 +19,9 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
-        UserAccount user = userAccountRepository.findByUserId(username);
-        if(user == null){
-            throw new UsernameNotFoundException("User not found with username:"+username);
-        }
+        UserAccount user = userAccountRepository.findByUserId(username)
+                .orElseThrow(()-> new RuntimeException("존재하지 않는 유저입니다."));
 
-        return user;
+        return new CustomUserDetails(user);
     }
 }

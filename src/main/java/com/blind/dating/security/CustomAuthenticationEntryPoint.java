@@ -1,14 +1,14 @@
 package com.blind.dating.security;
 
-import com.blind.dating.dto.response.ResponseDto;
+import com.blind.dating.common.Api;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @Component
@@ -18,20 +18,18 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException {
 
-        setResponse((response));
-    }
+//        String message = request.getAttribute("exception").toString();
 
-    /**
-     * 한글 출력을 위해 getWriter() 사용
-     */
-    private void setResponse(HttpServletResponse response) throws IOException {
         response.setContentType("application/json;charset=UTF-8");
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         ObjectMapper ob = new ObjectMapper();
-        ResponseDto dto = ResponseDto.builder().status("ExpiredJwtToken")
-                        .message("jwt 토큰 만료되었습니다.")
-                                .build();
+        Api dto = Api.builder().status("ExpiredJwtToken")
+                .message("message")
+                .build();
         response.getWriter().println(ob.writeValueAsString(dto));
+
     }
+
+
 
 }

@@ -1,20 +1,19 @@
 package com.blind.dating.service;
 
 import com.blind.dating.domain.Interest;
+import com.blind.dating.domain.Question;
 import com.blind.dating.domain.UserAccount;
 import com.blind.dating.dto.user.UserIdWithNicknameAndGender;
 import com.blind.dating.dto.user.UserUpdateRequestDto;
+import com.blind.dating.dto.user.UserWithInterestAndQuestionDto;
 import com.blind.dating.repository.InterestRepository;
 import com.blind.dating.repository.UserAccountRedisRepository;
 import com.blind.dating.repository.UserAccountRepository;
-import com.blind.dating.repository.querydsl.UserAccountRepositoryImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,7 +27,6 @@ import java.util.Optional;
 public class UserService {
 
     private final UserAccountRepository userAccountRepository;
-    private final UserAccountRepositoryImpl userAccountRepositoryImpl;
     private final InterestRepository interestRepository;
     private final UserAccountRedisRepository userAccountRedisRepository;
 
@@ -38,17 +36,19 @@ public class UserService {
      * @param pageable
      * @return Page<UserAccount>
      */
-    public Page<UserAccount> getUserList(Authentication authentication, Pageable pageable){
+    public Page<UserWithInterestAndQuestionDto> getUserList(Authentication authentication, Pageable pageable){
         String userId = (String) authentication.getPrincipal();
-        UserIdWithNicknameAndGender userInfo = userAccountRedisRepository.getUserInfo(userId);
-        System.out.println(userInfo);
-
-
-        if(userInfo.getGender().equals("M")){
-            return userAccountRepositoryImpl.findAllByGenderAndNotLikes("W",Long.valueOf(userId), pageable);
+        UserAccount user = userAccountRepository.findById(Long.valueOf(userId))
+                .orElseThrow(() -> new RuntimeException("예외 발생"));
+        Page<UserAccount> users;
+        if(user.getGender().equals("M")){
+            users = userAccountRepository.recommendUser("W",Long.valueOf(userId), pageable);
         }else{
-            return userAccountRepositoryImpl.findAllByGenderAndNotLikes("M",Long.valueOf(userId), pageable);
+            users = userAccountRepository.recommendUser("M",Long.valueOf(userId), pageable);
         }
+
+
+        return users.map(UserWithInterestAndQuestionDto::from);
 
     }
 
@@ -57,15 +57,13 @@ public class UserService {
      * @param authentication
      * @return UserAccount
      */
-    public UserAccount getMyInfo(Authentication authentication){
+    public UserWithInterestAndQuestionDto getMyInfo(Authentication authentication){
         String userId = (String) authentication.getPrincipal();
-        Optional<UserAccount> userAccount = userAccountRepository.findById(Long.valueOf(userId));
 
-        if(userAccount.isPresent()){
-            return userAccount.get();
-        }else{
-            throw new RuntimeException("요청중에 에러가 발생했습니다. 재요청 해주세요");
-        }
+        UserAccount user = userAccountRepository.findById(Long.valueOf(userId))
+                .orElseThrow(()-> new RuntimeException("내정보 조회에 실패했습니다."));
+
+        return UserWithInterestAndQuestionDto.from(user);
     }
 
     /**
@@ -79,20 +77,20 @@ public class UserService {
 
         String userId = (String) authentication.getPrincipal();
 
-        UserAccount user = userAccountRepository.findById(Long.valueOf(userId)).get();
+        UserAccount user = userAccountRepository.findById(Long.valueOf(userId))
+                .orElseThrow(() -> new RuntimeException("유저정보 조회중에 예외가 발생했습니다."));
         // 유저 정보 저장하기
         user.setRegion(dto.getRegion());
         user.setMbti(dto.getMbti());
         user.setSelfIntroduction(dto.getSelfIntroduction());
 
-        //관심사 리스트 삭제후 다시 저장하기.
         interestRepository.deleteAllByUserAccount(user);
-        List<Interest> list = new ArrayList<>();
-        for(String s: dto.getInterests()){
-            list.add(Interest.of(user,s));
-        }
 
-        interestRepository.saveAll(list);
+        List<Interest> interests = new ArrayList<>();
+        for(String s: dto.getInterests()){
+            interests.add(Interest.of(user,s));
+        }
+        user.setInterests(interests);
 
         return user;
     }

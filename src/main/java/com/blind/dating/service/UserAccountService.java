@@ -1,15 +1,15 @@
 package com.blind.dating.service;
 
+import com.blind.dating.common.code.ResponseCode;
 import com.blind.dating.domain.UserAccount;
 import com.blind.dating.dto.user.*;
 import com.blind.dating.repository.RefreshTokenRepository;
 import com.blind.dating.repository.UserAccountRedisRepository;
 import com.blind.dating.repository.UserAccountRepository;
 import com.blind.dating.security.TokenProvider;
+import com.blind.dating.common.code.UserResponseCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,7 +19,6 @@ import org.springframework.validation.FieldError;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -42,28 +41,18 @@ public class UserAccountService {
     @Transactional
     public UserAccount register(UserRequestDto dto){
 
-        if(dto == null || dto.getUserId() == null){
-            throw new RuntimeException("Invalid arguments");
-        }
-
         // 아이디 존재하는지 체크
         String userId = dto.getUserId();
         if(userAccountRepository.existsByUserId(userId)){
             throw new RuntimeException("UserId already exists");
         }
-
         // 유저 저장하기
-        UserAccount user = dto.toEntity();
-        user.setRecentLogin(LocalDateTime.now());
-        user.setDeleted(false);
-        user.setUserPassword(bCryptPasswordEncoder.encode(dto.getUserPassword()));
+        UserAccount user = dto.toRegisterEntity(bCryptPasswordEncoder.encode(dto.getUserPassword()));
 
-        UserAccount resultUser =  userAccountRepository.save(user);
-        //questions 저장하기
-        questionService.saveQuestions(resultUser,dto.getQuestions());
-        // interests 저장하기
-        interestService.saveInterest(resultUser, dto.getInterests());
-        return resultUser;
+        user.setQuestions(questionService.saveQuestions(user,dto.getQuestions()));
+        user.setInterests(interestService.saveInterest(user, dto.getInterests()));
+
+        return userAccountRepository.save(user);
     }
 
     /**
@@ -75,12 +64,9 @@ public class UserAccountService {
     @Transactional
     public LogInResponse getLoginInfo(String userId, String userPassword){
 
-        BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
-
         //userId로 유저 정보 가져오기
-        UserAccount user = userAccountRepository.findByUserId(userId);
-        //userAccountId로 refreshToken 가져오기
-
+        UserAccount user = userAccountRepository.findByUserId(userId)
+                .orElseThrow(()-> new RuntimeException("유저정보를 조회할 수 없습니다."));
         user.setRecentLogin(LocalDateTime.now());
 
         // 비밀번호 맞는지 확인하기.
@@ -89,20 +75,12 @@ public class UserAccountService {
             String accessToken = tokenProvider.create(user);
             String refreshToken = tokenProvider.refreshToken(user);
 
-            //UserInfo 캐싱하기
-            userAccountRedisRepository.saveUser(String.valueOf(user.getId()), new UserIdWithNicknameAndGender(user.getId(),user.getNickname(), user.getGender()));
-
             //refresh Token 캐싱하기
             refreshTokenRepository.save(String.valueOf(user.getId()), refreshToken);
 
-            LogInResponse response = LogInResponse.from(user);
-            response.setAccessToken(accessToken);
-            response.setRefreshToken(refreshToken);
-
-            return response;
-
+            return LogInResponse.from(user, accessToken, refreshToken);
         }else{
-            return null;
+            throw new RuntimeException("Not Found UserInfo");
         }
     }
 
@@ -111,10 +89,10 @@ public class UserAccountService {
      * @param userId
      * @return boolean
      */
-    public boolean checkUserId(String userId){
-        UserAccount user = userAccountRepository.findByUserId(userId);
+    public UserResponseCode checkUserId(String userId){
+        Boolean status = userAccountRepository.existsByUserId(userId);
 
-        return user != null;
+        return (status) ? UserResponseCode.EXIST_USER_ID : UserResponseCode.NOT_EXIST_USER_ID;
 
     }
 
@@ -123,9 +101,10 @@ public class UserAccountService {
      * @param nickname
      * @return boolean
      */
-    public boolean checkNickname(String nickname){
-        UserAccount user = userAccountRepository.findByNickname(nickname);
-        return user != null;
+    public ResponseCode checkNickname(String nickname){
+        Boolean flag = userAccountRepository.existsByNickname(nickname);
+
+        return (flag)? UserResponseCode.EXIST_NICKNAME: UserResponseCode.NOT_EXIST_NICKNAME;
     }
 
     /**

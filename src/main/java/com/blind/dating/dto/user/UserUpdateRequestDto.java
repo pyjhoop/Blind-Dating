@@ -10,8 +10,8 @@ import java.util.List;
 @Builder
 @ToString
 public class UserUpdateRequestDto {
-    private String region;
-    private String mbti;
-    private List<String> interests;
-    private String selfIntroduction;
+        private String region;
+        private String mbti;
+        private List<String> interests;
+        private String selfIntroduction;
 }

@@ -5,7 +5,6 @@ import com.blind.dating.domain.UserAccount;
 import com.blind.dating.dto.chat.ChatRoomDto;
 import com.blind.dating.repository.ChattingRoomRepository;
 import com.blind.dating.repository.UserAccountRepository;
-import com.blind.dating.repository.querydsl.ChattingRoomRepositoryImpl;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,8 +12,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -26,7 +27,6 @@ import static org.mockito.BDDMockito.given;
 class ChattingRoomServiceTest {
 
     @Mock private ChattingRoomRepository chattingRoomRepository;
-    @Mock private ChattingRoomRepositoryImpl chattingRoomRepositoryImpl;
     @Mock private ChatService chatService;
     @Mock private UserAccountRepository userAccountRepository;
     @InjectMocks private ChattingRoomService chattingRoomService;
@@ -51,17 +51,17 @@ class ChattingRoomServiceTest {
         assertThat(result).isNotNull();
     }
 
-    @DisplayName("참여한 채팅방들 조회")
+    @DisplayName("채팅방 리스트 조회")
     @Test
     void givenUserId_whenSelectChatRooms_thenResultChatRoomDtoList(){
         //Given
-        UserAccount user1 = UserAccount.of("qweeqw","asdfdf", "nickname","asdf","asdf","M","하이요");
-        Optional<UserAccount> optional = Optional.of(user1);
-        List<UserAccount> userList = List.of(user1);
-
+        UserAccount user1 = new UserAccount(1L, "user01", "pass01", "nick01","서울","intp","M", false, "안녕", LocalDateTime.now(), null, "kakao",null,null,null,null);
+        UserAccount user2 = new UserAccount(2L, "user02", "pass02", "nick02","서울","intp","W", false, "안녕", LocalDateTime.now(), null, "kakao",null,null,null,null);
         ChatRoom room = new ChatRoom();
+        room.setUsers(Set.of(user1, user2));
         List<ChatRoom> list = List.of(room);
-        given(userAccountRepository.findById(1L)).willReturn(optional);
+
+        given(userAccountRepository.findById(anyLong())).willReturn(Optional.of(user1));
         given(chattingRoomRepository.findAllByUsersAndStatusOrderByUpdatedAtDesc(user1, true)).willReturn(list);
         given(chatService.unreadChat(1L,room)).willReturn(1L);
         //When
@@ -70,6 +70,23 @@ class ChattingRoomServiceTest {
         //Then
         assertThat(result).isNotNull();
     }
+
+    @DisplayName("채팅방 리스트 조회시 유저정보 불일치로 예외 발생")
+    @Test
+    void givenUserId_whenSelectChatRooms_thenThrowException() {
+        // Given
+        given(userAccountRepository.findById(anyLong())).willReturn(Optional.empty());
+
+        // When
+        RuntimeException exception = assertThrows(RuntimeException.class, ()->{
+            chattingRoomService.getRooms(anyLong());
+        });
+
+        // Then
+        assertEquals(exception.getMessage(), "채팅방 조회시 내 정보가 제대로 조회되지 않았습니다. 다시 요청해 주세요");
+
+    }
+
 
     @DisplayName("채팅방 조회")
     @Test
@@ -90,7 +107,7 @@ class ChattingRoomServiceTest {
         assertThat(result).isNotNull();
     }
 
-    @DisplayName("채팅방 나가기")
+    @DisplayName("채팅방 나가기 true")
     @Test
     void givenRoomIdAndUserId_whenLeaveChatRoom_thenReturnTrue(){
         //Given
@@ -107,6 +124,40 @@ class ChattingRoomServiceTest {
 
         //Then
         assertThat(result).isFalse();
+    }
+
+    @DisplayName("채팅방 나가기 false")
+    @Test
+    void givenRoomIdAndUserId_whenLeaveChatRoom_thenReturnFalse(){
+        //Given
+        Long userId1 = 1L;
+        Long userId2 = 2L;
+        ChatRoom room = new ChatRoom();
+        room.setStatus(false);
+        Optional<ChatRoom> optional = Optional.of(room);
+
+        given(chattingRoomRepository.findById(1L)).willReturn(optional);
+
+        //When
+        Boolean result = chattingRoomService.leaveChatRoom("1","1");
+
+        //Then
+        assertThat(result).isTrue();
+    }
+
+    @DisplayName("채팅방 나가기 예외 발생")
+    @Test
+    void givenRoomIdAndUserId_whenLeaveChatRoom_thenThrowException(){
+        // Given
+        given(chattingRoomRepository.findById(1L)).willReturn(Optional.empty());
+
+        // When
+        RuntimeException exception = assertThrows(RuntimeException.class, ()-> {
+            chattingRoomService.leaveChatRoom("1", "1");
+        });
+
+        // Then
+        assertThat(exception.getMessage()).isEqualTo("채팅방 조회중 예외가 발생했습니다.");
     }
 
 

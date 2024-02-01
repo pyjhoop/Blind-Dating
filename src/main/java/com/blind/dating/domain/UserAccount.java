@@ -1,12 +1,10 @@
 package com.blind.dating.domain;
 
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-
-import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -18,7 +16,8 @@ import java.util.*;
         @Index(columnList = "gender")
 })
 @Entity
-public class UserAccount extends BaseEntity implements UserDetails {
+@AllArgsConstructor
+public class UserAccount extends BaseEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,11 +28,10 @@ public class UserAccount extends BaseEntity implements UserDetails {
     private String userId;
 
     @Setter
-    @Column(nullable = false, length = 255)
     private String userPassword;
 
     @Setter
-    @Column(nullable = false, unique = true, length = 255)
+    @Column(nullable = false, unique = true)
     private String nickname;
 
     @Setter
@@ -42,7 +40,7 @@ public class UserAccount extends BaseEntity implements UserDetails {
 
 
     @Setter
-    @Column(nullable = true, length = 20)
+    @Column(length = 20)
     private String mbti;
 
     @Setter
@@ -50,7 +48,6 @@ public class UserAccount extends BaseEntity implements UserDetails {
     private String gender;
 
     @Setter
-    @Column(nullable = true)
     private Boolean deleted;
 
     @Setter
@@ -59,24 +56,46 @@ public class UserAccount extends BaseEntity implements UserDetails {
     @Setter
     private LocalDateTime recentLogin;
 
+    @Setter
+    private String role;
 
-    @OneToMany(mappedBy = "userAccount", fetch = FetchType.EAGER)
+    @Setter
+    private String social;
+
+    @OneToMany(mappedBy = "userAccount", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ToString.Exclude @Setter
+    private List<Interest> interests;
+
+    @OneToMany(mappedBy = "userAccount",fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ToString.Exclude @Setter
+    private List<Question> questions;
+
+    @OneToMany(mappedBy = "receiver",fetch = FetchType.LAZY)
     @ToString.Exclude
-    private final Set<Interest> interests = new LinkedHashSet<>();
+    private List<LikesUnlikes> likesUnlikes;
 
-    @OneToMany(mappedBy = "userAccount",fetch = FetchType.EAGER)
-    @ToString.Exclude
-    private final Set<Question> questions = new LinkedHashSet<>();
-
-    @OneToMany(mappedBy = "receiver",fetch = FetchType.EAGER)
-    @ToString.Exclude
-    private final Set<LikesUnlikes> likesUnlikes = new LinkedHashSet<>();
-
-    @ManyToMany(mappedBy = "users")
-    private final Set<ChatRoom> chatRooms = new LinkedHashSet<>();
+    @ManyToMany(mappedBy = "users", fetch = FetchType.LAZY)
+    private List<ChatRoom> chatRooms;
 
 
     protected UserAccount(){}
+
+    private UserAccount(String userId, String userPassword, String nickname, String region, String mbti, String gender,Boolean deleted, String selfIntroduction, LocalDateTime recentLogin, String role) {
+        this.userId = userId;
+        this.userPassword = userPassword;
+        this.nickname = nickname;
+        this.region = region;
+        this.mbti = mbti;
+        this.gender = gender;
+        this.deleted = deleted;
+        this.selfIntroduction = selfIntroduction;
+        this.recentLogin = recentLogin;
+        this.role = role;
+    }
+
+    public static UserAccount of(String userId, String userPassword, String nickname, String region, String mbti, String gender, Boolean deleted, String selfIntroduction, LocalDateTime recentLogin, String role) {
+        return new UserAccount(userId, userPassword, nickname, region, mbti, gender,deleted, selfIntroduction, recentLogin, role);
+    }
 
     private UserAccount(String userId, String userPassword, String nickname, String region, String mbti, String gender, String selfIntroduction) {
         this.userId = userId;
@@ -91,11 +110,10 @@ public class UserAccount extends BaseEntity implements UserDetails {
         return new UserAccount(userId, userPassword, nickname, region, mbti, gender, selfIntroduction);
     }
 
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof UserAccount)) return false;
+        if (o == null || getClass() != o.getClass()) return false;
         UserAccount that = (UserAccount) o;
         return Objects.equals(id, that.id);
     }
@@ -103,40 +121,5 @@ public class UserAccount extends BaseEntity implements UserDetails {
     @Override
     public int hashCode() {
         return Objects.hash(id);
-    }
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
-    }
-
-    @Override
-    public String getPassword() {
-        return userPassword;
-    }
-
-    @Override
-    public String getUsername() {
-        return userId;
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return true;
     }
 }

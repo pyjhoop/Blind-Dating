@@ -1,18 +1,13 @@
 package com.blind.dating.domain;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
-import org.springframework.data.annotation.CreatedDate;
-
-import javax.persistence.*;
-import java.time.LocalDateTime;
+import jakarta.persistence.*;
+import lombok.*;
 import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;
 
 @NoArgsConstructor
+@AllArgsConstructor
 @Getter
 @ToString
 @Entity
@@ -24,12 +19,12 @@ public class ChatRoom extends BaseEntity{
 
     @Setter
     @ToString.Exclude
-   @ManyToMany(fetch = FetchType.EAGER)
-   @JoinTable(
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
            name = "user_chat_room",
            joinColumns = @JoinColumn(name = "chat_room_id"),
            inverseJoinColumns = @JoinColumn(name = "user_id")
-   )
+    )
    private Set<UserAccount> users = new LinkedHashSet<>();
 
     @Setter
@@ -43,9 +38,9 @@ public class ChatRoom extends BaseEntity{
     @Setter
     private String recentMessage;
 
-    @ToString.Exclude
+    @ToString.Exclude @Setter
     @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL)
-    private final Set<Chat> chats = new LinkedHashSet<>();
+    private Set<Chat> chats = new LinkedHashSet<>();
 
 
     @Override

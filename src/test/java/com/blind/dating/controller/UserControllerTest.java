@@ -110,6 +110,9 @@ class UserControllerTest extends ControllerTestConfig{
                                             .requestHeaders(
                                                     headerWithName("Authorization").description("Basic auth credentials")
                                             )
+                                            .requestHeaders(
+                                                    headerWithName("Authorization").description("Basic auth credentials")
+                                            )
                                             .queryParameters(
                                                     parameterWithName("page").optional().description("페이지 번호"),
                                                     parameterWithName("size").optional().description("페이지당 추천 유저 수")
@@ -216,6 +219,9 @@ class UserControllerTest extends ControllerTestConfig{
                                             .description("내정보 조회 API")
                                             .tag("User").description("내정보 조회 API")
                                             .requestFields()
+                                            .requestHeaders(
+                                                    headerWithName("Authorization").description("Basic auth credentials")
+                                            )
                                             .responseFields(
                                                     fieldWithPath("code").description("응답 코드"),
                                                     fieldWithPath("status").description("응답 상태"),
@@ -263,6 +269,9 @@ class UserControllerTest extends ControllerTestConfig{
                                             .description("내정보 조회 API")
                                             .tag("User").description("내정보 조회 API")
                                             .requestFields()
+                                            .requestHeaders(
+                                                    headerWithName("Authorization").description("Basic auth credentials")
+                                            )
                                             .responseFields(
                                                     fieldWithPath("code").description("응답 코드"),
                                                     fieldWithPath("status").description("응답 상태"),
@@ -310,6 +319,9 @@ class UserControllerTest extends ControllerTestConfig{
                                     ResourceSnippetParameters.builder()
                                             .description("내정보 수정 API")
                                             .tag("User").description("내정보 수정 API")
+                                            .requestHeaders(
+                                                    headerWithName("Authorization").description("Basic auth credentials")
+                                            )
                                             .requestFields(
                                                     fieldWithPath("region").description("사는 지역"),
                                                     fieldWithPath("mbti").description("MBTI"),
@@ -340,7 +352,7 @@ class UserControllerTest extends ControllerTestConfig{
             );
         }
 
-        @DisplayName("성공")
+        @DisplayName("실패")
         @Test
         public void givenUserInfo_WhenUpdateMyInfo_ThenReturnUnAuthorization() throws Exception {
             List<String> list = List.of("놀기","게임하기");
@@ -368,6 +380,9 @@ class UserControllerTest extends ControllerTestConfig{
                                     ResourceSnippetParameters.builder()
                                             .description("내정보 수정 API")
                                             .tag("User").description("내정보 수정 API")
+                                            .requestHeaders(
+                                                    headerWithName("Authorization").description("Basic auth credentials")
+                                            )
                                             .requestFields(
                                                     fieldWithPath("region").description("사는 지역"),
                                                     fieldWithPath("mbti").description("MBTI"),

@@ -75,7 +75,6 @@ class TokenControllerTest extends ControllerTestConfig{
                             .contentType(MediaType.APPLICATION_JSON)
                             .accept(MediaType.APPLICATION_JSON)
                             .cookie(cookie)
-                            .header("Authorization", "Bearer "+"refreshToken")
             ).andDo(
                     MockMvcRestDocumentationWrapper.document("토큰 재발급 - 성공",
                             preprocessRequest(prettyPrint()),

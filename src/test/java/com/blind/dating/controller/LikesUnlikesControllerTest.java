@@ -25,6 +25,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
+import static com.epages.restdocs.apispec.ResourceDocumentation.headerWithName;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -81,6 +82,9 @@ class LikesUnlikesControllerTest extends ControllerTestConfig{
                                     ResourceSnippetParameters.builder()
                                             .description("유저 좋아요 API")
                                             .tag("Like_Unlike").description("유저 좋아요")
+                                            .requestHeaders(
+                                                    headerWithName("Authorization").description("Basic auth credentials")
+                                            )
                                             .requestFields(
                                                     fieldWithPath("receiverId").description("상대방 유니크 번호")
                                             ).requestSchema(Schema.schema("유저 좋아요 요청"))
@@ -117,6 +121,9 @@ class LikesUnlikesControllerTest extends ControllerTestConfig{
                                     ResourceSnippetParameters.builder()
                                             .description("유저 좋아요 API")
                                             .tag("Like_Unlike").description("유저 좋아요")
+                                            .requestHeaders(
+                                                    headerWithName("Authorization").description("Basic auth credentials")
+                                            )
                                             .requestFields(
                                                     fieldWithPath("receiverId").description("상대방 유니크 번호")
                                             ).requestSchema(Schema.schema("유저 좋아요 요청"))
@@ -159,6 +166,9 @@ class LikesUnlikesControllerTest extends ControllerTestConfig{
                                     ResourceSnippetParameters.builder()
                                             .description("유저 싫어요 API")
                                             .tag("Like_Unlike").description("유저 싫어요")
+                                            .requestHeaders(
+                                                    headerWithName("Authorization").description("Basic auth credentials")
+                                            )
                                             .requestFields(
                                                     fieldWithPath("receiverId").description("상대방 유니크 번호")
                                             ).requestSchema(Schema.schema("유저 싫어요 요청"))
@@ -195,6 +205,9 @@ class LikesUnlikesControllerTest extends ControllerTestConfig{
                                     ResourceSnippetParameters.builder()
                                             .description("유저 싫어요 API")
                                             .tag("Like_Unlike").description("유저 싫어요")
+                                            .requestHeaders(
+                                                    headerWithName("Authorization").description("Basic auth credentials")
+                                            )
                                             .requestFields(
                                                     fieldWithPath("receiverId").description("상대방 유니크 번호")
                                             ).requestSchema(Schema.schema("유저 싫어요 요청"))

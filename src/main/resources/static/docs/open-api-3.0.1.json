@@ -28,7 +28,7 @@
                 },
                 "examples" : {
                   "채팅방 리스트 조회 - 성공" : {
-                    "value" : "{\r\n  \"code\" : 200,\r\n  \"status\" : \"OK\",\r\n  \"message\" : \"채팅방 리스트가 성공적으로 조회되었습니다.\",\r\n  \"data\" : [ {\r\n    \"roomId\" : 1,\r\n    \"updatedAt\" : \"2024-01-31 16:10:04\",\r\n    \"otherUserId\" : 2,\r\n    \"otherUserNickname\" : \"nick02\",\r\n    \"recentMessage\" : \"안녕 이게 최근 메시지야\",\r\n    \"unReadCount\" : 10\r\n  } ]\r\n}"
+                    "value" : "{\r\n  \"code\" : 200,\r\n  \"status\" : \"OK\",\r\n  \"message\" : \"채팅방 리스트가 성공적으로 조회되었습니다.\",\r\n  \"data\" : [ {\r\n    \"roomId\" : 1,\r\n    \"updatedAt\" : \"2024-01-31 22:55:15\",\r\n    \"otherUserId\" : 2,\r\n    \"otherUserNickname\" : \"nick02\",\r\n    \"recentMessage\" : \"안녕 이게 최근 메시지야\",\r\n    \"unReadCount\" : 10\r\n  } ]\r\n}"
                   }
                 }
               }

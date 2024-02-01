@@ -171,11 +171,14 @@ jacocoTestReport {
 							'**/security/**',
 							'**/util/**',
 							'**/handler/**',
-							'**/repository/querydsl/**'
+							'**/repository/**',
+							'**/domain/**',
+							'**/common/**'
 							// ...
 					])
 				})
 		)
+		executionData.setFrom(fileTree(dir: "${buildDir}/jacoco/testDebugUnitTest.exec"))
 	}
 }
 
@@ -194,6 +197,7 @@ jacocoTestCoverageVerification {
 				value = 'COVEREDRATIO'
 				minimum = 0.5
 			}
+
 		}
 
 	}

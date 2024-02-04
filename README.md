@@ -10,8 +10,8 @@
 
 
 ## 🛠프로젝트 아키텍처
-![dffd](https://github.com/Blind-Dating/Blind-Dating-BE/assets/59335316/86abd2cb-2bb2-4700-b08f-3e4fa97df224)
-
+![dffd](https://github.com/Blind-Dating/Blind-Dating-BE/assets/59335316/86abd2cb-2bb2-4700-b08f-3e4fa97df224) 
+ 
 
 
 

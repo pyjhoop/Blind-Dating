@@ -7,7 +7,7 @@
  - 이성을 소개해주는 블라인드 데이팅을 이용해주세요!    
 
 [👉🏻블라인드 데이팅 이용해보기 Click](https://fe-zeta.vercel.app)   
-[👉🏻 API 문서 상세보기](http://blind-dating.site:8081/docs/swagger)   
+[👉🏻 API 문서 상세보기](http://blind-dating.site/docs/swagger)   
 API 문서는 Swagger를 통해 작성되었습니다.
 
 
@@ -74,13 +74,22 @@ API 문서는 Swagger를 통해 작성되었습니다.
 조회하고자 JPQL을 작성했었고, 테스트시 MultipleBagFetchException이 발생했습니다. 해당 예외는 List 타입의 2개 이상의 엔티티를 패치조인 할때 발생하는 예외이고 이 문제를 해결하기 위해 
 BatchSize를 적용했습니다. 기본적으로 추천 유저는 페이지네이션 처리를 하였고, 한 페이지당 10명을 조회하기에 BatchSize는 10으로 정해서 MultipleBagFetchException과 N+1 문제를 해결했습니다.
 
-### 3. ElastiCache에서 요금 발생  
+### 3. Redis를 이용한 AccessToken 재발급 속도 17% 향상
+기존에 RDB에 RefreshToken을 저장한 뒤 AccessToken 재발급시에 사용했습니다. AccessToken의 만료시간이 1시간이고 프론트쪽에서 새로고침하면 토큰을 초기화시켜서 재요청 한다고 하셔서 추후에 
+RDB의 사용량이 증가할때 토큰 재발급의 속도가 느려질거라 생각했습니다. 이를 해결하기 위해 조회 속도가 빠르고 RDB와는 다른 DB를 찾게되었고, 결국 인메모리 방식의 DB인 Redis를 적용했습니다.
+RDB 평균응답 속도는 34ms, Redis 평균응답 속도는 29ms로 측정되었고, 응답속도가 17% 향상되었습니다.
+
+### 4. AWS Free tier 만료로 인해 배포 전략 수정
+AWS 서비스인 EC2, Redis, MySQL, S3, CodeDeploy를 사용했었고, 프리티어 만료로 해당 서비스를 계속 유지한다면 요금이 많이 나올것이라 생각했습니다. 기존 CI/CD는 githubAction과 S3, CodeDeploy로
+구현했다면, 지금은 홈서버를 이용해 Jenkins로 CI/CD 시스템을 구축했습니다.
+
+### 5. ElastiCache에서 요금 발생  
 AWS에서 발생한 만원 이상의 요금을 조사하기 위해 요금 명세서를 확인해 보았습니다. 결과적으로 Redis를 위한 ElastiCache에서 요금이 발생한 것을 확인할 수 있었습니다. 
 해당 서비스의 구성을 확인해 본 결과 노드의 수가 3개로 설정되어있었고, 이 3개의 노드가 24시간 동안 작동하여 기본 제공량인 750시간을 초과하면서 요금이 발생한 것을 파악했습니다.
 이에 따른 과금 문제를 해결하기 위해 노드의 수를 3개에서 1개로 줄여서 문제를 해결하였습니다.
 
 
-### 4. Post/Patch 테스트 코드 동작시 403 Forbidden 발생    
+### 6. Post/Patch 테스트 코드 동작시 403 Forbidden 발생    
 Get 테스트 코드는 잘 실행되는데 Post, Patch, Delete 테스트 코드 실행 시 csrfToken이 요청 시 주어지지 않아 403 Forbidden이 발생하는 것을 확인하였습니다.
 이에 대해 조사한 결과, @WebMvcTest는 보안 구성을 자동으로 로드하지 않는 것을 확인하였습니다. 이를 해결하기 위해 SecurityConfig 클래스를 `@Import(SecurityConfig.class)`를 추가해
 로드해주고, `csrf().disable()` 설정을 통해 csrfToken을 사용하지 않도록 함으로써 해당 문제를 해결할 수 있었습니다.

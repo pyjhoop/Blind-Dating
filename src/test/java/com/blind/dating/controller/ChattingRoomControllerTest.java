@@ -112,48 +112,7 @@ class ChattingRoomControllerTest extends ControllerTestConfig{
     @Nested
     @DisplayName("메시지 리스트 조회")
     class GetChatList{
-        @DisplayName("채팅방 메시지 리스트 조회시 채팅방 조회 실패예외 - 테스트")
-        @Test
-        @WithMockUser(username = "1")
-        void givenRoomIdAndChatId_whenEnterRoom_thenThrowException() throws Exception{
-            Authentication authentication = new UsernamePasswordAuthenticationToken("1",null);
-            given(chattingRoomService.getRoom(anyString())).willReturn(Optional.empty());
 
-            ResultActions actions = mvc.perform(
-                    RestDocumentationRequestBuilders.get("/api/chatroom/{roomId}","1")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .queryParam("page","0")
-                            .queryParam("size","30")
-                            .queryParam("chatId","2")
-                            .header("Authorization", "Bearer "+"accessToken")
-                            .principal(authentication)
-            ).andDo(
-                    MockMvcRestDocumentationWrapper.document("채팅 리스트 조회 - 실패",
-                            preprocessRequest(prettyPrint()),
-                            preprocessResponse(prettyPrint()),
-                            resource(
-                                    ResourceSnippetParameters.builder()
-                                            .description("채팅 리스트 조회 API")
-                                            .tag("Chatting Room Info").description("채팅 리스트 조회 - 실패")
-                                            .requestHeaders(
-                                                    headerWithName("Authorization").description("Basic auth credentials")
-                                            )
-                                            .queryParameters(
-                                                    parameterWithName("page").optional().description("페이지 번호"),
-                                                    parameterWithName("size").optional().description("페이지당 추천 유저 수"),
-                                                    parameterWithName("chatId").optional().description("채팅 번호")
-                                            ).requestFields()
-                                            .responseFields(
-                                                    fieldWithPath("code").description("응답 코드"),
-                                                    fieldWithPath("status").description("응답 상태"),
-                                                    fieldWithPath("message").description("응답 메시지"),
-                                                    fieldWithPath("data").description("응답 데이터")
-                                            ).responseSchema(Schema.schema("채팅 리스트 조회 실패 응답"))
-                                            .build()
-                            )
-                    )
-            ).andExpect(status().isBadRequest());
-        }
         @DisplayName("채팅방 메시지 리스트 조회 - 테스트")
         @Test
         @WithMockUser(username = "1")
@@ -165,7 +124,7 @@ class ChattingRoomControllerTest extends ControllerTestConfig{
 
             given(chattingRoomService.getRoom(anyString())).willReturn(Optional.of(chatRoom));
             given(chatService.selectChatList(any(ChatRoom.class), anyString())).willReturn(list);
-            
+
             ResultActions actions = mvc.perform(
                     RestDocumentationRequestBuilders.get("/api/chatroom/{roomId}","1")
                             .contentType(MediaType.APPLICATION_JSON)
@@ -175,13 +134,13 @@ class ChattingRoomControllerTest extends ControllerTestConfig{
                             .header("Authorization", "Bearer "+"accessToken")
                             .principal(authentication)
             ).andDo(
-                    MockMvcRestDocumentationWrapper.document("채팅 리스트 조회 - 성공",
+                    MockMvcRestDocumentationWrapper.document("메시지 리스트 조회 - 성공",
                             preprocessRequest(prettyPrint()),
                             preprocessResponse(prettyPrint()),
                             resource(
                                     ResourceSnippetParameters.builder()
-                                            .description("채팅 리스트 조회 API")
-                                            .tag("Chatting Room Info").description("채팅 리스트 조회 - 성공")
+                                            .description("메시지 리스트 조회 API")
+                                            .tag("Chatting Room Info")
                                             .requestHeaders(
                                                     headerWithName("Authorization").description("Basic auth credentials")
                                             )
@@ -214,6 +173,51 @@ class ChattingRoomControllerTest extends ControllerTestConfig{
                     )
             ).andExpect(status().isOk());
         }
+
+
+        @DisplayName("채팅방 메시지 리스트 조회시 채팅방 조회 실패예외 - 테스트")
+        @Test
+        @WithMockUser(username = "1")
+        void givenRoomIdAndChatId_whenEnterRoom_thenThrowException() throws Exception{
+            Authentication authentication = new UsernamePasswordAuthenticationToken("1",null);
+            given(chattingRoomService.getRoom(anyString())).willReturn(Optional.empty());
+
+            ResultActions actions = mvc.perform(
+                    RestDocumentationRequestBuilders.get("/api/chatroom/{roomId}","1")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .queryParam("page","0")
+                            .queryParam("size","30")
+                            .queryParam("chatId","2")
+                            .header("Authorization", "Bearer "+"accessToken")
+                            .principal(authentication)
+            ).andDo(
+                    MockMvcRestDocumentationWrapper.document("메시지 리스트 조회 - 실패",
+                            preprocessRequest(prettyPrint()),
+                            preprocessResponse(prettyPrint()),
+                            resource(
+                                    ResourceSnippetParameters.builder()
+                                            .description("메시지 리스트 조회 API")
+                                            .tag("Chatting Room Info")
+                                            .requestHeaders(
+                                                    headerWithName("Authorization").description("Basic auth credentials")
+                                            )
+                                            .queryParameters(
+                                                    parameterWithName("page").optional().description("페이지 번호"),
+                                                    parameterWithName("size").optional().description("페이지당 추천 유저 수"),
+                                                    parameterWithName("chatId").optional().description("채팅 번호")
+                                            ).requestFields()
+                                            .responseFields(
+                                                    fieldWithPath("code").description("응답 코드"),
+                                                    fieldWithPath("status").description("응답 상태"),
+                                                    fieldWithPath("message").description("응답 메시지"),
+                                                    fieldWithPath("data").description("응답 데이터")
+                                            ).responseSchema(Schema.schema("채팅 리스트 조회 실패 응답"))
+                                            .build()
+                            )
+                    )
+            ).andExpect(status().isBadRequest());
+        }
+
     }
 
 

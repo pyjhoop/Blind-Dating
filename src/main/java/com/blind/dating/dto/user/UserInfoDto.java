@@ -22,7 +22,7 @@ public class UserInfoDto {
     private List<QuestionDto> questions;
     private String selfIntroduction;
 
-    private UserInfoDto(Long id, String nickname, String region, String mbti, String gender, List<InterestDto> interests, List<QuestionDto> questions, String selfIntroduction) {
+    public UserInfoDto(Long id, String nickname, String region, String mbti, String gender, List<InterestDto> interests, List<QuestionDto> questions, String selfIntroduction) {
         this.id = id;
         this.nickname = nickname;
         this.region = region;

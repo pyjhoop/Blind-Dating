@@ -1,8 +1,10 @@
 package com.blind.dating.controller;
 
+import com.blind.dating.common.code.ResponseCode;
 import com.blind.dating.common.code.UserResponseCode;
 import com.blind.dating.domain.UserAccount;
 import com.blind.dating.common.Api;
+import com.blind.dating.dto.user.UserInfoDto;
 import com.blind.dating.dto.user.UserInfoWithPageInfo;
 import com.blind.dating.dto.user.UserUpdateRequestDto;
 import com.blind.dating.dto.user.UserWithInterestAndQuestionDto;
@@ -23,22 +25,51 @@ public class UserController {
 
     private final UserService userService;
 
-    // 유저10명 불러오기
-    @GetMapping("/user-list")
-    public ResponseEntity<?> getUserList(
+    @GetMapping("/users/all")
+    public ResponseEntity<?> getMaleAndFemaleUsers(
             Authentication authentication,
-            @PageableDefault(size = 10, sort = "recentLogin", direction = Sort.Direction.DESC) Pageable pageable
-            ){
+            @PageableDefault(size = 30, sort = "recentLogin", direction = Sort.Direction.DESC)
+            Pageable pageable
+    ){
+        Long id = Long.valueOf((String) authentication.getPrincipal());
+        Page<UserInfoDto> usersInfo = userService.getMaleAndFemaleUsers(pageable, id);
 
-        // 이성 추천 유저리스트 가져오기.
-        Page<UserWithInterestAndQuestionDto> pages = userService.getUserList(authentication,pageable);
-        UserInfoWithPageInfo content = new UserInfoWithPageInfo(pages.getNumber(), pages.getTotalPages(), pages.getContent());
+        UserInfoWithPageInfo result = new UserInfoWithPageInfo(usersInfo.getNumber(), usersInfo.getTotalPages(), usersInfo.getContent());
 
         return ResponseEntity.ok()
-                .body(Api.OK(UserResponseCode.GET_USER_LIST_SUCCESS, content));
+                .body(Api.OK(UserResponseCode.GET_USER_LIST_SUCCESS, result));
     }
 
-    @GetMapping("/user")
+    @GetMapping("/users/male")
+    public ResponseEntity<?> getMaleUsers(
+            Authentication authentication,
+            @PageableDefault(size = 30, sort = "recentLogin", direction = Sort.Direction.DESC)
+            Pageable pageable
+    ){
+        Long id = Long.valueOf((String) authentication.getPrincipal());
+        Page<UserInfoDto> usersInfo = userService.getMaleUsers(pageable, id);
+        UserInfoWithPageInfo result = new UserInfoWithPageInfo(usersInfo.getNumber(), usersInfo.getTotalPages(), usersInfo.getContent());
+
+        return ResponseEntity.ok()
+                .body(Api.OK(UserResponseCode.GET_USER_LIST_SUCCESS, result));
+    }
+
+    @GetMapping("/users/female")
+    public ResponseEntity<?> getFemaleUsers(
+            Authentication authentication,
+            @PageableDefault(size = 30, sort = "recentLogin", direction = Sort.Direction.DESC)
+            Pageable pageable
+    ){
+        Long id = Long.valueOf((String) authentication.getPrincipal());
+        Page<UserInfoDto> usersInfo = userService.getFemaleUsers(pageable, id);
+        UserInfoWithPageInfo result = new UserInfoWithPageInfo(usersInfo.getNumber(), usersInfo.getTotalPages(), usersInfo.getContent());
+
+        return ResponseEntity.ok()
+                .body(Api.OK(UserResponseCode.GET_USER_LIST_SUCCESS, result));
+    }
+
+
+    @GetMapping("/users")
     public ResponseEntity<?> getMyInfo(
             Authentication authentication
     ){
@@ -49,7 +80,7 @@ public class UserController {
                 .body(Api.OK(UserResponseCode.GET_USER_INFO_SUCCESS, userInfo));
     }
 
-    @PutMapping("/user")
+    @PutMapping("/users")
     public ResponseEntity<Api<UserWithInterestAndQuestionDto>> updateMyInfo(
             Authentication authentication
             , @RequestBody UserUpdateRequestDto dto

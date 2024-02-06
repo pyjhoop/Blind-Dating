@@ -80,116 +80,51 @@ class UserControllerTest extends ControllerTestConfig{
     @Nested
     @DisplayName("추천 유저 조회")
     class RecommendUserList {
-        @DisplayName("성공")
-        @Test
-        @WithMockUser(username = "1")
-        public void givenUserInfo_WhenSelectUserList_ThenReturnUserList() throws Exception {
-            //Given
-            UserWithInterestAndQuestionDto dto1 = UserWithInterestAndQuestionDto.of(1L,"userId1","nickname1","서울","INTP","M",interests, questions,"안녕");
-            UserWithInterestAndQuestionDto dto2 = UserWithInterestAndQuestionDto.of(2L,"userId2","nickname2","서울","INFP","W",interests, questions,"안녕");
-            Pageable pageable = Pageable.ofSize(10);
-            List<UserWithInterestAndQuestionDto> list = List.of(dto1, dto2);
-            Page<UserWithInterestAndQuestionDto> pages = new PageImpl<>(list, pageable, 2);
-
-            given(userService.getUserList(any(Authentication.class), any(Pageable.class))).willReturn(pages);
-
-            ResultActions actions = mvc.perform(
-                    RestDocumentationRequestBuilders.get("/api/user-list")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .queryParam("page","0")
-                            .queryParam("size","10")
-                            .header("Authorization", "Bearer "+"accessToken")
-            ).andDo(
-                    MockMvcRestDocumentationWrapper.document("이성 추천 받기 - 성공",
-                            preprocessRequest(prettyPrint()),
-                            preprocessResponse(prettyPrint()),
-                            resource(
-                                    ResourceSnippetParameters.builder()
-                                            .description("이성 추천받기 API")
-                                            .tag("User").description("이성 추천받기 API")
-                                            .requestHeaders(
-                                                    headerWithName("Authorization").description("Basic auth credentials")
-                                            )
-                                            .requestHeaders(
-                                                    headerWithName("Authorization").description("Basic auth credentials")
-                                            )
-                                            .queryParameters(
-                                                    parameterWithName("page").optional().description("페이지 번호"),
-                                                    parameterWithName("size").optional().description("페이지당 추천 유저 수")
-                                            ).requestFields()
-                                            .responseFields(
-                                                    fieldWithPath("code").description("응답 코드"),
-                                                    fieldWithPath("status").description("응답 상태"),
-                                                    fieldWithPath("message").description("응답 메시지"),
-                                                    fieldWithPath("data").description("응답 데이터"),
-                                                    fieldWithPath("data.pageNumber").description("페이지 번호"),
-                                                    fieldWithPath("data.totalPages").description("전체 페이지 개수"),
-                                                    fieldWithPath("data.content").description("페이지 내 추천 유저 정보"),
-                                                    fieldWithPath("data.content[].id").description("유저 유니크 번호"),
-                                                    fieldWithPath("data.content[].userId").description("유저 아이디"),
-                                                    fieldWithPath("data.content[].nickname").description("닉네임"),
-                                                    fieldWithPath("data.content[].region").description("사는 지역"),
-                                                    fieldWithPath("data.content[].mbti").description("MBTI"),
-                                                    fieldWithPath("data.content[].gender").description("성별"),
-                                                    fieldWithPath("data.content[].interests").description("관심사 리스트"),
-                                                    fieldWithPath("data.content[].interests[].id").description("관심사 아이디"),
-                                                    fieldWithPath("data.content[].interests[].interestName").description("관심사 명"),
-                                                    fieldWithPath("data.content[].questions").description("질의 답변 리스트"),
-                                                    fieldWithPath("data.content[].questions[].id").description("질의 답변 아이디"),
-                                                    fieldWithPath("data.content[].questions[].status").description("질의 답변 상태"),
-                                                    fieldWithPath("data.content[].selfIntroduction").description("자기소개")
-                                            ).responseSchema(Schema.schema("이성 추천받기 성공 응답"))
-                                            .build()
-                            )
-                    )
-            );
-            actions.andExpect(status().isOk());
-        }
-        @DisplayName("인증실패")
-        @Test
-        public void givenUserInfo_WhenSelectUserList_ThenUnAuthorized() throws Exception {
-            //Given
-            UserWithInterestAndQuestionDto dto1 = UserWithInterestAndQuestionDto.of(1L,"userId1","nickname1","서울","INTP","M",interests, questions,"안녕");
-            UserWithInterestAndQuestionDto dto2 = UserWithInterestAndQuestionDto.of(2L,"userId2","nickname2","서울","INFP","W",interests, questions,"안녕");
-            Pageable pageable = Pageable.ofSize(10);
-            List<UserWithInterestAndQuestionDto> list = List.of(dto1, dto2);
-            Page<UserWithInterestAndQuestionDto> pages = new PageImpl<>(list, pageable, 2);
-
-            given(userService.getUserList(any(Authentication.class), any(Pageable.class))).willReturn(pages);
-
-            ResultActions actions = mvc.perform(
-                    RestDocumentationRequestBuilders.get("/api/user-list")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .queryParam("page","0")
-                            .queryParam("size","10")
-                            .header("Authorization", "Bearer "+"accessToken")
-            ).andDo(
-                    MockMvcRestDocumentationWrapper.document("이성 추천 받기 - 인증실패",
-                            preprocessRequest(prettyPrint()),
-                            preprocessResponse(prettyPrint()),
-                            resource(
-                                    ResourceSnippetParameters.builder()
-                                            .description("이성 추천받기 API")
-                                            .tag("User").description("이성 추천받기 API")
-                                            .requestHeaders(
-                                                    headerWithName("Authorization").description("Basic auth credentials")
-                                            )
-                                            .queryParameters(
-                                                    parameterWithName("page").optional().description("페이지 번호"),
-                                                    parameterWithName("size").optional().description("페이지당 추천 유저 수")
-                                            ).requestFields()
-                                            .responseFields(
-                                                    fieldWithPath("code").description("응답 코드"),
-                                                    fieldWithPath("status").description("응답 상태"),
-                                                    fieldWithPath("message").description("응답 메시지"),
-                                                    fieldWithPath("data").description("응답 데이터")
-                                            ).responseSchema(Schema.schema("인증 실패 응답"))
-                                            .build()
-                            )
-                    )
-            );
-            actions.andExpect(status().is(401));
-        }
+//        @DisplayName("인증실패")
+//        @Test
+//        public void givenUserInfo_WhenSelectUserList_ThenUnAuthorized() throws Exception {
+//            //Given
+//            UserWithInterestAndQuestionDto dto1 = UserWithInterestAndQuestionDto.of(1L,"userId1","nickname1","서울","INTP","M",interests, questions,"안녕");
+//            UserWithInterestAndQuestionDto dto2 = UserWithInterestAndQuestionDto.of(2L,"userId2","nickname2","서울","INFP","W",interests, questions,"안녕");
+//            Pageable pageable = Pageable.ofSize(10);
+//            List<UserWithInterestAndQuestionDto> list = List.of(dto1, dto2);
+//            Page<UserWithInterestAndQuestionDto> pages = new PageImpl<>(list, pageable, 2);
+//
+//            given(userService.getUserList(any(Authentication.class), any(Pageable.class))).willReturn(pages);
+//
+//            ResultActions actions = mvc.perform(
+//                    RestDocumentationRequestBuilders.get("/api/user-list")
+//                            .contentType(MediaType.APPLICATION_JSON)
+//                            .queryParam("page","0")
+//                            .queryParam("size","10")
+//                            .header("Authorization", "Bearer "+"accessToken")
+//            ).andDo(
+//                    MockMvcRestDocumentationWrapper.document("이성 추천 받기 - 인증실패",
+//                            preprocessRequest(prettyPrint()),
+//                            preprocessResponse(prettyPrint()),
+//                            resource(
+//                                    ResourceSnippetParameters.builder()
+//                                            .description("이성 추천받기 API")
+//                                            .tag("User").description("이성 추천받기 API")
+//                                            .requestHeaders(
+//                                                    headerWithName("Authorization").description("Basic auth credentials")
+//                                            )
+//                                            .queryParameters(
+//                                                    parameterWithName("page").optional().description("페이지 번호"),
+//                                                    parameterWithName("size").optional().description("페이지당 추천 유저 수")
+//                                            ).requestFields()
+//                                            .responseFields(
+//                                                    fieldWithPath("code").description("응답 코드"),
+//                                                    fieldWithPath("status").description("응답 상태"),
+//                                                    fieldWithPath("message").description("응답 메시지"),
+//                                                    fieldWithPath("data").description("응답 데이터")
+//                                            ).responseSchema(Schema.schema("인증 실패 응답"))
+//                                            .build()
+//                            )
+//                    )
+//            );
+//            actions.andExpect(status().is(401));
+//        }
     }
     
 

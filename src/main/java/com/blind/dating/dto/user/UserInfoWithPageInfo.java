@@ -10,5 +10,5 @@ import java.util.List;
 public class UserInfoWithPageInfo {
     private int pageNumber;
     private int totalPages;
-    private List<UserWithInterestAndQuestionDto> content;
+    private List<UserInfoDto> content;
 }

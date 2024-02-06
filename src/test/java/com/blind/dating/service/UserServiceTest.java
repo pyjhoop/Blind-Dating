@@ -62,67 +62,8 @@ public class UserServiceTest {
     }
 
 
-    @DisplayName("남성 추천 리스트 - 테스트")
-    @Test
-    @WithMockUser(username = "1")
-    void givenRequireData_whenSelectWomanList_thenReturnUserList(){
-        //Given
-        Pageable pageable = Pageable.ofSize(10);
-        List<UserAccount> list = List.of(user2);
-        Page<UserAccount> pages = new PageImpl<>(list, pageable, 10);
 
-        UserIdWithNicknameAndGender userInfo = new UserIdWithNicknameAndGender(1L,"fd","M");
 
-        given(userAccountRepository.findById(1L)).willReturn(Optional.of(user));
-        given(userAccountRepository.recommendUser("W",1L, pageable)).willReturn(pages);
-
-        //When
-        Page<UserWithInterestAndQuestionDto> result = userService.getUserList(authentication, pageable);
-
-        //Then
-        assertThat(result).isNotNull();
-        assertThat(result.getTotalPages()).isEqualTo(1);
-
-    }
-
-    @DisplayName("여성 추천 리스트 - 테스트")
-    @Test
-    @WithMockUser(username = "1")
-    void givenRequireData_whenSelectManList_thenReturnUserList(){
-        //Given
-        Pageable pageable = Pageable.ofSize(10);
-        List<UserAccount> list = List.of(user);
-        Page<UserAccount> pages = new PageImpl<>(list, pageable, 10);
-
-        UserIdWithNicknameAndGender userInfo = new UserIdWithNicknameAndGender(2L,"nickname2","W");
-
-        given(userAccountRepository.findById(anyLong())).willReturn(Optional.of(user2));
-        given(userAccountRepository.recommendUser("M",1L, pageable)).willReturn(pages);
-
-        //When
-        Page<UserWithInterestAndQuestionDto> result = userService.getUserList(authentication, pageable);
-
-        //Then
-        assertThat(result).isNotNull();
-        assertThat(result.getTotalPages()).isEqualTo(1);
-
-    }
-
-    @DisplayName("이성 추천 리스트중 예외 - 테스트")
-    @Test
-    @WithMockUser(username = "1")
-    void givenRequireData_whenSelectManList_thenThrowException(){
-        //Given
-        given(userAccountRepository.findById(anyLong())).willReturn(Optional.empty());
-        //When
-        RuntimeException exception = assertThrows(RuntimeException.class, ()-> {
-            userService.getUserList(authentication, Pageable.ofSize(2));
-        });
-
-        //Then
-        assertEquals(exception.getMessage(),"예외 발생");
-
-    }
 
     @DisplayName("내정보 조회 - 테스트")
     @Test

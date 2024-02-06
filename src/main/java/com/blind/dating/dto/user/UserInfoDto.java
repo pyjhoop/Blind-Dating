@@ -3,19 +3,17 @@ package com.blind.dating.dto.user;
 import com.blind.dating.domain.UserAccount;
 import com.blind.dating.dto.interest.InterestDto;
 import com.blind.dating.dto.question.QuestionDto;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Data
 @NoArgsConstructor
-public class UserWithInterestAndQuestionDto {
-
+public class UserInfoDto {
     private Long id;
-    private String userId;
     private String nickname;
     private String region;
     private String mbti;
@@ -24,9 +22,8 @@ public class UserWithInterestAndQuestionDto {
     private List<QuestionDto> questions;
     private String selfIntroduction;
 
-private UserWithInterestAndQuestionDto(Long id, String userId, String nickname, String region, String mbti, String gender, List<InterestDto> interests, List<QuestionDto> questions, String selfIntroduction) {
+    private UserInfoDto(Long id, String nickname, String region, String mbti, String gender, List<InterestDto> interests, List<QuestionDto> questions, String selfIntroduction) {
         this.id = id;
-        this.userId = userId;
         this.nickname = nickname;
         this.region = region;
         this.mbti = mbti;
@@ -35,14 +32,10 @@ private UserWithInterestAndQuestionDto(Long id, String userId, String nickname, 
         this.questions = questions;
         this.selfIntroduction = selfIntroduction;
     }
-    public static UserWithInterestAndQuestionDto of(Long id, String userId, String nickname, String region, String mbti, String gender, List<InterestDto> interests, List<QuestionDto> questions, String selfIntroduction) {
-        return new UserWithInterestAndQuestionDto(id, userId, nickname, region, mbti, gender, interests, questions, selfIntroduction);
-    }
 
-    public static UserWithInterestAndQuestionDto from(UserAccount user) {
-        return new UserWithInterestAndQuestionDto(
+    public static UserInfoDto From(UserAccount user) {
+        return new UserInfoDto(
                 user.getId(),
-                user.getUserId(),
                 user.getNickname(),
                 user.getRegion(),
                 user.getMbti(),
@@ -52,7 +45,6 @@ private UserWithInterestAndQuestionDto(Long id, String userId, String nickname, 
                 user.getSelfIntroduction()
         );
     }
-
 
 
 }

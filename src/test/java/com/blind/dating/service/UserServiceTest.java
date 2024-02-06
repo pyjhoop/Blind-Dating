@@ -4,6 +4,7 @@ import com.blind.dating.domain.Interest;
 import com.blind.dating.domain.Question;
 import com.blind.dating.domain.UserAccount;
 import com.blind.dating.dto.user.UserIdWithNicknameAndGender;
+import com.blind.dating.dto.user.UserInfoDto;
 import com.blind.dating.dto.user.UserUpdateRequestDto;
 import com.blind.dating.dto.user.UserWithInterestAndQuestionDto;
 import com.blind.dating.repository.InterestRepository;
@@ -61,70 +62,59 @@ public class UserServiceTest {
         authentication = new UsernamePasswordAuthenticationToken("1",user.getUserPassword());
     }
 
-
-    @DisplayName("남성 추천 리스트 - 테스트")
+    @DisplayName("성별 상관없이 유저 조회")
     @Test
     @WithMockUser(username = "1")
-    void givenRequireData_whenSelectWomanList_thenReturnUserList(){
-        //Given
-        Pageable pageable = Pageable.ofSize(10);
-        List<UserAccount> list = List.of(user2);
-        Page<UserAccount> pages = new PageImpl<>(list, pageable, 10);
+    void givenId_whenGetMaleAndFemaleUsers_thenReturnUsers() {
+        // Given
+        Long id = 1L;
+        Pageable pageable = Pageable.ofSize(2);
+        Page<UserAccount> page = new PageImpl<>(List.of(user,user2));
+        given(userAccountRepository.findAllByIdNot(id, pageable)).willReturn(page);
 
-        UserIdWithNicknameAndGender userInfo = new UserIdWithNicknameAndGender(1L,"fd","M");
+        // When
+        Page<UserInfoDto> result = userService.getMaleAndFemaleUsers(pageable, id);
 
-        given(userAccountRepository.findById(1L)).willReturn(Optional.of(user));
-        given(userAccountRepository.recommendUser("W",1L, pageable)).willReturn(pages);
-
-        //When
-        Page<UserWithInterestAndQuestionDto> result = userService.getUserList(authentication, pageable);
-
-        //Then
-        assertThat(result).isNotNull();
-        assertThat(result.getTotalPages()).isEqualTo(1);
-
+        // Then
+        assertThat(result.getContent().get(0)).hasFieldOrPropertyWithValue("nickname",user.getNickname());
+        assertThat(result.getContent().get(1)).hasFieldOrPropertyWithValue("nickname",user2.getNickname());
     }
 
-    @DisplayName("여성 추천 리스트 - 테스트")
+    @DisplayName("남성 유저 조회")
     @Test
     @WithMockUser(username = "1")
-    void givenRequireData_whenSelectManList_thenReturnUserList(){
-        //Given
-        Pageable pageable = Pageable.ofSize(10);
-        List<UserAccount> list = List.of(user);
-        Page<UserAccount> pages = new PageImpl<>(list, pageable, 10);
+    void givenId_whenGetMaleUsers_thenReturnUsers() {
+        // Given
+        Long id = 1L;
+        Pageable pageable = Pageable.ofSize(1);
+        Page<UserAccount> page = new PageImpl<>(List.of(user));
+        given(userAccountRepository.findAllByIdNotAndGender(id,"M" ,pageable)).willReturn(page);
 
-        UserIdWithNicknameAndGender userInfo = new UserIdWithNicknameAndGender(2L,"nickname2","W");
+        // When
+        Page<UserInfoDto> result = userService.getMaleUsers(pageable, id);
 
-        given(userAccountRepository.findById(anyLong())).willReturn(Optional.of(user2));
-        given(userAccountRepository.recommendUser("M",1L, pageable)).willReturn(pages);
-
-        //When
-        Page<UserWithInterestAndQuestionDto> result = userService.getUserList(authentication, pageable);
-
-        //Then
-        assertThat(result).isNotNull();
-        assertThat(result.getTotalPages()).isEqualTo(1);
-
+        // Then
+        assertThat(result.getContent().get(0)).hasFieldOrPropertyWithValue("nickname",user.getNickname());
     }
 
-    @DisplayName("이성 추천 리스트중 예외 - 테스트")
+    @DisplayName("여성 유저 조회")
     @Test
     @WithMockUser(username = "1")
-    void givenRequireData_whenSelectManList_thenThrowException(){
-        //Given
-        given(userAccountRepository.findById(anyLong())).willReturn(Optional.empty());
-        //When
-        RuntimeException exception = assertThrows(RuntimeException.class, ()-> {
-            userService.getUserList(authentication, Pageable.ofSize(2));
-        });
+    void givenId_whenGetFemaleUsers_thenReturnUsers() {
+        // Given
+        Long id = 1L;
+        Pageable pageable = Pageable.ofSize(1);
+        Page<UserAccount> page = new PageImpl<>(List.of(user2));
+        given(userAccountRepository.findAllByIdNotAndGender(id, "W",pageable)).willReturn(page);
 
-        //Then
-        assertEquals(exception.getMessage(),"예외 발생");
+        // When
+        Page<UserInfoDto> result = userService.getFemaleUsers(pageable, id);
 
+        // Then
+        assertThat(result.getContent().get(0)).hasFieldOrPropertyWithValue("nickname",user2.getNickname());
     }
 
-    @DisplayName("내정보 조회 - 테스트")
+    @DisplayName("내정보 조회 성공")
     @Test
     @WithMockUser(username = "1")
     void givenUser_whenGetMyInfo_thenReturnUserInfo(){
@@ -139,7 +129,7 @@ public class UserServiceTest {
         assertThat(result).hasFieldOrPropertyWithValue("userId","user01");
     }
 
-    @DisplayName("내정보 조회 - 테스트")
+    @DisplayName("내정보 조회시 예외발생")
     @Test
     @WithMockUser(username = "1")
     void givenUser_whenGetMyInfo_thenThrowException(){
@@ -157,7 +147,7 @@ public class UserServiceTest {
 
 
 
-    @DisplayName("내 정보 수정하기 - 테스트")
+    @DisplayName("내 정보 수정하기 성공")
     @Test
     @WithMockUser(username = "1")
     void givenUser_whenUpdateMyInfo_thenReturnUserInfo(){
@@ -182,7 +172,7 @@ public class UserServiceTest {
         assertThat(result).hasFieldOrPropertyWithValue("userId","user01");
     }
 
-    @DisplayName("내 정보 수정중에 예외 발생 - 테스트")
+    @DisplayName("내 정보 수정시 예외발생")
     @Test
     @WithMockUser(username = "1")
     void givenUser_whenUpdateMyInfo_thenThrowException(){
@@ -200,7 +190,7 @@ public class UserServiceTest {
     }
 
 
-    @DisplayName("특정 유저 조회하기 - 테스트")
+    @DisplayName("특정 유저 조회 성공")
     @Test
     @WithMockUser(username = "1")
     void givenUserId_whenSelectUserAccount_thenReturnUserAccount(){

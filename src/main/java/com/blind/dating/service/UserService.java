@@ -4,6 +4,7 @@ import com.blind.dating.domain.Interest;
 import com.blind.dating.domain.Question;
 import com.blind.dating.domain.UserAccount;
 import com.blind.dating.dto.user.UserIdWithNicknameAndGender;
+import com.blind.dating.dto.user.UserInfoDto;
 import com.blind.dating.dto.user.UserUpdateRequestDto;
 import com.blind.dating.dto.user.UserWithInterestAndQuestionDto;
 import com.blind.dating.repository.InterestRepository;
@@ -28,29 +29,34 @@ public class UserService {
 
     private final UserAccountRepository userAccountRepository;
     private final InterestRepository interestRepository;
-    private final UserAccountRedisRepository userAccountRedisRepository;
-
-    /**
-     * 이성 추천리스트 조회
-     * @param authentication
-     * @param pageable
-     * @return Page<UserAccount>
-     */
-    public Page<UserWithInterestAndQuestionDto> getUserList(Authentication authentication, Pageable pageable){
-        String userId = (String) authentication.getPrincipal();
-        UserAccount user = userAccountRepository.findById(Long.valueOf(userId))
-                .orElseThrow(() -> new RuntimeException("예외 발생"));
-        Page<UserAccount> users;
-        if(user.getGender().equals("M")){
-            users = userAccountRepository.recommendUser("W",Long.valueOf(userId), pageable);
-        }else{
-            users = userAccountRepository.recommendUser("M",Long.valueOf(userId), pageable);
-        }
-
-
-        return users.map(UserWithInterestAndQuestionDto::from);
-
+    // 최근 로그인 순으로 나를 제외한 전체 유저 30명 조회
+    @Transactional(readOnly = true)
+    public Page<UserInfoDto> getMaleAndFemaleUsers(
+            Pageable pageable,
+            Long id
+    ){
+        Page<UserAccount> users = userAccountRepository.findAllByIdNot(id, pageable);
+        return users.map(UserInfoDto::From);
     }
+    // 최근 로그인 순으로 나를 제외한 남성 유저 30명 조회
+    @Transactional(readOnly = true)
+    public Page<UserInfoDto> getMaleUsers(
+            Pageable pageable,
+            Long id
+    ){
+        Page<UserAccount> users = userAccountRepository.findAllByIdNotAndGender(id, "M" ,pageable);
+        return users.map(UserInfoDto::From);
+    }
+    // 최근 로그인 순으로 나를 제외한 여성 유저 30명 조회
+    @Transactional(readOnly = true)
+    public Page<UserInfoDto> getFemaleUsers(
+            Pageable pageable,
+            Long id
+    ){
+        Page<UserAccount> users = userAccountRepository.findAllByIdNotAndGender(id, "W" ,pageable);
+        return users.map(UserInfoDto::From);
+    }
+
 
     /**
      * 내 정보 조회하기

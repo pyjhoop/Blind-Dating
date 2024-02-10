@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.OptionalInt;
 
 @Service
 @RequiredArgsConstructor
@@ -30,8 +31,8 @@ public class LikesUnlikesService {
         Long receiver = Long.parseLong(receiverId);
 
         //이미 좋아요 눌렀는지 확인부터 해야지
-        likesUnlikesRepository.findByUserId(userId)
-                .orElseThrow(()-> new RuntimeException("이미 좋아요한 유저입니다."));
+        Optional<LikesUnlikes> likes =  likesUnlikesRepository.findByUserId(userId);
+        if(likes.isPresent()) throw new RuntimeException("이미 좋아요한 유저입니다.");
 
         // receiverId로 유저가 존재하는지 조회
         UserAccount receiverAccount = userAccountRepository.findById(receiver)

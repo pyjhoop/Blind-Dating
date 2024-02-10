@@ -26,17 +26,21 @@ public class LikesUnlikesService {
 
     @Transactional
     public Boolean likeUser(Authentication authentication, String receiverId){
-        String userId = (String) authentication.getPrincipal();
+        Long userId = Long.valueOf((String) authentication.getPrincipal());
         Long receiver = Long.parseLong(receiverId);
+
+        //이미 좋아요 눌렀는지 확인부터 해야지
+        likesUnlikesRepository.findByUserId(userId)
+                .orElseThrow(()-> new RuntimeException("이미 좋아요한 유저입니다."));
 
         // receiverId로 유저가 존재하는지 조회
         UserAccount receiverAccount = userAccountRepository.findById(receiver)
                 .orElseThrow(() -> new RuntimeException("존재하지 않는 계정입니다."));
 
         // like 저장
-        likesUnlikesRepository.save(LikesUnlikes.of(Long.valueOf(userId),receiverAccount, true));
+        likesUnlikesRepository.save(LikesUnlikes.of(userId,receiverAccount, true));
 
-        UserAccount userAccount = userAccountRepository.findById(Long.valueOf(userId))
+        UserAccount userAccount = userAccountRepository.findById(userId)
                 .orElseThrow(()-> new RuntimeException("존재하지 않는 계정입니다."));
 
         // receiverId를 가진 유저가 나를 이미 좋아요 눌렀는지 확인 후 좋아요 눌렀으면 채팅 방 생성하기.

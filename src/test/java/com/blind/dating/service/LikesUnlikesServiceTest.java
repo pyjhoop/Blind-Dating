@@ -54,7 +54,6 @@ class LikesUnlikesServiceTest {
     @Test
     void givenUserIdAndReceiverId_whenLikeUser_thenSaveLikes(){
         //Given
-        given(likesUnlikesRepository.findByUserId(1L)).willReturn(Optional.of(new LikesUnlikes()));
         given(userAccountRepository.findById(Long.parseLong(receiverId))).willReturn(Optional.of(receiverAccount));
         given(likesUnlikesRepository.save(any(LikesUnlikes.class))).willReturn(new LikesUnlikes());
         given(userAccountRepository.findById(Long.parseLong(userId))).willReturn(Optional.of(senderAccount));
@@ -72,7 +71,6 @@ class LikesUnlikesServiceTest {
     @Test
     void givenUserIdAndReceiverId_whenLikeUser_thenSaveLikesAndChatRoom() {
         // Given
-        given(likesUnlikesRepository.findByUserId(1L)).willReturn(Optional.of(new LikesUnlikes()));
         given(userAccountRepository.findById(2L)).willReturn(Optional.of(receiverAccount));
         given(likesUnlikesRepository.save(any(LikesUnlikes.class))).willReturn(new LikesUnlikes());
         given(userAccountRepository.findById(1L)).willReturn(Optional.of(senderAccount));
@@ -93,7 +91,6 @@ class LikesUnlikesServiceTest {
     void givenUserIdAndReceiverId_whenLikeUser_thenThrowException() {
         // Given
         Long receiverId = 2L;
-        given(likesUnlikesRepository.findByUserId(1L)).willReturn(Optional.of(new LikesUnlikes()));
         given(userAccountRepository.findById(receiverId)).willReturn(Optional.empty());
 
         // When
@@ -110,7 +107,6 @@ class LikesUnlikesServiceTest {
     @Test
     void givenUserIdAndReceiverId_whenLikeUser_thenThrowException2(){
         //Given
-        given(likesUnlikesRepository.findByUserId(1L)).willReturn(Optional.of(new LikesUnlikes()));
         given(userAccountRepository.findById(Long.parseLong(receiverId))).willReturn(Optional.of(receiverAccount));
         given(likesUnlikesRepository.save(any(LikesUnlikes.class))).willReturn(new LikesUnlikes());
         given(userAccountRepository.findById(Long.parseLong(userId))).willReturn(Optional.empty());

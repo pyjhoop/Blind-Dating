@@ -26,4 +26,10 @@ public class Api<T> {
                 data);
     }
 
+    public static <T> Api<T> ERROR(ResponseCode code) {
+        return new Api<T>(
+            code.getCode(), code.getStatus(), code.getMessage(), null
+        );
+    }
+
 }

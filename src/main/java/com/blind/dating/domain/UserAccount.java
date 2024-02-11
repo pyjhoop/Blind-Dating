@@ -78,6 +78,7 @@ public class UserAccount extends BaseEntity{
     private List<ChatRoom> chatRooms;
 
 
+
     protected UserAccount(){}
 
     private UserAccount(String userId, String userPassword, String nickname, String region, String mbti, String gender,Boolean deleted, String selfIntroduction, LocalDateTime recentLogin, String role) {

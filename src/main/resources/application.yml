@@ -2,6 +2,8 @@ server:
   port: 8081
 
 spring:
+  profiles:
+    active: local
   # 테스트 환경에서의 db
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver

@@ -1,8 +1,10 @@
 package com.blind.dating.service;
 
+import com.blind.dating.common.code.ChattingRoomResponseCode;
 import com.blind.dating.domain.ChatRoom;
 import com.blind.dating.domain.UserAccount;
 import com.blind.dating.dto.chat.ChatRoomDto;
+import com.blind.dating.exception.ApiException;
 import com.blind.dating.repository.ChattingRoomRepository;
 import com.blind.dating.repository.UserAccountRepository;
 import lombok.RequiredArgsConstructor;
@@ -42,7 +44,7 @@ public class ChattingRoomService {
     public List<ChatRoomDto> getRooms(Long userId){
 
         UserAccount user = userAccountRepository.findById(userId)
-                .orElseThrow(()-> new RuntimeException("채팅방 조회시 내 정보가 제대로 조회되지 않았습니다. 다시 요청해 주세요"));
+                .orElseThrow(()-> new ApiException(ChattingRoomResponseCode.GET_ROOMS_FAIL));
 
         List<ChatRoom> chatRooms = chatRoomRepository.findAllByUsersAndStatusOrderByUpdatedAtDesc(user, true);
 
@@ -70,7 +72,7 @@ public class ChattingRoomService {
     public Boolean leaveChatRoom(String roomId, String userId){
 
         ChatRoom chatRoom = chatRoomRepository.findById(Long.valueOf(roomId))
-                .orElseThrow(()-> new RuntimeException("채팅방 조회중 예외가 발생했습니다."));
+                .orElseThrow(()-> new ApiException(ChattingRoomResponseCode.GET_ROOMS_FAIL));
 
         if(!chatRoom.getStatus()){
             chatRoomRepository.delete(chatRoom);

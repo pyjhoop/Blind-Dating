@@ -3,6 +3,7 @@ package com.blind.dating.service;
 import com.blind.dating.common.code.ResponseCode;
 import com.blind.dating.domain.UserAccount;
 import com.blind.dating.dto.user.*;
+import com.blind.dating.exception.ApiException;
 import com.blind.dating.repository.RefreshTokenRepository;
 import com.blind.dating.repository.UserAccountRedisRepository;
 import com.blind.dating.repository.UserAccountRepository;
@@ -44,7 +45,7 @@ public class UserAccountService {
         // 아이디 존재하는지 체크
         String userId = dto.getUserId();
         if(userAccountRepository.existsByUserId(userId)){
-            throw new RuntimeException("UserId already exists");
+            throw new ApiException(UserResponseCode.EXIST_USER_ID);
         }
         // 유저 저장하기
         UserAccount user = dto.toRegisterEntity(bCryptPasswordEncoder.encode(dto.getUserPassword()));
@@ -66,7 +67,7 @@ public class UserAccountService {
 
         //userId로 유저 정보 가져오기
         UserAccount user = userAccountRepository.findByUserId(userId)
-                .orElseThrow(()-> new RuntimeException("유저정보를 조회할 수 없습니다."));
+                .orElseThrow(()-> new ApiException(UserResponseCode.LOGIN_FAIL));
         user.setRecentLogin(LocalDateTime.now());
 
         // 비밀번호 맞는지 확인하기.

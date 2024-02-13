@@ -1,10 +1,13 @@
 package com.blind.dating.service;
 
+import com.blind.dating.common.code.TokenResponseCode;
+import com.blind.dating.common.code.UserResponseCode;
 import com.blind.dating.domain.UserAccount;
 import com.blind.dating.dto.user.LogInResponse;
 import com.blind.dating.dto.user.TokenDto;
 import com.blind.dating.dto.user.UserIdRequestDto;
 import com.blind.dating.dto.user.UserInfoWithTokens;
+import com.blind.dating.exception.ApiException;
 import com.blind.dating.repository.RefreshTokenRepository;
 import com.blind.dating.repository.UserAccountRepository;
 import com.blind.dating.security.TokenProvider;
@@ -33,7 +36,7 @@ public class TokenService {
         String userId = tokenProvider.validateAndGetUserId(cookie.getValue());
         String refreshToken = refreshTokenRepository.getRefreshToken(userId);
 
-        if(refreshToken == null) throw new RuntimeException("조회된 리프레쉬 토큰이 없습니다.");
+        if(refreshToken == null) throw new ApiException(TokenResponseCode.NOT_FOUND_REFRESH_TOKEN);
         return userId;
     }
 
@@ -45,7 +48,7 @@ public class TokenService {
     @Transactional
     public LogInResponse updateRefreshToken(String userId){
         UserAccount user = userAccountRepository.findById(Long.valueOf(userId))
-                .orElseThrow(() -> new RuntimeException(userId+"에 해당하는 유저는 존재하지 않습니다."));
+                .orElseThrow(() -> new ApiException(TokenResponseCode.NOT_FOUND_REFRESH_TOKEN));
 
         String accessToken = tokenProvider.create(user);
         String refreshToken = tokenProvider.refreshToken(user);

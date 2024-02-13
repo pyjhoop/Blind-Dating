@@ -1,5 +1,6 @@
 package com.blind.dating.service;
 
+import com.blind.dating.common.code.UserResponseCode;
 import com.blind.dating.domain.Interest;
 import com.blind.dating.domain.Question;
 import com.blind.dating.domain.UserAccount;
@@ -7,6 +8,7 @@ import com.blind.dating.dto.user.UserIdWithNicknameAndGender;
 import com.blind.dating.dto.user.UserInfoDto;
 import com.blind.dating.dto.user.UserUpdateRequestDto;
 import com.blind.dating.dto.user.UserWithInterestAndQuestionDto;
+import com.blind.dating.exception.ApiException;
 import com.blind.dating.repository.InterestRepository;
 import com.blind.dating.repository.UserAccountRedisRepository;
 import com.blind.dating.repository.UserAccountRepository;
@@ -58,33 +60,22 @@ public class UserService {
     }
 
 
-    /**
-     * 내 정보 조회하기
-     * @param authentication
-     * @return UserAccount
-     */
     public UserWithInterestAndQuestionDto getMyInfo(Authentication authentication){
         String userId = (String) authentication.getPrincipal();
 
         UserAccount user = userAccountRepository.findById(Long.valueOf(userId))
-                .orElseThrow(()-> new RuntimeException("내정보 조회에 실패했습니다."));
+                .orElseThrow(()-> new ApiException(UserResponseCode.GET_USER_INFO_FAIL));
 
         return UserWithInterestAndQuestionDto.from(user);
     }
 
-    /**
-     * 내 정보 수정하기.
-     * @param authentication
-     * @param dto
-     * @return UserAccount
-     */
     @Transactional
     public UserAccount updateMyInfo(Authentication authentication, UserUpdateRequestDto dto){
 
         String userId = (String) authentication.getPrincipal();
 
         UserAccount user = userAccountRepository.findById(Long.valueOf(userId))
-                .orElseThrow(() -> new RuntimeException("유저정보 조회중에 예외가 발생했습니다."));
+                .orElseThrow(() -> new ApiException(UserResponseCode.UPDATE_USER_INFO_FAIL));
         // 유저 정보 저장하기
         user.setRegion(dto.getRegion());
         user.setMbti(dto.getMbti());

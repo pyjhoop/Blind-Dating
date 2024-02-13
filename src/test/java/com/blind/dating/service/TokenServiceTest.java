@@ -1,10 +1,12 @@
 package com.blind.dating.service;
 
+import com.blind.dating.common.code.TokenResponseCode;
 import com.blind.dating.domain.Interest;
 import com.blind.dating.domain.Question;
 import com.blind.dating.domain.UserAccount;
 import com.blind.dating.dto.user.LogInResponse;
 import com.blind.dating.dto.user.UserInfoWithTokens;
+import com.blind.dating.exception.ApiException;
 import com.blind.dating.repository.RefreshTokenRepository;
 import com.blind.dating.repository.UserAccountRepository;
 import com.blind.dating.security.TokenProvider;
@@ -57,11 +59,11 @@ class TokenServiceTest {
         given(tokenProvider.validateAndGetUserId(cookie.getValue())).willReturn("1");
         given(refreshTokenRepository.getRefreshToken("1")).willReturn(null);
 
-        RuntimeException exception = assertThrows(RuntimeException.class, ()->{
+        ApiException exception = assertThrows(ApiException.class, ()->{
             tokenService.validRefreshToken(cookie);
         });
 
-        assertThat(exception.getMessage()).isEqualTo("조회된 리프레쉬 토큰이 없습니다.");
+        assertThat(exception.getResponseCode()).isEqualTo(TokenResponseCode.NOT_FOUND_REFRESH_TOKEN);
     }
 
 
@@ -93,11 +95,11 @@ class TokenServiceTest {
         given(userAccountRepository.findById(1L)).willReturn(Optional.empty());
 
         // When
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+        ApiException exception = assertThrows(ApiException.class, () -> {
             tokenService.updateRefreshToken("1");
         });
 
-        assertThat(exception.getMessage()).isEqualTo("1에 해당하는 유저는 존재하지 않습니다.");
+        assertThat(exception.getResponseCode()).isEqualTo(TokenResponseCode.NOT_FOUND_REFRESH_TOKEN);
     }
 
 

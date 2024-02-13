@@ -91,7 +91,6 @@ class UserControllerTest extends ControllerTestConfig{
             Long id = 1L;
             Pageable pageable = PageRequest.of(0, 1);
             Page<UserInfoDto> page = new PageImpl<>(List.of(dto), pageable,1L);
-            System.out.println(">>"+page.getContent());
 
             given(userService.getMaleAndFemaleUsers(any(Pageable.class), anyLong())).willReturn(page);
 

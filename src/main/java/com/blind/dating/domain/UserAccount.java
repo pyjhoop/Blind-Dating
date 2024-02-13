@@ -70,10 +70,6 @@ public class UserAccount extends BaseEntity{
     @ToString.Exclude @Setter
     private List<Question> questions;
 
-    @OneToMany(mappedBy = "receiver",fetch = FetchType.LAZY)
-    @ToString.Exclude
-    private List<LikesUnlikes> likesUnlikes;
-
     @ManyToMany(mappedBy = "users", fetch = FetchType.LAZY)
     private List<ChatRoom> chatRooms;
 

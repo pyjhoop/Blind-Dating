@@ -1,5 +1,6 @@
 package com.blind.dating.service;
 
+import com.blind.dating.common.code.UserResponseCode;
 import com.blind.dating.domain.Interest;
 import com.blind.dating.domain.Question;
 import com.blind.dating.domain.UserAccount;
@@ -7,6 +8,7 @@ import com.blind.dating.dto.user.UserIdWithNicknameAndGender;
 import com.blind.dating.dto.user.UserInfoDto;
 import com.blind.dating.dto.user.UserUpdateRequestDto;
 import com.blind.dating.dto.user.UserWithInterestAndQuestionDto;
+import com.blind.dating.exception.ApiException;
 import com.blind.dating.repository.InterestRepository;
 import com.blind.dating.repository.UserAccountRedisRepository;
 import com.blind.dating.repository.UserAccountRepository;
@@ -137,12 +139,12 @@ public class UserServiceTest {
         given(userAccountRepository.findById(1L)).willReturn(Optional.empty());
 
         //When
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+        ApiException exception = assertThrows(ApiException.class, () -> {
             userService.getMyInfo(authentication);
         });
 
         //Then
-        assertThat(exception.getMessage()).isEqualTo("내정보 조회에 실패했습니다.");
+        assertThat(exception.getResponseCode()).isEqualTo(UserResponseCode.GET_USER_INFO_FAIL);
     }
 
 
@@ -181,12 +183,12 @@ public class UserServiceTest {
         UserUpdateRequestDto dto = new UserUpdateRequestDto();
 
         //When
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+        ApiException exception = assertThrows(ApiException.class, () -> {
             UserAccount result = userService.updateMyInfo(authentication, dto);
         });
 
         //Then
-        assertThat(exception.getMessage()).isEqualTo("유저정보 조회중에 예외가 발생했습니다.");
+        assertThat(exception.getResponseCode()).isEqualTo(UserResponseCode.UPDATE_USER_INFO_FAIL);
     }
 
 

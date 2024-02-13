@@ -1,8 +1,10 @@
 package com.blind.dating.service;
 
+import com.blind.dating.common.code.ChattingRoomResponseCode;
 import com.blind.dating.domain.ChatRoom;
 import com.blind.dating.domain.UserAccount;
 import com.blind.dating.dto.chat.ChatRoomDto;
+import com.blind.dating.exception.ApiException;
 import com.blind.dating.repository.ChattingRoomRepository;
 import com.blind.dating.repository.UserAccountRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -78,12 +80,12 @@ class ChattingRoomServiceTest {
         given(userAccountRepository.findById(anyLong())).willReturn(Optional.empty());
 
         // When
-        RuntimeException exception = assertThrows(RuntimeException.class, ()->{
+        ApiException exception = assertThrows(ApiException.class, ()->{
             chattingRoomService.getRooms(anyLong());
         });
 
         // Then
-        assertEquals(exception.getMessage(), "채팅방 조회시 내 정보가 제대로 조회되지 않았습니다. 다시 요청해 주세요");
+        assertThat(exception.getResponseCode()).isEqualTo(ChattingRoomResponseCode.GET_ROOMS_FAIL);
 
     }
 
@@ -152,12 +154,12 @@ class ChattingRoomServiceTest {
         given(chattingRoomRepository.findById(1L)).willReturn(Optional.empty());
 
         // When
-        RuntimeException exception = assertThrows(RuntimeException.class, ()-> {
+        ApiException exception = assertThrows(ApiException.class, ()-> {
             chattingRoomService.leaveChatRoom("1", "1");
         });
 
         // Then
-        assertThat(exception.getMessage()).isEqualTo("채팅방 조회중 예외가 발생했습니다.");
+        assertThat(exception.getResponseCode()).isEqualTo(ChattingRoomResponseCode.GET_ROOMS_FAIL);
     }
 
 

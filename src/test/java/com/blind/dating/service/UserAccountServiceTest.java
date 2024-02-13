@@ -7,6 +7,7 @@ import com.blind.dating.domain.Question;
 import com.blind.dating.domain.UserAccount;
 import com.blind.dating.dto.user.LogInResponse;
 import com.blind.dating.dto.user.UserRequestDto;
+import com.blind.dating.exception.ApiException;
 import com.blind.dating.repository.RefreshTokenRepository;
 import com.blind.dating.repository.UserAccountRedisRepository;
 import com.blind.dating.repository.UserAccountRepository;
@@ -104,12 +105,12 @@ class UserAccountServiceTest {
         given(userAccountRepository.existsByUserId(dto.getUserId())).willReturn(true);// 존재 x
 
         //when
-        RuntimeException exception = assertThrows(RuntimeException.class, ()-> {
+        ApiException exception = assertThrows(ApiException.class, ()-> {
             UserAccount info = userAccountService.register(dto);
         });
 
         //then
-        assertThat(exception.getMessage()).isEqualTo("UserId already exists");
+        assertThat(exception.getResponseCode()).isEqualTo(UserResponseCode.EXIST_USER_ID);
 
     }
 
@@ -158,12 +159,12 @@ class UserAccountServiceTest {
         given(userAccountRepository.findByUserId(anyString())).willReturn(Optional.empty());
 
         // When
-        RuntimeException exception = assertThrows(RuntimeException.class, ()-> {
+        ApiException exception = assertThrows(ApiException.class, ()-> {
             userAccountService.getLoginInfo("user01", "pass01");
         });
 
         // Then
-        assertThat(exception.getMessage()).isEqualTo("유저정보를 조회할 수 없습니다.");
+        assertThat(exception.getResponseCode()).isEqualTo(UserResponseCode.LOGIN_FAIL);
 
 
     }

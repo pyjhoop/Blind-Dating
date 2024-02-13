@@ -1,9 +1,11 @@
 package com.blind.dating.service;
 
+import com.blind.dating.common.code.ChatResponseCode;
 import com.blind.dating.domain.Chat;
 import com.blind.dating.domain.ChatRoom;
 import com.blind.dating.domain.ReadChat;
 import com.blind.dating.dto.chat.ChatRequestDto;
+import com.blind.dating.exception.ApiException;
 import com.blind.dating.repository.ChatRepository;
 import com.blind.dating.repository.ChattingRoomRepository;
 import com.blind.dating.repository.ReadChatRepository;
@@ -136,12 +138,12 @@ class ChatServiceTest {
         given(readChatRepository.findByChatRoomAndUserId(chatRoom, 1L)).willReturn(Optional.empty());
 
         //When
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+        ApiException exception = assertThrows(ApiException.class, () -> {
             Long result = chatService.unreadChat(1L,chatRoom);
         });
 
         //Then
-        assertThat(exception.getMessage()).isEqualTo("안읽은 메세지 개수 반환 중에 예외 발생");
+        assertThat(exception.getResponseCode()).isEqualTo(ChatResponseCode.READ_CHAT_NOT_FOUND);
     }
 
 }

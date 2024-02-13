@@ -13,5 +13,5 @@ import java.util.List;
 
 public interface ChattingRoomRepository extends JpaRepository<ChatRoom, Long> {
 
-    List<ChatRoom> findAllByUsersAndStatusOrderByUpdatedAtDesc(UserAccount userAccount, Boolean status);
+//    List<ChatRoom> findAllByUsersAndStatusOrderByUpdatedAtDesc(UserAccount userAccount, Boolean status);
 }

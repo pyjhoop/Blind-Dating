@@ -12,7 +12,7 @@ spring:
     password: ${PASSWORD}
 
   jpa:
-    hibernate.ddl-auto: update
+    hibernate.ddl-auto: create
     #defer-datasource-initialization: true  # 파일로 테스트 데이터 베이스를 만들수 있게 해준다. 리소스안에 data.sql파일 만듬.
     show-sql: true
     properties:

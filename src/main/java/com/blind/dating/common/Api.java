@@ -26,6 +26,14 @@ public class Api<T> {
                 data);
     }
 
+    public static <T> Api<T> OK(ResponseCode responseCode){
+        return new Api<T>(
+                responseCode.getCode(),
+                responseCode.getStatus(),
+                responseCode.getMessage(),
+                null);
+    }
+
     public static <T> Api<T> ERROR(ResponseCode code) {
         return new Api<T>(
             code.getCode(), code.getStatus(), code.getMessage(), null

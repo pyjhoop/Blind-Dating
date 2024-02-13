@@ -21,6 +21,7 @@ public class UserAccount extends BaseEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "userAccountId")
     private Long id;
 
     @Setter
@@ -69,10 +70,6 @@ public class UserAccount extends BaseEntity{
     @OneToMany(mappedBy = "userAccount",fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @ToString.Exclude @Setter
     private List<Question> questions;
-
-    @ManyToMany(mappedBy = "users", fetch = FetchType.LAZY)
-    private List<ChatRoom> chatRooms;
-
 
 
     protected UserAccount(){}

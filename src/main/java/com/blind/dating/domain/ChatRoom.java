@@ -3,6 +3,7 @@ package com.blind.dating.domain;
 import jakarta.persistence.*;
 import lombok.*;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -15,17 +16,12 @@ public class ChatRoom extends BaseEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "chatRoomId")
     private Long id;
 
+    @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL)
     @Setter
-    @ToString.Exclude
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(
-           name = "user_chat_room",
-           joinColumns = @JoinColumn(name = "chat_room_id"),
-           inverseJoinColumns = @JoinColumn(name = "user_id")
-    )
-   private Set<UserAccount> users = new LinkedHashSet<>();
+    private List<UserChatRoom> userChatRooms;
 
     @Setter
     @OneToMany(mappedBy = "chatRoom")
@@ -38,10 +34,10 @@ public class ChatRoom extends BaseEntity{
     @Setter
     private String recentMessage;
 
-    @ToString.Exclude @Setter
-    @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL)
-    private Set<Chat> chats = new LinkedHashSet<>();
-
+    public ChatRoom(Boolean status, String recentMessage) {
+        this.status = status;
+        this.recentMessage = recentMessage;
+    }
 
     @Override
     public boolean equals(Object o) {

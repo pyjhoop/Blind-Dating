@@ -26,40 +26,36 @@ public class ChattingRoomService {
     private final ChatService chatService;
     private final UserAccountRepository userAccountRepository;
 
-    public ChatRoom create(UserAccount user1, UserAccount user2){
-       ChatRoom room = new ChatRoom();
-       room.getUsers().add(user1);
-       room.getUsers().add(user2);
+//    public ChatRoom create(UserAccount user1, UserAccount user2){
+//       ChatRoom room = new ChatRoom();
+//       room.getUsers().add(user1);
+//       room.getUsers().add(user2);
+//
+//        return chatRoomRepository.save(room);
+//
+//    }
 
-        return chatRoomRepository.save(room);
 
-    }
-
-    /**
-     * 현재 내가 참여하고 있는 채팅방 조회 서비스
-     * @param userId
-     * @return List<ChatRoomDto></ChatRoomDto>
-     */
-    @Transactional
-    public List<ChatRoomDto> getRooms(Long userId){
-
-        UserAccount user = userAccountRepository.findById(userId)
-                .orElseThrow(()-> new ApiException(ChattingRoomResponseCode.GET_ROOMS_FAIL));
-
-        List<ChatRoom> chatRooms = chatRoomRepository.findAllByUsersAndStatusOrderByUpdatedAtDesc(user, true);
-
-        return chatRooms.stream().map(room -> {
-            Set<UserAccount> users = room.getUsers();
-            UserAccount other = users.stream().filter(
-                    it -> !it.equals(user)
-            ).collect(Collectors.toList()).get(0);
-
-            // 채팅방에서 읽지 않은 채팅 개수 조회
-            Long unReadCount = chatService.unreadChat(userId, room);
-            // 상대방 정보 조회하기
-            return ChatRoomDto.From(other, room, unReadCount);
-        }).collect(Collectors.toList());
-    }
+//    @Transactional
+//    public List<ChatRoomDto> getRooms(Long userId){
+//
+//        UserAccount user = userAccountRepository.findById(userId)
+//                .orElseThrow(()-> new ApiException(ChattingRoomResponseCode.GET_ROOMS_FAIL));
+//
+//        List<ChatRoom> chatRooms = chatRoomRepository.findAllByUsersAndStatusOrderByUpdatedAtDesc(user, true);
+//
+//        return chatRooms.stream().map(room -> {
+//            Set<UserAccount> users = room.getUsers();
+//            UserAccount other = users.stream().filter(
+//                    it -> !it.equals(user)
+//            ).collect(Collectors.toList()).get(0);
+//
+//            // 채팅방에서 읽지 않은 채팅 개수 조회
+//            Long unReadCount = chatService.unreadChat(userId, room);
+//            // 상대방 정보 조회하기
+//            return ChatRoomDto.From(other, room, unReadCount);
+//        }).collect(Collectors.toList());
+//    }
 
     public Optional<ChatRoom> getRoom(String roomId){
 

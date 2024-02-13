@@ -73,7 +73,7 @@ class PostControllerTest extends ControllerTestConfig{
     @BeforeEach
     void setting() {
         request = new PostRequestDto("제목이야", "내용이야");
-        user = new UserAccount(1L, "userId","password","nickname","서울","INTP","M",false,"하이요",null, Role.USER.getValue(),"K",null,null,null,null);
+        user = new UserAccount(1L, "userId","password","nickname","서울","INTP","M",false,"하이요",null, Role.USER.getValue(),"K",null,null,null);
         post = new Post(1L, user, "제목이야", "내용이야", 0L, 0L);
         post.setCreatedAt(LocalDateTime.now());
         authentication = new UsernamePasswordAuthenticationToken("1",null);

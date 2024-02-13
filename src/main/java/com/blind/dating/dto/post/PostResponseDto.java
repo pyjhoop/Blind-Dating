@@ -8,6 +8,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -24,6 +26,7 @@ public class PostResponseDto {
     private Long hit;
 
     private Long view;
+    private LocalDate createdAt;
 
 
 
@@ -34,7 +37,8 @@ public class PostResponseDto {
                 post.getTitle(),
                 post.getContent(),
                 post.getHit(),
-                post.getView()
+                post.getView(),
+                post.getCreatedAt().toLocalDate()
         );
     }
 }

@@ -1,9 +1,11 @@
 package com.blind.dating.service;
 
+import com.blind.dating.common.code.ChatResponseCode;
 import com.blind.dating.domain.Chat;
 import com.blind.dating.domain.ChatRoom;
 import com.blind.dating.domain.ReadChat;
 import com.blind.dating.dto.chat.ChatRequestDto;
+import com.blind.dating.exception.ApiException;
 import com.blind.dating.repository.ChatRepository;
 import com.blind.dating.repository.ChattingRoomRepository;
 import com.blind.dating.repository.ReadChatRepository;
@@ -37,7 +39,8 @@ public class ChatService {
     @Transactional
     public Chat saveChat(ChatRequestDto dto){
         // 속한 방번호를 통해 최근 메세지를 업데이트 후에 chat 저장하기
-        ChatRoom room = chattingRoomRepository.findById(Long.valueOf(dto.getChatRoomId())).get();
+        ChatRoom room = chattingRoomRepository.findById(Long.valueOf(dto.getChatRoomId()))
+                        .orElseThrow(()-> new ApiException(ChatResponseCode.CHAT_NOT_FOUND));
         room.setRecentMessage(dto.getMessage());
         return chatRepository.save(Chat.of(room,Long.valueOf(dto.getWriterId()),dto.getMessage()));
     }
@@ -49,7 +52,7 @@ public class ChatService {
         Long listSize = (long) list.size();
 
         ReadChat readChat = readChatRepository.findByChatRoomAndUserId(chatRoom, userId)
-                .orElseThrow(()-> new RuntimeException("안읽은 메세지 개수 반환 중에 예외 발생"));
+                .orElseThrow(()-> new ApiException(ChatResponseCode.READ_CHAT_NOT_FOUND));
 
         if(readChat.getChatId() == 0){
             return listSize;

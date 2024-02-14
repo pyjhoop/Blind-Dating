@@ -6,10 +6,12 @@ import com.blind.dating.domain.Question;
 import com.blind.dating.domain.Role;
 import com.blind.dating.domain.UserAccount;
 import com.blind.dating.dto.interest.InterestDto;
+import com.blind.dating.dto.post.PostResponseDto;
 import com.blind.dating.dto.question.QuestionDto;
 import com.blind.dating.dto.user.UserInfoDto;
 import com.blind.dating.dto.user.UserUpdateRequestDto;
 import com.blind.dating.dto.user.UserWithInterestAndQuestionDto;
+import com.blind.dating.exception.ApiException;
 import com.blind.dating.repository.UserAccountRedisRepository;
 import com.blind.dating.security.TokenProvider;
 import com.blind.dating.service.UserService;
@@ -28,28 +30,34 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 import static com.epages.restdocs.apispec.ResourceDocumentation.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doThrow;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @DisplayName("UserController -테스트")
 @WebMvcTest(UserController.class)
 @Import(SecurityConfig.class)
-@AutoConfigureMockMvc(addFilters = false)
 class UserControllerTest extends ControllerTestConfig{
 
     @Autowired
@@ -70,7 +78,7 @@ class UserControllerTest extends ControllerTestConfig{
 
     @BeforeEach
     void setUp(){
-        user = new UserAccount(1L,"userId","userPassword","nickname","서울","INTP","M",false, "안녕", LocalDateTime.now(), Role.USER.getValue(),null,null,null,null,null);
+        user = new UserAccount(1L,"userId","userPassword","nickname","서울","INTP","M",false, "안녕", LocalDateTime.now(), Role.USER.getValue(),null,null,null);
         user.setQuestions(List.of(new Question()));
         user.setInterests(List.of(new Interest()));
         authentication = new UsernamePasswordAuthenticationToken("1",user.getUserPassword());
@@ -79,6 +87,7 @@ class UserControllerTest extends ControllerTestConfig{
         questions = List.of(new QuestionDto(1L,true), new QuestionDto(2L, false),
                 new QuestionDto(3L, true));
         dto = new UserInfoDto(1L, "nickname1","서울","INTP","M", interests, questions, "하이요");
+
     }
 
     @Nested
@@ -86,28 +95,27 @@ class UserControllerTest extends ControllerTestConfig{
     class MaleAndFemaleUser {
         @DisplayName("조회 성공")
         @Test
-        void testGetMaileAndFemaleUsers() throws Exception {
+        @WithMockUser(username = "1", password = "", roles = "USER")
+        void testGetMaileAndFemaleUsersThenReturn200() throws Exception {
             // Given
-            Long id = 1L;
             Pageable pageable = PageRequest.of(0, 1);
             Page<UserInfoDto> page = new PageImpl<>(List.of(dto), pageable,1L);
 
-            given(userService.getMaleAndFemaleUsers(any(Pageable.class), anyLong())).willReturn(page);
+            given(userService.getMaleAndFemaleUsers(any(Pageable.class), any(Authentication.class))).willReturn(page);
 
             ResultActions actions = mvc.perform(
                     RestDocumentationRequestBuilders.get("/api/users/all")
                             .contentType(MediaType.APPLICATION_JSON)
                             .accept(MediaType.APPLICATION_JSON)
-                            .principal(authentication)
                             .header("Authorization", "Bearer "+"accessToken")
             ).andDo(
-                    MockMvcRestDocumentationWrapper.document("전체유저 조회 - 성공",
+                    MockMvcRestDocumentationWrapper.document("전체 유저 조회 - 성공",
                             preprocessRequest(prettyPrint()),
                             preprocessResponse(prettyPrint()),
                             resource(
                                     ResourceSnippetParameters.builder()
-                                            .description("남성과 여성을 최근 로그인한 순으로 조회한다.")
-                                            .tag("User").summary("전체 유저 조회 API")
+                                            .description("남성과 여성을 조회한다.")
+                                            .tag("User").summary("남성과 여성 추천 유저 조회 API")
                                             .requestFields()
                                             .requestHeaders(
                                                     headerWithName("Authorization").description("Basic auth credentials")
@@ -132,11 +140,90 @@ class UserControllerTest extends ControllerTestConfig{
                                                     fieldWithPath("data.content[].questions[].id").description("질의 답변 아이디"),
                                                     fieldWithPath("data.content[].questions[].status").description("질의 답변 상태"),
                                                     fieldWithPath("data.content[].selfIntroduction").description("자기소개")
-                                            ).responseSchema(Schema.schema("전체 유저정보 조회")).build()
+                                            ).responseSchema(Schema.schema("유저 리스트 조회")).build()
                             )
                     )
             );
             actions.andExpect(status().isOk());
+        }
+
+        @DisplayName("인증 실패")
+        @Test
+        void testGetMaileAndFemaleUsersThenReturn401() throws Exception {
+            // Given
+            Pageable pageable = PageRequest.of(0, 1);
+            Page<UserInfoDto> page = new PageImpl<>(List.of(dto), pageable,1L);
+
+            given(userService.getMaleAndFemaleUsers(any(Pageable.class), any(Authentication.class))).willReturn(page);
+
+            ResultActions actions = mvc.perform(
+                    RestDocumentationRequestBuilders.get("/api/users/all")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .accept(MediaType.APPLICATION_JSON)
+                            .header("Authorization", "Bearer "+"accessToken")
+            ).andDo(
+                    MockMvcRestDocumentationWrapper.document("전체 유저 조회 - 인증 실패",
+                            preprocessRequest(prettyPrint()),
+                            preprocessResponse(prettyPrint()),
+                            resource(
+                                    ResourceSnippetParameters.builder()
+                                            .description("유저 조회시 인증 실패")
+                                            .tag("User").summary("남성과 여성 추천 유저 조회 API")
+                                            .requestFields()
+                                            .requestHeaders(
+                                                    headerWithName("Authorization").description("Basic auth credentials")
+                                            )
+                                            .responseFields(
+                                                    fieldWithPath("code").description("응답 코드"),
+                                                    fieldWithPath("status").description("응답 상태"),
+                                                    fieldWithPath("message").description("응답 메시지"),
+                                                    fieldWithPath("data").description("응답 데이터")
+                                            ).responseSchema(Schema.schema("유저 리스트 조회 실패")).build()
+                            )
+                    )
+            );
+            actions.andExpect(status().is(401));
+        }
+
+        @DisplayName("서버 에러")
+        @Test
+        @WithMockUser(username = "1", password = "", roles = "USER")
+        void testGetMaileAndFemaleUsersThenReturn500() throws Exception {
+            // Given
+            Pageable pageable = PageRequest.of(0, 1);
+            Page<UserInfoDto> page = new PageImpl<>(List.of(dto), pageable,1L);
+
+
+            given(userService.getMaleAndFemaleUsers(any(Pageable.class), any(Authentication.class)))
+                    .willThrow(new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error"));
+
+            ResultActions actions = mvc.perform(
+                    RestDocumentationRequestBuilders.get("/api/users/all")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .accept(MediaType.APPLICATION_JSON)
+                            .header("Authorization", "Bearer "+"accessToken")
+            ).andDo(
+                    MockMvcRestDocumentationWrapper.document("전체 유저 조회 - 서버 에러",
+                            preprocessRequest(prettyPrint()),
+                            preprocessResponse(prettyPrint()),
+                            resource(
+                                    ResourceSnippetParameters.builder()
+                                            .description("추천 유저 조회시 서버 에러")
+                                            .tag("User").summary("남성과 여성 추천 유저 조회 API")
+                                            .requestFields()
+                                            .requestHeaders(
+                                                    headerWithName("Authorization").description("Basic auth credentials")
+                                            )
+                                            .responseFields(
+                                                    fieldWithPath("code").description("응답 코드"),
+                                                    fieldWithPath("status").description("응답 상태"),
+                                                    fieldWithPath("message").description("응답 메시지"),
+                                                    fieldWithPath("data").description("응답 데이터")
+                                            ).responseSchema(Schema.schema("유저 리스트 조회 실패")).build()
+                            )
+                    )
+            );
+            actions.andExpect(status().is(500));
         }
     }
 
@@ -145,20 +232,19 @@ class UserControllerTest extends ControllerTestConfig{
     class MaleUser {
         @DisplayName("조회 성공")
         @Test
-        void testGetMaileUsers() throws Exception {
+        @WithMockUser(username = "1", password = "", roles = "USER")
+        void testGetMaileUsersThenReturn200() throws Exception {
             // Given
-            Long id = 1L;
             Pageable pageable = PageRequest.of(0, 1);
             Page<UserInfoDto> page = new PageImpl<>(List.of(dto), pageable,1L);
-            System.out.println(">>"+page.getNumber());
 
-            given(userService.getMaleUsers(any(Pageable.class), anyLong())).willReturn(page);
+            given(userService.getMaleUsers(any(Pageable.class), any(Authentication.class))).willReturn(page);
+
 
             ResultActions actions = mvc.perform(
                     RestDocumentationRequestBuilders.get("/api/users/male")
                             .contentType(MediaType.APPLICATION_JSON)
                             .accept(MediaType.APPLICATION_JSON)
-                            .principal(authentication)
                             .header("Authorization", "Bearer "+"accessToken")
             ).andDo(
                     MockMvcRestDocumentationWrapper.document("남성 유저 조회 - 성공",
@@ -192,12 +278,93 @@ class UserControllerTest extends ControllerTestConfig{
                                                     fieldWithPath("data.content[].questions[].id").description("질의 답변 아이디"),
                                                     fieldWithPath("data.content[].questions[].status").description("질의 답변 상태"),
                                                     fieldWithPath("data.content[].selfIntroduction").description("자기소개")
-                                            ).responseSchema(Schema.schema("전체 유저정보 조회")).build()
+                                            ).responseSchema(Schema.schema("유저 리스트 조회")).build()
                             )
                     )
             );
             actions.andExpect(status().isOk());
         }
+
+        @DisplayName("인증 실패")
+        @Test
+        void testGetMaileUsersThenReturn401() throws Exception {
+            // Given
+            Pageable pageable = PageRequest.of(0, 1);
+            Page<UserInfoDto> page = new PageImpl<>(List.of(dto), pageable,1L);
+
+            given(userService.getMaleUsers(any(Pageable.class), any(Authentication.class))).willReturn(page);
+
+
+            ResultActions actions = mvc.perform(
+                    RestDocumentationRequestBuilders.get("/api/users/male")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .accept(MediaType.APPLICATION_JSON)
+                            .header("Authorization", "Bearer "+"accessToken")
+            ).andDo(
+                    MockMvcRestDocumentationWrapper.document("남성 유저 조회 - 인증 실패",
+                            preprocessRequest(prettyPrint()),
+                            preprocessResponse(prettyPrint()),
+                            resource(
+                                    ResourceSnippetParameters.builder()
+                                            .description("남성을 최근 로그인 한 순으로 조회한다.")
+                                            .tag("User").summary("남성 유저조회 API")
+                                            .requestFields()
+                                            .requestHeaders(
+                                                    headerWithName("Authorization").description("Basic auth credentials")
+                                            )
+                                            .responseFields(
+                                                    fieldWithPath("code").description("응답 코드"),
+                                                    fieldWithPath("status").description("응답 상태"),
+                                                    fieldWithPath("message").description("응답 메시지"),
+                                                    fieldWithPath("data").description("응답 데이터")
+                                            ).responseSchema(Schema.schema("유저 리스트 조회 실패")).build()
+                            )
+                    )
+            );
+            actions.andExpect(status().is(401));
+        }
+
+        @DisplayName("서버 에러")
+        @Test
+        @WithMockUser(username = "1", password = "", roles = "USER")
+        void testGetMaileUsersThenReturn500() throws Exception {
+            // Given
+            Pageable pageable = PageRequest.of(0, 1);
+            Page<UserInfoDto> page = new PageImpl<>(List.of(dto), pageable,1L);
+
+            given(userService.getMaleUsers(any(Pageable.class), any(Authentication.class)))
+                    .willThrow(new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error"));
+
+            ResultActions actions = mvc.perform(
+                    RestDocumentationRequestBuilders.get("/api/users/male")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .accept(MediaType.APPLICATION_JSON)
+                            .header("Authorization", "Bearer "+"accessToken")
+            ).andDo(
+                    MockMvcRestDocumentationWrapper.document("남성 유저 조회 - 서버 에러",
+                            preprocessRequest(prettyPrint()),
+                            preprocessResponse(prettyPrint()),
+                            resource(
+                                    ResourceSnippetParameters.builder()
+                                            .description("남성을 최근 로그인 한 순으로 조회한다.")
+                                            .tag("User").summary("남성 유저조회 API")
+                                            .requestFields()
+                                            .requestHeaders(
+                                                    headerWithName("Authorization").description("Basic auth credentials")
+                                            )
+                                            .responseFields(
+                                                    fieldWithPath("code").description("응답 코드"),
+                                                    fieldWithPath("status").description("응답 상태"),
+                                                    fieldWithPath("message").description("응답 메시지"),
+                                                    fieldWithPath("data").description("응답 데이터")
+                                            ).responseSchema(Schema.schema("유저 리스트 조회 실패")).build()
+                            )
+                    )
+            );
+            actions.andExpect(status().is(500));
+        }
+
+
     }
 
     @Nested
@@ -205,21 +372,19 @@ class UserControllerTest extends ControllerTestConfig{
     class FemaleUser {
         @DisplayName("조회 성공")
         @Test
-        void testGetFemaleUsers() throws Exception {
+        @WithMockUser(username = "1", password = "", roles = "USER")
+        void testGetFemaleUsersThen200() throws Exception {
             // Given
-            Long id = 1L;
             Pageable pageable = PageRequest.of(0, 1);
             dto.setGender("W");
             Page<UserInfoDto> page = new PageImpl<>(List.of(dto), pageable,1L);
-            System.out.println(">>"+page.getContent());
 
-            given(userService.getFemaleUsers(any(Pageable.class), anyLong())).willReturn(page);
+            given(userService.getFemaleUsers(any(Pageable.class), any(Authentication.class))).willReturn(page);
 
             ResultActions actions = mvc.perform(
                     RestDocumentationRequestBuilders.get("/api/users/female")
                             .contentType(MediaType.APPLICATION_JSON)
                             .accept(MediaType.APPLICATION_JSON)
-                            .principal(authentication)
                             .header("Authorization", "Bearer "+"accessToken")
             ).andDo(
                     MockMvcRestDocumentationWrapper.document("여성 유저 조회 - 성공",
@@ -253,11 +418,89 @@ class UserControllerTest extends ControllerTestConfig{
                                                     fieldWithPath("data.content[].questions[].id").description("질의 답변 아이디"),
                                                     fieldWithPath("data.content[].questions[].status").description("질의 답변 상태"),
                                                     fieldWithPath("data.content[].selfIntroduction").description("자기소개")
-                                            ).responseSchema(Schema.schema("전체 유저정보 조회")).build()
+                                            ).responseSchema(Schema.schema("유저 리스트 조회")).build()
                             )
                     )
             );
             actions.andExpect(status().isOk());
+        }
+
+        @DisplayName("인증 실패")
+        @Test
+        void testGetFemaleUsersThen401() throws Exception {
+            // Given
+            dto.setGender("W");
+            Pageable pageable = PageRequest.of(0, 1);
+            Page<UserInfoDto> page = new PageImpl<>(List.of(dto), pageable,1L);
+
+            given(userService.getFemaleUsers(any(Pageable.class), any(Authentication.class))).willReturn(page);
+
+            ResultActions actions = mvc.perform(
+                    RestDocumentationRequestBuilders.get("/api/users/female")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .accept(MediaType.APPLICATION_JSON)
+                            .header("Authorization", "Bearer "+"accessToken")
+            ).andDo(
+                    MockMvcRestDocumentationWrapper.document("여성 유저 조회 - 인증 실패",
+                            preprocessRequest(prettyPrint()),
+                            preprocessResponse(prettyPrint()),
+                            resource(
+                                    ResourceSnippetParameters.builder()
+                                            .description("여성을 최근 로그인 한 순으로 조회한다.")
+                                            .tag("User").summary("여성 유저조회 API")
+                                            .requestFields()
+                                            .requestHeaders(
+                                                    headerWithName("Authorization").description("Basic auth credentials")
+                                            )
+                                            .responseFields(
+                                                    fieldWithPath("code").description("응답 코드"),
+                                                    fieldWithPath("status").description("응답 상태"),
+                                                    fieldWithPath("message").description("응답 메시지"),
+                                                    fieldWithPath("data").description("응답 데이터")
+                                            ).responseSchema(Schema.schema("유저 리스트 조회 실패")).build()
+                            )
+                    )
+            );
+            actions.andExpect(status().is(401));
+        }
+        @DisplayName("서버 에러")
+        @Test
+        @WithMockUser(username = "1", password = "", roles = "USER")
+        void testGetFemaleUsersThenReturn500() throws Exception {
+            // Given
+            Pageable pageable = PageRequest.of(0, 1);
+            Page<UserInfoDto> page = new PageImpl<>(List.of(dto), pageable,1L);
+
+            given(userService.getFemaleUsers(any(Pageable.class), any(Authentication.class)))
+                    .willThrow(new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error"));
+
+            ResultActions actions = mvc.perform(
+                    RestDocumentationRequestBuilders.get("/api/users/female")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .accept(MediaType.APPLICATION_JSON)
+                            .header("Authorization", "Bearer "+"accessToken")
+            ).andDo(
+                    MockMvcRestDocumentationWrapper.document("여성 유저 조회 - 서버 에러",
+                            preprocessRequest(prettyPrint()),
+                            preprocessResponse(prettyPrint()),
+                            resource(
+                                    ResourceSnippetParameters.builder()
+                                            .description("여성을 최근 로그인 한 순으로 조회한다.")
+                                            .tag("User").summary("여성 유저조회 API")
+                                            .requestFields()
+                                            .requestHeaders(
+                                                    headerWithName("Authorization").description("Basic auth credentials")
+                                            )
+                                            .responseFields(
+                                                    fieldWithPath("code").description("응답 코드"),
+                                                    fieldWithPath("status").description("응답 상태"),
+                                                    fieldWithPath("message").description("응답 메시지"),
+                                                    fieldWithPath("data").description("응답 데이터")
+                                            ).responseSchema(Schema.schema("유저 리스트 조회 실패")).build()
+                            )
+                    )
+            );
+            actions.andExpect(status().is(500));
         }
     }
 
@@ -269,8 +512,8 @@ class UserControllerTest extends ControllerTestConfig{
     class GetMyInfo{
         @DisplayName("성공")
         @Test
-        @WithMockUser(username = "1")
-        public void givenUserInfo_WhenSelectMyInfo_ThenReturnMyInfo() throws Exception {
+        @WithMockUser(username = "1", password = "", roles = "USER")
+        public void testGetMyInfoThen200() throws Exception {
             //Given
             UserWithInterestAndQuestionDto dto1 = UserWithInterestAndQuestionDto.of(1L,"userId1","nickname1","서울","INTP","M",interests, questions,"안녕");
             given(userService.getMyInfo(any(Authentication.class))).willReturn(dto1);
@@ -280,7 +523,6 @@ class UserControllerTest extends ControllerTestConfig{
                     RestDocumentationRequestBuilders.get("/api/users")
                             .contentType(MediaType.APPLICATION_JSON)
                             .accept(MediaType.APPLICATION_JSON)
-                            .principal(authentication)
                             .header("Authorization", "Bearer "+"accessToken")
             ).andDo(
                     MockMvcRestDocumentationWrapper.document("내정보 조회 - 성공",
@@ -288,7 +530,7 @@ class UserControllerTest extends ControllerTestConfig{
                             preprocessResponse(prettyPrint()),
                             resource(
                                     ResourceSnippetParameters.builder()
-                                            .description("내정보 조회 API")
+                                            .description("내정보 조회를 조회합니다.")
                                             .tag("User").description("내정보 조회 API")
                                             .requestFields()
                                             .requestHeaders(
@@ -319,6 +561,84 @@ class UserControllerTest extends ControllerTestConfig{
             actions.andExpect(status().isOk());
         }
 
+        @DisplayName("인증 실패")
+        @Test
+        public void testGetMyInfoThen401() throws Exception {
+            //Given
+            UserWithInterestAndQuestionDto dto1 = UserWithInterestAndQuestionDto.of(1L,"userId1","nickname1","서울","INTP","M",interests, questions,"안녕");
+            given(userService.getMyInfo(any(Authentication.class))).willReturn(dto1);
+
+            //When && Then
+            ResultActions actions = mvc.perform(
+                    RestDocumentationRequestBuilders.get("/api/users")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .accept(MediaType.APPLICATION_JSON)
+                            .header("Authorization", "Bearer "+"accessToken")
+            ).andDo(
+                    MockMvcRestDocumentationWrapper.document("내정보 조회 - 인증 실패",
+                            preprocessRequest(prettyPrint()),
+                            preprocessResponse(prettyPrint()),
+                            resource(
+                                    ResourceSnippetParameters.builder()
+                                            .description("내정보 조회를 조회합니다.")
+                                            .tag("User").description("내정보 조회 API")
+                                            .requestFields()
+                                            .requestHeaders(
+                                                    headerWithName("Authorization").description("Basic auth credentials")
+                                            )
+                                            .responseFields(
+                                                    fieldWithPath("code").description("응답 코드"),
+                                                    fieldWithPath("status").description("응답 상태"),
+                                                    fieldWithPath("message").description("응답 메시지"),
+                                                    fieldWithPath("data").description("응답 데이터")
+                                            ).responseSchema(Schema.schema("내정보 조회 실패")).build()
+                            )
+                    )
+            );
+            actions.andExpect(status().is(401));
+        }
+
+        @DisplayName("서버 에러")
+        @Test
+        @WithMockUser(username = "1", password = "", roles = "USER")
+        public void testGetMyInfoThen500() throws Exception {
+            //Given
+            UserWithInterestAndQuestionDto dto1 = UserWithInterestAndQuestionDto.of(1L,"userId1","nickname1","서울","INTP","M",interests, questions,"안녕");
+            given(userService.getMyInfo(any(Authentication.class))).willReturn(dto1);
+            given(userService.getMyInfo(any(Authentication.class)))
+                    .willThrow(new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error"));
+
+
+            //When && Then
+            ResultActions actions = mvc.perform(
+                    RestDocumentationRequestBuilders.get("/api/users")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .accept(MediaType.APPLICATION_JSON)
+                            .header("Authorization", "Bearer "+"accessToken")
+            ).andDo(
+                    MockMvcRestDocumentationWrapper.document("내정보 조회 - 서버 에러",
+                            preprocessRequest(prettyPrint()),
+                            preprocessResponse(prettyPrint()),
+                            resource(
+                                    ResourceSnippetParameters.builder()
+                                            .description("내정보 조회를 조회합니다.")
+                                            .tag("User").description("내정보 조회 API")
+                                            .requestFields()
+                                            .requestHeaders(
+                                                    headerWithName("Authorization").description("Basic auth credentials")
+                                            )
+                                            .responseFields(
+                                                    fieldWithPath("code").description("응답 코드"),
+                                                    fieldWithPath("status").description("응답 상태"),
+                                                    fieldWithPath("message").description("응답 메시지"),
+                                                    fieldWithPath("data").description("응답 데이터")
+                                            ).responseSchema(Schema.schema("내정보 조회 실패")).build()
+                            )
+                    )
+            );
+            actions.andExpect(status().is(500));
+        }
+
     }
 
 
@@ -328,8 +648,8 @@ class UserControllerTest extends ControllerTestConfig{
     class UpdateMyInfo{
         @DisplayName("성공")
         @Test
-        @WithMockUser(username = "1")
-        public void givenUserInfo_WhenUpdateMyInfo_ThenReturnMyInfo() throws Exception {
+        @WithMockUser(username = "1", password = "", roles = "USER")
+        public void testUpdateMyInfoThen200() throws Exception {
             List<String> list = List.of("놀기","게임하기");
             UserUpdateRequestDto dto = new UserUpdateRequestDto("인천","ESTP",list,"안녕하세요");
             UserWithInterestAndQuestionDto dto1 = UserWithInterestAndQuestionDto.of(1L,"userId1","nickname1","서울","INTP","M",interests, questions,"안녕");
@@ -345,7 +665,6 @@ class UserControllerTest extends ControllerTestConfig{
                     RestDocumentationRequestBuilders.put("/api/users")
                             .contentType(MediaType.APPLICATION_JSON)
                             .accept(MediaType.APPLICATION_JSON)
-                            .principal(authentication)
                             .header("Authorization", "Bearer "+"accessToken")
                             .content(objectMapper.writeValueAsString(dto))
             ).andDo(
@@ -387,6 +706,107 @@ class UserControllerTest extends ControllerTestConfig{
                             )
                     )
             );
+            actions.andExpect(status().is(200));
+        }
+
+        @DisplayName("인증 실패")
+        @Test
+        public void testUpdateMyInfoThen401() throws Exception {
+            List<String> list = List.of("놀기","게임하기");
+            UserUpdateRequestDto dto = new UserUpdateRequestDto("인천","ESTP",list,"안녕하세요");
+            UserWithInterestAndQuestionDto dto1 = UserWithInterestAndQuestionDto.of(1L,"userId1","nickname1","서울","INTP","M",interests, questions,"안녕");
+
+            List<Interest> list1 = List.of(new Interest(1L, user, "놀기"), new Interest(2L, user, "게임하기"));
+            List<Question> list2 = List.of(new Question(1L, user, true),new Question(2L, user, false));
+            user.setInterests(list1);
+            user.setQuestions(list2);
+            given(userService.updateMyInfo(any(Authentication.class), eq(dto))).willReturn(user);
+
+            //When && Then
+            ResultActions actions = mvc.perform(
+                    RestDocumentationRequestBuilders.put("/api/users")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .accept(MediaType.APPLICATION_JSON)
+                            .header("Authorization", "Bearer "+"accessToken")
+                            .content(objectMapper.writeValueAsString(dto))
+            ).andDo(
+                    MockMvcRestDocumentationWrapper.document("내정보 수정 - 인증 실패",
+                            preprocessRequest(prettyPrint()),
+                            preprocessResponse(prettyPrint()),
+                            resource(
+                                    ResourceSnippetParameters.builder()
+                                            .description("내정보 수정 API")
+                                            .tag("User").description("내정보 수정 API")
+                                            .requestHeaders(
+                                                    headerWithName("Authorization").description("Basic auth credentials")
+                                            )
+                                            .requestFields(
+                                                    fieldWithPath("region").description("사는 지역"),
+                                                    fieldWithPath("mbti").description("MBTI"),
+                                                    fieldWithPath("interests").description("관심사"),
+                                                    fieldWithPath("selfIntroduction").description("자기소개")
+                                            ).requestSchema(Schema.schema("내정보 수정 요청"))
+                                            .responseFields(
+                                                    fieldWithPath("code").description("응답 코드"),
+                                                    fieldWithPath("status").description("응답 상태"),
+                                                    fieldWithPath("message").description("응답 메시지"),
+                                                    fieldWithPath("data").description("응답 데이터")
+                                            ).responseSchema(Schema.schema("내정보 수정 실패")).build()
+                            )
+                    )
+            );
+            actions.andExpect(status().is(401));
+        }
+
+        @DisplayName("서버 오류")
+        @Test
+        @WithMockUser(username = "1", password = "", roles = "USER")
+        public void testUpdateMyInfoThen500() throws Exception {
+            List<String> list = List.of("놀기","게임하기");
+            UserUpdateRequestDto dto = new UserUpdateRequestDto("인천","ESTP",list,"안녕하세요");
+            UserWithInterestAndQuestionDto dto1 = UserWithInterestAndQuestionDto.of(1L,"userId1","nickname1","서울","INTP","M",interests, questions,"안녕");
+
+            List<Interest> list1 = List.of(new Interest(1L, user, "놀기"), new Interest(2L, user, "게임하기"));
+            List<Question> list2 = List.of(new Question(1L, user, true),new Question(2L, user, false));
+            user.setInterests(list1);
+            user.setQuestions(list2);
+            given(userService.updateMyInfo(any(Authentication.class), eq(dto)))
+                    .willThrow(new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error"));
+
+            //When && Then
+            ResultActions actions = mvc.perform(
+                    RestDocumentationRequestBuilders.put("/api/users")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .accept(MediaType.APPLICATION_JSON)
+                            .header("Authorization", "Bearer "+"accessToken")
+                            .content(objectMapper.writeValueAsString(dto))
+            ).andDo(
+                    MockMvcRestDocumentationWrapper.document("내정보 수정 - 서버 오류",
+                            preprocessRequest(prettyPrint()),
+                            preprocessResponse(prettyPrint()),
+                            resource(
+                                    ResourceSnippetParameters.builder()
+                                            .description("내정보 수정 API")
+                                            .tag("User").description("내정보 수정 API")
+                                            .requestHeaders(
+                                                    headerWithName("Authorization").description("Basic auth credentials")
+                                            )
+                                            .requestFields(
+                                                    fieldWithPath("region").description("사는 지역"),
+                                                    fieldWithPath("mbti").description("MBTI"),
+                                                    fieldWithPath("interests").description("관심사"),
+                                                    fieldWithPath("selfIntroduction").description("자기소개")
+                                            ).requestSchema(Schema.schema("내정보 수정 요청"))
+                                            .responseFields(
+                                                    fieldWithPath("code").description("응답 코드"),
+                                                    fieldWithPath("status").description("응답 상태"),
+                                                    fieldWithPath("message").description("응답 메시지"),
+                                                    fieldWithPath("data").description("응답 데이터")
+                                            ).responseSchema(Schema.schema("내정보 수정 실패")).build()
+                            )
+                    )
+            );
+            actions.andExpect(status().is(500));
         }
 
     }

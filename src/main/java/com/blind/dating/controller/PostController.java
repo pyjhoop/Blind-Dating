@@ -27,8 +27,7 @@ public class PostController {
         Authentication authentication,
         @RequestBody PostRequestDto request
     ) {
-        Long userId = Long.valueOf((String) authentication.getPrincipal());
-        PostResponseDto result = postService.createPost(userId, request);
+        PostResponseDto result = postService.createPost(authentication, request);
 
         return ResponseEntity.ok()
                 .body(Api.OK(PostResponseCode.CREATE_POST_SUCCESS, result));

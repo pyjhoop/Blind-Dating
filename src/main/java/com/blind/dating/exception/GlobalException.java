@@ -10,6 +10,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -17,6 +18,19 @@ import java.util.Map;
 @Slf4j
 @ControllerAdvice
 public class GlobalException {
+
+    @ExceptionHandler(value = ResponseStatusException.class)
+    public ResponseEntity<Api> responseStatusException(Exception e){
+
+        log.error(e+"");
+
+        return ResponseEntity.status(500)
+                .body(Api.builder()
+                        .code(500)
+                        .status("Internal Server Error")
+                        .message("Internal Server Error")
+                        .build());
+    }
 
     @ExceptionHandler(value = RuntimeException.class)
     public ResponseEntity<Api> runtimeException(Exception e){

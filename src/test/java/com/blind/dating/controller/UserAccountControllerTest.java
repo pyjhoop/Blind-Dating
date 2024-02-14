@@ -26,11 +26,15 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -42,12 +46,9 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWit
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
 
-
 @DisplayName("UserAccountController - 테스트")
 @Import(SecurityConfig.class)
 @WebMvcTest(UserAccountController.class)
-@AutoConfigureMockMvc(addFilters = false)
-@Tag("인증 관련 API")
 class UserAccountControllerTest extends ControllerTestConfig{
 
     @Autowired
@@ -62,6 +63,7 @@ class UserAccountControllerTest extends ControllerTestConfig{
     @MockBean private JwtAuthenticationFilter jwtAuthenticationFilter;
     @MockBean private CustomUserDetailsService customUserDetailsService;
     @MockBean private CookieUtil cookieUtil;
+
 
 
     private UserRequestDto dto;
@@ -138,6 +140,56 @@ class UserAccountControllerTest extends ControllerTestConfig{
                             .content(objectMapper.writeValueAsString(dto))
             ).andDo(
                     MockMvcRestDocumentationWrapper.document("userId로인한 예외발생",
+                            preprocessRequest(prettyPrint()),
+                            preprocessResponse(prettyPrint()),
+                            resource(
+                                    ResourceSnippetParameters.builder()
+                                            .description("회원가입 API")
+                                            .tag("UserAccount").description("인증 관련 API")
+                                            .requestFields(
+                                                    fieldWithPath("userId").description("유저 아이디"),
+                                                    fieldWithPath("userPassword").description("비밀번호"),
+                                                    fieldWithPath("nickname").description("닉네임"),
+                                                    fieldWithPath("region").description("사는 지역"),
+                                                    fieldWithPath("mbti").description("MBTI"),
+                                                    fieldWithPath("gender").description("성별"),
+                                                    fieldWithPath("interests").description("관심사"),
+                                                    fieldWithPath("questions").description("질문에 대한 답변"),
+                                                    fieldWithPath("selfIntroduction").description("자기소개")
+                                            ).requestSchema(Schema.schema("회원가입 요청"))
+                                            .responseFields(
+                                                    fieldWithPath("code").description("응답 코드"),
+                                                    fieldWithPath("status").description("응답 상태"),
+                                                    fieldWithPath("message").description("응답 메시지"),
+                                                    fieldWithPath("data").description("응답 데이터"),
+                                                    fieldWithPath("data.userId").description("아이디 관련 에러")
+                                            ).responseSchema(Schema.schema("회원가입 실패 응답"))
+                                            .build()
+                            )
+                    )
+
+            );
+
+            actions.andExpect(status().isBadRequest());
+
+        }
+
+        @DisplayName("서버 오류")
+        @Test
+        void givenUserRequest_whenRegister_thenServerError() throws Exception {
+            // Given
+            dto.setUserId("use");
+            given(userAccountService.register(any(UserRequestDto.class)))
+                    .willThrow(new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error"));
+
+
+            ResultActions actions = mockMvc.perform(
+                    RestDocumentationRequestBuilders.post("/api/signup")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .accept(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(dto))
+            ).andDo(
+                    MockMvcRestDocumentationWrapper.document("회원가입 - 서버 오류",
                             preprocessRequest(prettyPrint()),
                             preprocessResponse(prettyPrint()),
                             resource(
@@ -272,6 +324,45 @@ class UserAccountControllerTest extends ControllerTestConfig{
             );
             actions.andExpect(status().isBadRequest());
         }
+
+        @DisplayName("서버 오류")
+        @Test
+        void givenLoginInfo_whenLogin_thenThrowServerException() throws Exception {
+            String userId = "userId";
+            String userPassword = "userPwd";
+            LoginInputDto loginDto = new LoginInputDto(userId, userPassword);
+
+            given(userAccountService.getLoginInfo(userId, userPassword))
+                    .willThrow(new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error"));
+
+            ResultActions actions = mockMvc.perform(
+                    RestDocumentationRequestBuilders.post("/api/login")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .accept(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(loginDto))
+            ).andDo(
+                    MockMvcRestDocumentationWrapper.document("로그인 실패 - 서버 오류",
+                            preprocessRequest(prettyPrint()),
+                            preprocessResponse(prettyPrint()),
+                            resource(
+                                    ResourceSnippetParameters.builder()
+                                            .description("로그인 API")
+                                            .tag("UserAccount").description("로그인 API")
+                                            .requestFields(
+                                                    fieldWithPath("userId").description("유저 아이디"),
+                                                    fieldWithPath("userPassword").description("비밀번호")
+                                            ).requestSchema(Schema.schema("로그인 요청"))
+                                            .responseFields(
+                                                    fieldWithPath("code").description("응답 코드"),
+                                                    fieldWithPath("status").description("응답 상태"),
+                                                    fieldWithPath("message").description("응답 메시지"),
+                                                    fieldWithPath("data").description("응답 데이터")
+                                            ).responseSchema(Schema.schema("로그인 실패 응답")).build()
+                            )
+                    )
+            );
+            actions.andExpect(status().is(500));
+        }
     }
 
     @Nested
@@ -346,9 +437,43 @@ class UserAccountControllerTest extends ControllerTestConfig{
                             )
                     )
             );
-
             actions.andExpect(status().isOk());
+        }
 
+        @DisplayName("서버 오류")
+        @Test
+        void givenUserId_whenCheckUserId_thenReturn500() throws Exception {
+            // Given
+            UserIdRequestDto dto = new UserIdRequestDto("userId");
+            given(userAccountService.checkUserId(dto.getUserId()))
+                    .willThrow(new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error"));
+
+            ResultActions actions = mockMvc.perform(
+                    RestDocumentationRequestBuilders.post("/api/check-userId")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .accept(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(dto))
+            ).andDo(
+                    MockMvcRestDocumentationWrapper.document("아이디 중복체크 - 서버 오류",
+                            preprocessRequest(prettyPrint()),
+                            preprocessResponse(prettyPrint()),
+                            resource(
+                                    ResourceSnippetParameters.builder()
+                                            .description("중복아이디 체크 API")
+                                            .tag("UserAccount").description("인증 관련 API")
+                                            .requestFields(
+                                                    fieldWithPath("userId").description("유저 아이디")
+                                            ).requestSchema(Schema.schema("아이디 중복체크 요청"))
+                                            .responseFields(
+                                                    fieldWithPath("code").description("응답 코드"),
+                                                    fieldWithPath("status").description("응답 상태"),
+                                                    fieldWithPath("message").description("응답 메시지"),
+                                                    fieldWithPath("data").description("응답 데이터")
+                                            ).responseSchema(Schema.schema("중복아이디 체크 응답")).build()
+                            )
+                    )
+            );
+            actions.andExpect(status().is(500));
         }
     }
 
@@ -426,7 +551,43 @@ class UserAccountControllerTest extends ControllerTestConfig{
             );
 
             actions.andExpect(status().isOk());
+        }
 
+        @DisplayName("서버 오류")
+        @Test
+        void givenUserId_whenCheckUserId_thenReturn500() throws Exception {
+            // Given
+            UserNicknameRequestDto dto = new UserNicknameRequestDto("nickname");
+            given(userAccountService.checkNickname(dto.getNickname()))
+                    .willThrow(new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error"));
+
+            ResultActions actions = mockMvc.perform(
+                    RestDocumentationRequestBuilders.post("/api/check-nickname")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .accept(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(dto))
+            ).andDo(
+                    MockMvcRestDocumentationWrapper.document("닉네임 중복체크 - 서버 오류",
+                            preprocessRequest(prettyPrint()),
+                            preprocessResponse(prettyPrint()),
+                            resource(
+                                    ResourceSnippetParameters.builder()
+                                            .description("닉네임 중복체크 API")
+                                            .tag("UserAccount").description("닉네임 중복체크 API")
+                                            .requestFields(
+                                                    fieldWithPath("nickname").description("닉네임")
+                                            ).requestSchema(Schema.schema("닉네임 중복체크 요청"))
+                                            .responseFields(
+                                                    fieldWithPath("code").description("응답 코드"),
+                                                    fieldWithPath("status").description("응답 상태"),
+                                                    fieldWithPath("message").description("응답 메시지"),
+                                                    fieldWithPath("data").description("응답 데이터")
+                                            ).responseSchema(Schema.schema("닉네임 중복체크 응답")).build()
+                            )
+                    )
+            );
+
+            actions.andExpect(status().is(500));
         }
     }
 

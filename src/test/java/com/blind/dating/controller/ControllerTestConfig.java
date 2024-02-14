@@ -1,11 +1,18 @@
 package com.blind.dating.controller;
 
+import com.blind.dating.repository.UserAccountRedisRepository;
+import com.blind.dating.security.TokenProvider;
+import com.blind.dating.service.PostService;
+import com.blind.dating.service.TokenService;
+import com.blind.dating.service.UserService;
+import com.blind.dating.util.CookieUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.test.web.servlet.MockMvc;

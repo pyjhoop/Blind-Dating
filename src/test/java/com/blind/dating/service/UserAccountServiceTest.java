@@ -27,10 +27,8 @@ import org.springframework.validation.FieldError;
 import java.time.LocalDateTime;
 import java.util.*;
 
-import static junit.framework.TestCase.assertEquals;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.never;
@@ -251,7 +249,7 @@ class UserAccountServiceTest {
         Map<String, String> expected = new HashMap<>();
         expected.put("valid_fieldName1", "errorMessage1");
         expected.put("valid_fieldName2", "errorMessage2");
-        assertEquals(expected, result);
+        assertThat(result).isEqualTo(expected);
     }
 
 }

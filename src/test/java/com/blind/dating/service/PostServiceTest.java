@@ -21,6 +21,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -30,9 +32,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.when;
 
-@DisplayName("Post Service - 테스트")
 @ExtendWith(MockitoExtension.class)
+@DisplayName("Post Service - 테스트")
 class PostServiceTest {
 
     @Mock private PostRepository postRepository;
@@ -44,13 +47,15 @@ class PostServiceTest {
     private Long postId = 1L;
     private UserAccount user;
     private Post post;
+    private Authentication authentication;
 
     @BeforeEach
     void setting() {
         request = new PostRequestDto("제목이야", "내용이야");
-        user = new UserAccount(1L, "userId","password","nickname","서울","INTP","M",false,"하이요",null, Role.USER.getValue(),"K",null,null,null);
+        user = new UserAccount(1L, "userId","password","nickname","서울","INTP","M",false,"하이요",null, Role.USER.getValue(),"K",null,null);
         post = new Post(1L, user, "제목이야", "내용이야", 0L, 0L);
         post.setCreatedAt(LocalDateTime.now());
+        authentication = new UsernamePasswordAuthenticationToken("1","");
     }
 
     @Test
@@ -61,7 +66,7 @@ class PostServiceTest {
         given(postRepository.save(any(Post.class))).willReturn(post);
 
         // When
-        PostResponseDto result = postService.createPost(userId, request);
+        PostResponseDto result = postService.createPost(authentication, request);
 
         // Then
         assertThat(result).hasFieldOrPropertyWithValue("id", 1L);
@@ -78,7 +83,7 @@ class PostServiceTest {
 
         // When
         ApiException exception = assertThrows(ApiException.class, ()-> {
-            PostResponseDto result = postService.createPost(userId, request);
+            PostResponseDto result = postService.createPost(authentication, request);
         });
 
         // Then

@@ -31,9 +31,8 @@ public class UserController {
             @PageableDefault(size = 30, sort = "recentLogin", direction = Sort.Direction.DESC)
             Pageable pageable
     ){
-        Long id = Long.valueOf((String) authentication.getPrincipal());
-        Page<UserInfoDto> usersInfo = userService.getMaleAndFemaleUsers(pageable, id);
 
+        Page<UserInfoDto> usersInfo = userService.getMaleAndFemaleUsers(pageable, authentication);
         UserInfoWithPageInfo result = new UserInfoWithPageInfo(usersInfo.getNumber(), usersInfo.getTotalPages(), usersInfo.getContent());
 
         return ResponseEntity.ok()
@@ -46,8 +45,7 @@ public class UserController {
             @PageableDefault(size = 30, sort = "recentLogin", direction = Sort.Direction.DESC)
             Pageable pageable
     ){
-        Long id = Long.valueOf((String) authentication.getPrincipal());
-        Page<UserInfoDto> usersInfo = userService.getMaleUsers(pageable, id);
+        Page<UserInfoDto> usersInfo = userService.getMaleUsers(pageable, authentication);
         UserInfoWithPageInfo result = new UserInfoWithPageInfo(usersInfo.getNumber(), usersInfo.getTotalPages(), usersInfo.getContent());
 
         return ResponseEntity.ok()
@@ -60,8 +58,7 @@ public class UserController {
             @PageableDefault(size = 30, sort = "recentLogin", direction = Sort.Direction.DESC)
             Pageable pageable
     ){
-        Long id = Long.valueOf((String) authentication.getPrincipal());
-        Page<UserInfoDto> usersInfo = userService.getFemaleUsers(pageable, id);
+        Page<UserInfoDto> usersInfo = userService.getFemaleUsers(pageable, authentication);
         UserInfoWithPageInfo result = new UserInfoWithPageInfo(usersInfo.getNumber(), usersInfo.getTotalPages(), usersInfo.getContent());
 
         return ResponseEntity.ok()

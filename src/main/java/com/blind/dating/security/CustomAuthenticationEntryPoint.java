@@ -18,13 +18,12 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException {
 
-//        String message = request.getAttribute("exception").toString();
-
         response.setContentType("application/json;charset=UTF-8");
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         ObjectMapper ob = new ObjectMapper();
-        Api dto = Api.builder().status("ExpiredJwtToken")
-                .message("message")
+        Api dto = Api.builder().status("unAuthorized")
+                .code(401)
+                .message("unAuthorized")
                 .build();
         response.getWriter().println(ob.writeValueAsString(dto));
 

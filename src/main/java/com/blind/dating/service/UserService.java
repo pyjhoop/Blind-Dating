@@ -35,27 +35,30 @@ public class UserService {
     @Transactional(readOnly = true)
     public Page<UserInfoDto> getMaleAndFemaleUsers(
             Pageable pageable,
-            Long id
+            Authentication authentication
     ){
-        Page<UserAccount> users = userAccountRepository.findAllByIdNot(id, pageable);
+        Long userId = Long.valueOf((String) authentication.getPrincipal());
+        Page<UserAccount> users = userAccountRepository.findAllByIdNot(userId, pageable);
         return users.map(UserInfoDto::From);
     }
     // 최근 로그인 순으로 나를 제외한 남성 유저 30명 조회
     @Transactional(readOnly = true)
     public Page<UserInfoDto> getMaleUsers(
             Pageable pageable,
-            Long id
+            Authentication authentication
     ){
-        Page<UserAccount> users = userAccountRepository.findAllByIdNotAndGender(id, "M" ,pageable);
+        Long userId = Long.valueOf((String) authentication.getPrincipal());
+        Page<UserAccount> users = userAccountRepository.findAllByIdNotAndGender(userId, "M" ,pageable);
         return users.map(UserInfoDto::From);
     }
     // 최근 로그인 순으로 나를 제외한 여성 유저 30명 조회
     @Transactional(readOnly = true)
     public Page<UserInfoDto> getFemaleUsers(
             Pageable pageable,
-            Long id
+            Authentication authentication
     ){
-        Page<UserAccount> users = userAccountRepository.findAllByIdNotAndGender(id, "W" ,pageable);
+        Long userId = Long.valueOf((String) authentication.getPrincipal());
+        Page<UserAccount> users = userAccountRepository.findAllByIdNotAndGender(userId, "W" ,pageable);
         return users.map(UserInfoDto::From);
     }
 

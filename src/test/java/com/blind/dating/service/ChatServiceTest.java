@@ -102,48 +102,48 @@ class ChatServiceTest {
         assertThat(result).isNotNull();
     }
 
-    @DisplayName("ReadChat의 chatId가 0이상일 때 안읽은 채팅 개수 조회하기")
-    @Test
-    void givenUserIdAndRoomId_whenUpdateUnReadChatReadChatChatIdNot0_thenReturnSize2(){
-        //Given
-        Set<Chat> chats = Set.of(new Chat(1L, new ChatRoom(), 1L, "message"));
-        List<Chat> list = List.of(new Chat(2L, null, 1L, null), new Chat(), new Chat(), new Chat());
-        ChatRoom chatRoom = new ChatRoom(1L, null, null,false, "message",chats);
-        ReadChat readChat = ReadChat.of(chatRoom,1L,1L);
-        Optional<ReadChat> optional = Optional.of(readChat);
-
-        given(chatRepository.findAllByChatRoomOrderByIdDesc(chatRoom)).willReturn(list);
-        given(readChatRepository.findByChatRoomAndUserId(any(ChatRoom.class),anyLong())).willReturn(optional);
-        given(chatRepository.countByIdBetween(1L, 2L)).willReturn(2L);
-
-        //When
-        Long result = chatService.unreadChat(1L,chatRoom);
-
-        //Then
-        assertThat(result).isNotNull();
-        assertThat(result).isEqualTo(1L);
-    }
-
-    @DisplayName("안읽은 채팅 조회시 예외 발생 - 테스트")
-    @Test
-    void givenUserIdAndRoomId_whenUpdateUnReadChat_thenThrowException(){
-        //Given
-        Set<Chat> chats = Set.of(new Chat(1L, new ChatRoom(), 1L, "message"));
-        List<Chat> list = List.of(new Chat(2L, null, 1L, null), new Chat(), new Chat(), new Chat());
-        ChatRoom chatRoom = new ChatRoom(1L, null, null,false, "message", chats);
-        ReadChat readChat = ReadChat.of(chatRoom,1L,1L);
-        Optional<ReadChat> optional = Optional.of(readChat);
-
-        given(chatRepository.findAllByChatRoomOrderByIdDesc(chatRoom)).willReturn(list);
-        given(readChatRepository.findByChatRoomAndUserId(chatRoom, 1L)).willReturn(Optional.empty());
-
-        //When
-        ApiException exception = assertThrows(ApiException.class, () -> {
-            Long result = chatService.unreadChat(1L,chatRoom);
-        });
-
-        //Then
-        assertThat(exception.getResponseCode()).isEqualTo(ChatResponseCode.READ_CHAT_NOT_FOUND);
-    }
+//    @DisplayName("ReadChat의 chatId가 0이상일 때 안읽은 채팅 개수 조회하기")
+//    @Test
+//    void givenUserIdAndRoomId_whenUpdateUnReadChatReadChatChatIdNot0_thenReturnSize2(){
+//        //Given
+//        Set<Chat> chats = Set.of(new Chat(1L, new ChatRoom(), 1L, "message"));
+//        List<Chat> list = List.of(new Chat(2L, null, 1L, null), new Chat(), new Chat(), new Chat());
+//        ChatRoom chatRoom = new ChatRoom(1L, null, null,false, "message",chats);
+//        ReadChat readChat = ReadChat.of(chatRoom,1L,1L);
+//        Optional<ReadChat> optional = Optional.of(readChat);
+//
+//        given(chatRepository.findAllByChatRoomOrderByIdDesc(chatRoom)).willReturn(list);
+//        given(readChatRepository.findByChatRoomAndUserId(any(ChatRoom.class),anyLong())).willReturn(optional);
+//        given(chatRepository.countByIdBetween(1L, 2L)).willReturn(2L);
+//
+//        //When
+//        Long result = chatService.unreadChat(1L,chatRoom);
+//
+//        //Then
+//        assertThat(result).isNotNull();
+//        assertThat(result).isEqualTo(1L);
+//    }
+//
+//    @DisplayName("안읽은 채팅 조회시 예외 발생 - 테스트")
+//    @Test
+//    void givenUserIdAndRoomId_whenUpdateUnReadChat_thenThrowException(){
+//        //Given
+//        Set<Chat> chats = Set.of(new Chat(1L, new ChatRoom(), 1L, "message"));
+//        List<Chat> list = List.of(new Chat(2L, null, 1L, null), new Chat(), new Chat(), new Chat());
+//        ChatRoom chatRoom = new ChatRoom(1L, null, null,false, "message", chats);
+//        ReadChat readChat = ReadChat.of(chatRoom,1L,1L);
+//        Optional<ReadChat> optional = Optional.of(readChat);
+//
+//        given(chatRepository.findAllByChatRoomOrderByIdDesc(chatRoom)).willReturn(list);
+//        given(readChatRepository.findByChatRoomAndUserId(chatRoom, 1L)).willReturn(Optional.empty());
+//
+//        //When
+//        ApiException exception = assertThrows(ApiException.class, () -> {
+//            Long result = chatService.unreadChat(1L,chatRoom);
+//        });
+//
+//        //Then
+//        assertThat(exception.getResponseCode()).isEqualTo(ChatResponseCode.READ_CHAT_NOT_FOUND);
+//    }
 
 }

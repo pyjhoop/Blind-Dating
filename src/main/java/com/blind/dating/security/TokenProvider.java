@@ -86,29 +86,24 @@ public class TokenProvider {
 
     }
 
-    public boolean validateToken(String token, HttpServletRequest request) {
+    public boolean validateToken(String token) {
         try {
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
             return true;
         } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
 
-            log.info(ErrorCode.MALFORMED_TOKEN.getMessage());
-            request.setAttribute("exception",ErrorCode.MALFORMED_TOKEN.getMessage());
             throw new JwtException(ErrorCode.MALFORMED_TOKEN.getMessage());
         } catch (ExpiredJwtException e) {
 
             log.info(ErrorCode.EXPIRED_TOKEN.getMessage());
-            request.setAttribute("exception",ErrorCode.EXPIRED_TOKEN.getMessage());
             throw new JwtException(ErrorCode.EXPIRED_TOKEN.getMessage());
         } catch (UnsupportedJwtException e) {
 
             log.info(ErrorCode.UNSUPPORTED_TOKEN.getMessage());
-            request.setAttribute("exception",ErrorCode.UNSUPPORTED_TOKEN.getMessage());
             throw new JwtException(ErrorCode.UNSUPPORTED_TOKEN.getMessage());
         } catch (IllegalArgumentException e) {
 
             log.info(ErrorCode.WRONG_TYPE_TOKEN.getMessage());
-            request.setAttribute("exception",ErrorCode.WRONG_TYPE_TOKEN.getMessage());
             throw new JwtException(ErrorCode.WRONG_TYPE_TOKEN.getMessage());
         }
     }

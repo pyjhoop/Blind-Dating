@@ -35,7 +35,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 String token = parseBearerToken(request);
 
                 // 토큰 검증하기 JWT이므로 인가 서버에 요청하지 않아도됨
-                if(token != null && tokenProvider.validateToken(token, request)){
+                if(token != null && tokenProvider.validateToken(token)){
 
                     // setContext 에 인증객체 저장하기.
                     Authentication authentication = tokenProvider.getAuthentication(token);
@@ -45,6 +45,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
 
         }catch (Exception e){
+            System.out.println(e);
 
         }
 

@@ -20,10 +20,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
+import org.springframework.security.core.Authentication;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.web.server.ResponseStatusException;
 
 
 import java.util.List;
@@ -64,7 +68,7 @@ class TokenControllerTest extends ControllerTestConfig{
     class ReissueTokens {
         @DisplayName("성공")
         @Test
-        void givenRefreshToken_whenRegenerateRefreshToken_thenReturnRefreshToken() throws Exception {
+        void testRegenerateRefreshTokenThen200() throws Exception {
             //Given
             String userId = "1";
             given(tokenService.validRefreshToken(any(Cookie.class))).willReturn(userId);
@@ -110,9 +114,9 @@ class TokenControllerTest extends ControllerTestConfig{
             actions.andExpect(status().isOk());
         }
 
-        @DisplayName("실패")
+        @DisplayName("리프레시 토큰 없어서 실패")
         @Test
-        void givenNoting_whenRegenerateRefreshToken_thenReturnRefreshToken() throws Exception {
+        void testRegenerateRefreshTokenThen400() throws Exception {
             //Given
             String userId = "1";
             given(tokenService.validRefreshToken(any(Cookie.class))).willReturn(userId);
@@ -143,6 +147,41 @@ class TokenControllerTest extends ControllerTestConfig{
                     )
             );
             actions.andExpect(status().is(400));
+        }
+
+        @DisplayName("리프레시 서버 에러")
+        @Test
+        void testRegenerateRefreshTokenThen500() throws Exception {
+            //Given
+            String userId = "1";
+            given(tokenService.validRefreshToken(any(Cookie.class)))
+                    .willThrow(new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error"));
+
+            ResultActions actions = mvc.perform(
+                    RestDocumentationRequestBuilders.get("/api/refresh")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .accept(MediaType.APPLICATION_JSON)
+                            .cookie(cookie)
+                            .header("Authorization", "Bearer "+"refreshToken")
+            ).andDo(
+                    MockMvcRestDocumentationWrapper.document("토큰 재발급 - 서버 에러",
+                            preprocessRequest(prettyPrint()),
+                            preprocessResponse(prettyPrint()),
+                            resource(
+                                    ResourceSnippetParameters.builder()
+                                            .description("토큰 재발급 API")
+                                            .tag("Tokens").description("토큰 재발급")
+                                            .requestFields()
+                                            .responseFields(
+                                                    fieldWithPath("code").description("응답 코드"),
+                                                    fieldWithPath("status").description("응답 상태"),
+                                                    fieldWithPath("message").description("응답 메시지"),
+                                                    fieldWithPath("data").description("응답 데이터")
+                                            ).responseSchema(Schema.schema("토큰 재발급 실패")).build()
+                            )
+                    )
+            );
+            actions.andExpect(status().is(500));
         }
     }
 

@@ -12,6 +12,7 @@ import com.blind.dating.repository.UserAccountRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,7 +26,8 @@ public class PostService {
     private final UserAccountRepository userAccountRepository;
 
     @Transactional
-    public PostResponseDto createPost(Long userId, PostRequestDto request) {
+    public PostResponseDto createPost(Authentication authentication, PostRequestDto request) {
+        Long userId = Long.valueOf((String) authentication.getPrincipal());
         UserAccount user = userAccountRepository.findById(userId)
                 .orElseThrow(()-> new ApiException(PostResponseCode.CREATE_POST_FAil));
 

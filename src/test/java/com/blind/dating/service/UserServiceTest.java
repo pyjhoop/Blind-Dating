@@ -31,12 +31,8 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThrows;
-import static org.mockito.ArgumentMatchers.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
 
 
 @DisplayName("UserService 테스트")
@@ -75,7 +71,7 @@ public class UserServiceTest {
         given(userAccountRepository.findAllByIdNot(id, pageable)).willReturn(page);
 
         // When
-        Page<UserInfoDto> result = userService.getMaleAndFemaleUsers(pageable, id);
+        Page<UserInfoDto> result = userService.getMaleAndFemaleUsers(pageable, authentication);
 
         // Then
         assertThat(result.getContent().get(0)).hasFieldOrPropertyWithValue("nickname",user.getNickname());
@@ -93,7 +89,7 @@ public class UserServiceTest {
         given(userAccountRepository.findAllByIdNotAndGender(id,"M" ,pageable)).willReturn(page);
 
         // When
-        Page<UserInfoDto> result = userService.getMaleUsers(pageable, id);
+        Page<UserInfoDto> result = userService.getMaleUsers(pageable, authentication);
 
         // Then
         assertThat(result.getContent().get(0)).hasFieldOrPropertyWithValue("nickname",user.getNickname());
@@ -110,7 +106,7 @@ public class UserServiceTest {
         given(userAccountRepository.findAllByIdNotAndGender(id, "W",pageable)).willReturn(page);
 
         // When
-        Page<UserInfoDto> result = userService.getFemaleUsers(pageable, id);
+        Page<UserInfoDto> result = userService.getFemaleUsers(pageable, authentication);
 
         // Then
         assertThat(result.getContent().get(0)).hasFieldOrPropertyWithValue("nickname",user2.getNickname());

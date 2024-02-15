@@ -19,14 +19,8 @@ public class ChatRoom extends BaseEntity{
     @Column(name = "chatRoomId")
     private Long id;
 
-    @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL)
-    @Setter
-    private List<UserChatRoom> userChatRooms;
-
-    @Setter
-    @OneToMany(mappedBy = "chatRoom")
-    @ToString.Exclude
-    private Set<ReadChat> readChat = new LinkedHashSet<>();
+    @ManyToOne
+    private UserAccount receiver;
 
     @Setter
     private Boolean status;
@@ -34,7 +28,8 @@ public class ChatRoom extends BaseEntity{
     @Setter
     private String recentMessage;
 
-    public ChatRoom(Boolean status, String recentMessage) {
+    public ChatRoom(UserAccount receiver, Boolean status, String recentMessage) {
+        this.receiver = receiver;
         this.status = status;
         this.recentMessage = recentMessage;
     }

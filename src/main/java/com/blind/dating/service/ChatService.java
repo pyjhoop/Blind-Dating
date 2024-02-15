@@ -28,12 +28,8 @@ public class ChatService {
 
 
     @Transactional(readOnly = true)
-    public List<Chat> selectChatList(ChatRoom chatRoom, String chatId){
-        if(Long.parseLong(chatId) == 0){
-            return chatRepository.findAllByChatRoomOrderByIdDesc(chatRoom);
-        }else{
-            return chatRepository.findByChatRoomAndIdLessThanEqualOrderByIdDesc(chatRoom, Long.valueOf(chatId));
-        }
+    public Page<Chat> selectChatList(ChatRoom chatRoom, Pageable pageable){
+        return chatRepository.findAllByChatRoom(chatRoom, pageable);
     }
 
     @Transactional
@@ -45,20 +41,20 @@ public class ChatService {
         return chatRepository.save(Chat.of(room,Long.valueOf(dto.getWriterId()),dto.getMessage()));
     }
 
-    @Transactional(readOnly = true)
-    public Long unreadChat(Long userId, ChatRoom chatRoom){
-
-        List<Chat> list = chatRepository.findAllByChatRoomOrderByIdDesc(chatRoom);
-        Long listSize = (long) list.size();
-
-        ReadChat readChat = readChatRepository.findByChatRoomAndUserId(chatRoom, userId)
-                .orElseThrow(()-> new ApiException(ChatResponseCode.READ_CHAT_NOT_FOUND));
-
-        if(readChat.getChatId() == 0){
-            return listSize;
-        }else{
-            return chatRepository.countByIdBetween(readChat.getChatId(), list.get(0).getId()) -1;
-        }
-
-    }
+//    @Transactional(readOnly = true)
+//    public Long unreadChat(Long userId, ChatRoom chatRoom){
+//
+//        List<Chat> list = chatRepository.findAllByChatRoomOrderByIdDesc(chatRoom);
+//        Long listSize = (long) list.size();
+//
+//        ReadChat readChat = readChatRepository.findByChatRoomAndUserId(chatRoom, userId)
+//                .orElseThrow(()-> new ApiException(ChatResponseCode.READ_CHAT_NOT_FOUND));
+//
+//        if(readChat.getChatId() == 0){
+//            return listSize;
+//        }else{
+//            return chatRepository.countByIdBetween(readChat.getChatId(), list.get(0).getId()) -1;
+//        }
+//
+//    }
 }

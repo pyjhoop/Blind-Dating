@@ -27,10 +27,9 @@ public class PostController {
         Authentication authentication,
         @RequestBody PostRequestDto request
     ) {
-        PostResponseDto result = postService.createPost(authentication, request);
-
+        postService.createPost(authentication, request);
         return ResponseEntity.ok()
-                .body(Api.OK(PostResponseCode.CREATE_POST_SUCCESS, result));
+                .body(Api.OK(PostResponseCode.CREATE_POST_SUCCESS));
     }
     // post 수정
     @PatchMapping("/posts/{postId}")

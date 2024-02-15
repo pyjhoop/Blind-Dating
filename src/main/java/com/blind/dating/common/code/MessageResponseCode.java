@@ -12,7 +12,8 @@ public enum MessageResponseCode implements ResponseCode{
     REJECT_MESSAGE_SUCCESS(200,"메시지 거절에 성공했습니다.", "OK"),
     GET_MESSAGE_TOME_SUCCESS(200,"내게온 메시지 조회 성공했습니다.", "OK"),
     GET_MESSAGE_FROMME_SUCCESS(200,"내가 보낸 메시지 조회 성공했습니다.", "OK"),
-    POST_MESSAGE_SUCCESS(200,"메시지기 성공적으로 전송되었습니다.", "OK");
+    POST_MESSAGE_SUCCESS(200,"메시지기 성공적으로 전송되었습니다.", "OK"),
+    MESSAGE_ALREADY_POST(200,"해당 유저에게 이미 메시지를 전송했습니다.", "OK");
 
     private final int code;
     private final String message;

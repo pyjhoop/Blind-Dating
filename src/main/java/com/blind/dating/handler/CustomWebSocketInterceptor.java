@@ -22,6 +22,8 @@ import org.springframework.messaging.support.MessageHeaderAccessor;
 import org.springframework.stereotype.Component;
 
 import java.security.Principal;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -42,6 +44,8 @@ public class CustomWebSocketInterceptor implements ChannelInterceptor {
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
+        log.info(">>>> 하이");
+        log.info(accessor.getCommand()+"");
 
         // CONNECT, DISCONNECT 등 상태를 알아내줌
         StompCommand command = accessor.getCommand();
@@ -53,42 +57,22 @@ public class CustomWebSocketInterceptor implements ChannelInterceptor {
         switch (command) {
             case CONNECT:
                 // 세션 연결 처리
-                if(accessor.getNativeHeader("username") == null){
-                    break;
-                }
-
-                String username = accessor.getNativeHeader("username").get(0);
                 String roomId = accessor.getNativeHeader("roomId").get(0);
                 String userId = accessor.getNativeHeader("userId").get(0);
 
+                Map<String, Object> map = new HashMap<>();
+                map.put("roomId", roomId);
+                map.put("userId",userId);
+                accessor.setSessionAttributes(map);
 
-                //방번호로 접속해있는 유저를 찾기 위해 세션에 방번호 저장.
-                accessor.getSessionAttributes().put("roomId",roomId);
-                accessor.getSessionAttributes().put("userId", userId);
-
-                Optional<Chat> chat = chatRepository.findFirstByChatRoomIdOrderByCreatedAtDesc(Long.valueOf(roomId));
-
-                Long chatId = 0L;
-                if(chat.isPresent()){
-                    chatId = chat.get().getId();
-                }
-
-                ChatRoom chatRoom = chattingRoomRepository.findById(Long.valueOf(roomId))
-                        .orElseThrow(()-> new RuntimeException("채팅방 소켓 연결중에 예외가 발생했습니다."));
-
-                ReadChat readChat = readChatRepository.findByChatRoomAndUserId(chatRoom, Long.valueOf(userId))
-                        .orElseThrow(()-> new RuntimeException("채팅방 소켓 연결중에 예외가 발생했습니다."));
-
-                readChat.setChatId(chatId);
-                readChatRepository.save(readChat);
                 sessionRedisRepository.saveUserId(roomId, userId);
 
                 break;
             case DISCONNECT:
-
-                // 세션 종료 처리
-                String roomId1 = accessor.getSessionAttributes().get("roomId").toString();
-                String userId1 = accessor.getSessionAttributes().get("userId").toString();
+                log.info("종료");
+                String userId1 = (String) message.getHeaders().get("userId");
+                String roomId1 = (String) message.getHeaders().get("roomId");
+                System.out.println("User ID: " + userId1 + ", Room ID: " + roomId1);
 
                 sessionRedisRepository.removeUserId(roomId1, userId1);
 

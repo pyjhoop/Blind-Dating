@@ -16,10 +16,6 @@ import java.util.concurrent.ConcurrentHashMap;
 @Configuration
 @EnableWebSocketMessageBroker
 public class StompWebSocketConfig implements WebSocketMessageBrokerConfigurer {
-    //endpoint를 /stomp로 하고, allowedOrigins를 "*"로 하면 페이지에서
-    //Get /info 404 Error가 발생한다. 그래서 아래와 같이 2개의 계층으로 분리하고
-    //origins를 개발 도메인으로 변경하니 잘 동작하였다.
-    //이유는 왜 그런지 아직 찾지 못함
     private final SocketHandler socketHandler;
     private final CustomWebSocketInterceptor customWebSocketInterceptor;
     // 세션 관리를 위한 맵을 선언합니다.
@@ -27,7 +23,7 @@ public class StompWebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/stomp/chat","/stomp/chatroom")
-                .setAllowedOrigins("http://localhost:8081", "http://127.0.0.1:5500","https://127.0.0.1:5173", "http://localhost:80","https://fe-zeta.vercel.app")
+                .setAllowedOrigins("http://localhost:5500","http://127.0.0.1:5500", "http://127.0.0.1:3000","http://localhost:3000", "http://localhost:80","https://fe-zeta.vercel.app")
                 .withSockJS();
     }
 

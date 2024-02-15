@@ -11,7 +11,7 @@ import java.util.Optional;
 
 public interface ChatRepository extends JpaRepository<Chat,Long> {
 
-    List<Chat> findAllByChatRoomOrderByIdDesc(ChatRoom chatRoom);
+    Page<Chat> findAllByChatRoom(ChatRoom chatRoom, Pageable pageable);
 
     Long countByIdBetween(Long chatId1, Long chatId2);
 

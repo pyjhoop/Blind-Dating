@@ -14,10 +14,12 @@ public class SessionRedisRepository {
     private final RedisTemplate redisTemplate;
 
     public void saveUserId(String roomId, String userId){
+        System.out.println("시작");
         redisTemplate.opsForSet().add("roomId"+roomId, userId);
     }
 
     public void removeUserId(String roomId, String userId){
+        System.out.println(roomId+ userId+"시작");
         redisTemplate.opsForSet().remove("roomId"+roomId, userId);
     }
 

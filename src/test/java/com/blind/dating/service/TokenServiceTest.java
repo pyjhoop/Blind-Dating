@@ -71,7 +71,6 @@ class TokenServiceTest {
         //Given
         UserAccount user = UserAccount.of("qweeqw","asdfdf", "nickname","asdf","asdf","M","하이요");
         user.setInterests(List.of(new Interest()));
-        user.setQuestions(List.of(new Question()));
         given(userAccountRepository.findById(1L)).willReturn(Optional.of(user));
         given(tokenProvider.create(user)).willReturn("access");
         given(tokenProvider.refreshToken(user)).willReturn("refresh");

@@ -3,7 +3,6 @@ package com.blind.dating.controller;
 import com.blind.dating.config.SecurityConfig;
 import com.blind.dating.domain.token.TokenController;
 import com.blind.dating.dto.interest.InterestDto;
-import com.blind.dating.dto.question.QuestionDto;
 import com.blind.dating.dto.user.LogInResponse;
 import com.blind.dating.security.TokenProvider;
 import com.blind.dating.domain.token.TokenService;
@@ -54,10 +53,8 @@ class TokenControllerTest extends ControllerTestConfig{
     void setting() {
         List<InterestDto> interests = List.of(InterestDto.of(1L,"자전거 타기"),
                 InterestDto.of(2L, "놀기"), InterestDto.of(3L,"게임하기"));
-        List<QuestionDto> questions = List.of(new QuestionDto(1L,true), new QuestionDto(2L, false),
-                new QuestionDto(3L, true));
 
-        logInResponse = new LogInResponse(1L, "userId","nickname","서울","INTP","M", interests, questions,"하이요","accessToken","refreshToken");
+        logInResponse = new LogInResponse(1L, "userId","nickname","서울","INTP","M", interests,"하이요","accessToken","refreshToken");
         cookie = new Cookie("refreshToken", "refreshToken");
     }
 

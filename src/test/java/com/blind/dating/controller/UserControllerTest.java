@@ -6,7 +6,6 @@ import com.blind.dating.domain.user.Role;
 import com.blind.dating.domain.user.UserAccount;
 import com.blind.dating.domain.user.UserController;
 import com.blind.dating.dto.interest.InterestDto;
-import com.blind.dating.dto.question.QuestionDto;
 import com.blind.dating.dto.user.UserInfoDto;
 import com.blind.dating.dto.user.UserUpdateRequestDto;
 import com.blind.dating.dto.user.UserWithInterestAndQuestionDto;

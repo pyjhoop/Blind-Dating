@@ -46,7 +46,6 @@ class UserAccountServiceTest {
     @Mock private TokenProvider tokenProvider;
     @Mock private UserAccountRedisRepository userAccountRedisRepository;
     @Mock private RefreshTokenRepository refreshTokenRepository;
-    @Mock private QuestionService questionService;
     @Mock private InterestService interestService;
     @Mock private Errors errors;
 
@@ -63,7 +62,6 @@ class UserAccountServiceTest {
         user.setDeleted(false);
         user.setUserPassword(bCryptPasswordEncoder.encode(dto.getUserPassword()));
         user.setInterests(List.of(new Interest()));
-        user.setQuestions(List.of(new Question()));
     }
 
 
@@ -74,13 +72,11 @@ class UserAccountServiceTest {
         //given
         String accessToken = "asdffqwerqwerdfgscvASDF";
         String password = "hashPass";
-        List<Question> list = List.of();
         List<Interest> list1 = List.of();
 
         given(userAccountRepository.existsByUserId(dto.getUserId())).willReturn(false);// 존재 x
         given(bCryptPasswordEncoder.encode(dto.getUserPassword())).willReturn(password);
         given(userAccountRepository.save(user)).willReturn(user);
-        given(questionService.saveQuestions(user, dto.getQuestions())).willReturn(list);
         given(interestService.saveInterest(user, dto.getInterests())).willReturn(list1);
 
         //when
@@ -98,7 +94,6 @@ class UserAccountServiceTest {
         //given
         String accessToken = "asdffqwerqwerdfgscvASDF";
         String password = "hashPass";
-        List<Question> list = List.of();
         List<Interest> list1 = List.of();
 
         given(userAccountRepository.existsByUserId(dto.getUserId())).willReturn(true);// 존재 x

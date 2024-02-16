@@ -52,10 +52,8 @@ public class UserServiceTest {
     void setUp(){
         user = UserAccount.of("user01","pass01", "nickname1","서울","intp","M","하이요");
         user.setInterests(List.of(new Interest()));
-        user.setQuestions(List.of(new Question()));
         user2 = UserAccount.of("user02","pass02", "nickname2","서울","intp","W","하이요");
         user2.setInterests(List.of(new Interest()));
-        user2.setQuestions(List.of(new Question()));
         authentication = new UsernamePasswordAuthenticationToken("1",user.getUserPassword());
     }
 

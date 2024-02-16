@@ -6,7 +6,6 @@ import com.blind.dating.domain.interest.Interest;
 import com.blind.dating.domain.user.UserAccount;
 import com.blind.dating.domain.user.UserAccountController;
 import com.blind.dating.dto.interest.InterestDto;
-import com.blind.dating.dto.question.QuestionDto;
 import com.blind.dating.dto.user.*;
 import com.blind.dating.security.JwtAuthenticationFilter;
 import com.blind.dating.security.TokenProvider;
@@ -75,7 +74,6 @@ class UserAccountControllerTest extends ControllerTestConfig{
         user.setDeleted(false);
         user.setUserPassword(bCryptPasswordEncoder.encode(dto.getUserPassword()));
         user.setInterests(List.of(new Interest()));
-        user.setQuestions(List.of(new Question()));
     }
 
     @Nested
@@ -233,12 +231,9 @@ class UserAccountControllerTest extends ControllerTestConfig{
             LoginInputDto loginDto = new LoginInputDto(userId, userPassword);
             List<InterestDto> interests = List.of(InterestDto.of(1L,"자전거 타기"),
                     InterestDto.of(2L, "놀기"), InterestDto.of(3L,"게임하기"));
-            List<QuestionDto> questions = List.of(new QuestionDto(1L,true), new QuestionDto(2L, false),
-                    new QuestionDto(3L, true));
 
             LogInResponse response = LogInResponse.from(user, "accessToken", "refreshToken");
             response.setInterests(interests);
-            response.setQuestions(questions);
 
             given(userAccountService.getLoginInfo(userId, userPassword)).willReturn(response);
 

@@ -1,30 +1,20 @@
 package com.blind.dating.handler;
 
-import com.blind.dating.domain.Chat;
-import com.blind.dating.domain.ChatRoom;
-import com.blind.dating.domain.ReadChat;
-import com.blind.dating.dto.user.UserSession;
-import com.blind.dating.handler.SessionHandler;
-import com.blind.dating.repository.ChatRepository;
-import com.blind.dating.repository.ChattingRoomRepository;
-import com.blind.dating.repository.ReadChatRepository;
-import com.blind.dating.repository.SessionRedisRepository;
+import com.blind.dating.domain.chat.ChatRepository;
+import com.blind.dating.domain.chatRoom.ChattingRoomRepository;
+import com.blind.dating.domain.readChat.ReadChatRepository;
+import com.blind.dating.domain.redis.SessionRedisRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
-import org.springframework.messaging.support.MessageHeaderAccessor;
 import org.springframework.stereotype.Component;
 
-import java.security.Principal;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 /**
  * 웹 소켓에 연결되거나 연결이 끊겼을때 session을 관리하기 위한 인터셉터

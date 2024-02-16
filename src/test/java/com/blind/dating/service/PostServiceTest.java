@@ -1,15 +1,16 @@
 package com.blind.dating.service;
 
 import com.blind.dating.common.code.PostResponseCode;
-import com.blind.dating.domain.Post;
-import com.blind.dating.domain.Role;
-import com.blind.dating.domain.UserAccount;
+import com.blind.dating.domain.post.Post;
+import com.blind.dating.domain.user.Role;
+import com.blind.dating.domain.post.PostService;
+import com.blind.dating.domain.user.UserAccount;
 import com.blind.dating.dto.post.PageInfoWithPosts;
 import com.blind.dating.dto.post.PostRequestDto;
 import com.blind.dating.dto.post.PostResponseDto;
 import com.blind.dating.exception.ApiException;
-import com.blind.dating.repository.PostRepository;
-import com.blind.dating.repository.UserAccountRepository;
+import com.blind.dating.domain.post.PostRepository;
+import com.blind.dating.domain.user.UserAccountRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -32,7 +33,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("Post Service - 테스트")

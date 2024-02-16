@@ -1,15 +1,12 @@
 package com.blind.dating.dto.user;
 
-import com.blind.dating.domain.Interest;
-import com.blind.dating.domain.UserAccount;
+import com.blind.dating.domain.user.UserAccount;
 import com.blind.dating.dto.interest.InterestDto;
-import com.blind.dating.dto.question.QuestionDto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Data
@@ -24,12 +21,11 @@ public class LogInResponse {
     private String mbti;
     private String gender;
     private List<InterestDto> interests;
-    private List<QuestionDto> questions;
     private String selfIntroduction;
     private String accessToken;
     private String refreshToken;
 
-    private LogInResponse(Long id, String userId, String nickname, String region, String mbti, String gender, List<InterestDto> interests, List<QuestionDto> questions, String selfIntroduction) {
+    private LogInResponse(Long id, String userId, String nickname, String region, String mbti, String gender, List<InterestDto> interests, String selfIntroduction) {
         this.id = id;
         this.userId = userId;
         this.nickname = nickname;
@@ -37,7 +33,6 @@ public class LogInResponse {
         this.mbti = mbti;
         this.gender = gender;
         this.interests = interests;
-        this.questions = questions;
         this.selfIntroduction = selfIntroduction;
     }
 
@@ -50,7 +45,6 @@ public class LogInResponse {
                 user.getMbti(),
                 user.getGender(),
                 user.getInterests().stream().map(InterestDto::from).collect(Collectors.toList()),
-                user.getQuestions().stream().map(QuestionDto::from).collect(Collectors.toList()),
                 user.getSelfIntroduction(),
                 accessToken,
                 refreshToken

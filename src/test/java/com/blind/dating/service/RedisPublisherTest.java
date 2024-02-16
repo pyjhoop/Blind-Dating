@@ -1,5 +1,6 @@
 package com.blind.dating.service;
 
+import com.blind.dating.domain.redis.RedisPublisher;
 import com.blind.dating.dto.chat.ChatDto;
 import com.blind.dating.dto.chat.ChatListWithUserId;
 import com.blind.dating.dto.chat.ChatRoomDto;
@@ -9,17 +10,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 

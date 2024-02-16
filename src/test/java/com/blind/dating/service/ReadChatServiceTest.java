@@ -1,10 +1,11 @@
 package com.blind.dating.service;
 
-import com.blind.dating.domain.ChatRoom;
-import com.blind.dating.domain.ReadChat;
-import com.blind.dating.repository.ChattingRoomRepository;
-import com.blind.dating.repository.ReadChatRepository;
-import com.blind.dating.repository.SessionRedisRepository;
+import com.blind.dating.domain.chatRoom.ChatRoom;
+import com.blind.dating.domain.readChat.ReadChat;
+import com.blind.dating.domain.chatRoom.ChattingRoomRepository;
+import com.blind.dating.domain.readChat.ReadChatService;
+import com.blind.dating.domain.readChat.ReadChatRepository;
+import com.blind.dating.domain.redis.SessionRedisRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -12,7 +13,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Set;
 

@@ -1,13 +1,12 @@
 package com.blind.dating.service;
 
 import com.blind.dating.common.code.ChattingRoomResponseCode;
-import com.blind.dating.domain.ChatRoom;
-import com.blind.dating.domain.UserAccount;
-import com.blind.dating.dto.chat.ChatRoomDto;
+import com.blind.dating.domain.chat.ChatService;
+import com.blind.dating.domain.chatRoom.ChatRoom;
+import com.blind.dating.domain.chatRoom.ChattingRoomService;
 import com.blind.dating.exception.ApiException;
-import com.blind.dating.repository.ChattingRoomRepository;
-import com.blind.dating.repository.UserAccountRepository;
-import org.junit.jupiter.api.Disabled;
+import com.blind.dating.domain.chatRoom.ChattingRoomRepository;
+import com.blind.dating.domain.user.UserAccountRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,14 +14,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 
 @DisplayName("ChattingRoomService - 테스트")

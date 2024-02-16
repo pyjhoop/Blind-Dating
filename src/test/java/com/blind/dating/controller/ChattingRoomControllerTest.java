@@ -1,15 +1,14 @@
 package com.blind.dating.controller;
 
 import com.blind.dating.config.SecurityConfig;
-import com.blind.dating.domain.Chat;
-import com.blind.dating.domain.ChatRoom;
-import com.blind.dating.domain.UserAccount;
-import com.blind.dating.dto.chat.ChatDto;
+import com.blind.dating.domain.chat.Chat;
+import com.blind.dating.domain.chatRoom.ChatRoom;
+import com.blind.dating.domain.chatRoom.ChattingRoomController;
 import com.blind.dating.dto.chat.ChatRoomDto;
 import com.blind.dating.security.JwtAuthenticationFilter;
-import com.blind.dating.service.ChatService;
-import com.blind.dating.service.ChattingRoomService;
-import com.blind.dating.service.UserService;
+import com.blind.dating.domain.chat.ChatService;
+import com.blind.dating.domain.chatRoom.ChattingRoomService;
+import com.blind.dating.domain.user.UserService;
 import com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper;
 import com.epages.restdocs.apispec.ResourceSnippetParameters;
 import com.epages.restdocs.apispec.Schema;

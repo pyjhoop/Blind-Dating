@@ -1,20 +1,18 @@
 package com.blind.dating.controller;
 
 import com.blind.dating.config.SecurityConfig;
-import com.blind.dating.domain.Interest;
-import com.blind.dating.domain.Question;
-import com.blind.dating.domain.Role;
-import com.blind.dating.domain.UserAccount;
+import com.blind.dating.domain.interest.Interest;
+import com.blind.dating.domain.user.Role;
+import com.blind.dating.domain.user.UserAccount;
+import com.blind.dating.domain.user.UserController;
 import com.blind.dating.dto.interest.InterestDto;
-import com.blind.dating.dto.post.PostResponseDto;
 import com.blind.dating.dto.question.QuestionDto;
 import com.blind.dating.dto.user.UserInfoDto;
 import com.blind.dating.dto.user.UserUpdateRequestDto;
 import com.blind.dating.dto.user.UserWithInterestAndQuestionDto;
-import com.blind.dating.exception.ApiException;
-import com.blind.dating.repository.UserAccountRedisRepository;
+import com.blind.dating.domain.user.UserAccountRedisRepository;
 import com.blind.dating.security.TokenProvider;
-import com.blind.dating.service.UserService;
+import com.blind.dating.domain.user.UserService;
 import com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper;
 import com.epages.restdocs.apispec.ResourceSnippetParameters;
 import com.epages.restdocs.apispec.Schema;
@@ -22,7 +20,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
@@ -35,11 +32,9 @@ import org.springframework.http.MediaType;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
@@ -73,20 +68,16 @@ class UserControllerTest extends ControllerTestConfig{
     private UserAccount user;
     private Authentication authentication;
     List<InterestDto> interests;
-    List<QuestionDto> questions;
     private UserInfoDto dto;
 
     @BeforeEach
     void setUp(){
-        user = new UserAccount(1L,"userId","userPassword","nickname","서울","INTP","M",false, "안녕", LocalDateTime.now(), Role.USER.getValue(),null,null,null);
-        user.setQuestions(List.of(new Question()));
+        user = new UserAccount(1L,"userId","userPassword","nickname","서울","INTP","M",false, "안녕", LocalDateTime.now(), Role.USER.getValue(),null,null);
         user.setInterests(List.of(new Interest()));
         authentication = new UsernamePasswordAuthenticationToken("1",user.getUserPassword());
         interests = List.of(InterestDto.of(1L,"자전거 타기"),
                 InterestDto.of(2L, "놀기"), InterestDto.of(3L,"게임하기"));
-        questions = List.of(new QuestionDto(1L,true), new QuestionDto(2L, false),
-                new QuestionDto(3L, true));
-        dto = new UserInfoDto(1L, "nickname1","서울","INTP","M", interests, questions, "하이요");
+        dto = new UserInfoDto(1L, "nickname1","서울","INTP","M", interests, "하이요");
 
     }
 
@@ -515,7 +506,7 @@ class UserControllerTest extends ControllerTestConfig{
         @WithMockUser(username = "1", password = "", roles = "USER")
         public void testGetMyInfoThen200() throws Exception {
             //Given
-            UserWithInterestAndQuestionDto dto1 = UserWithInterestAndQuestionDto.of(1L,"userId1","nickname1","서울","INTP","M",interests, questions,"안녕");
+            UserWithInterestAndQuestionDto dto1 = UserWithInterestAndQuestionDto.of(1L,"userId1","nickname1","서울","INTP","M",interests,null);
             given(userService.getMyInfo(any(Authentication.class))).willReturn(dto1);
 
             //When && Then
@@ -565,7 +556,7 @@ class UserControllerTest extends ControllerTestConfig{
         @Test
         public void testGetMyInfoThen401() throws Exception {
             //Given
-            UserWithInterestAndQuestionDto dto1 = UserWithInterestAndQuestionDto.of(1L,"userId1","nickname1","서울","INTP","M",interests, questions,"안녕");
+            UserWithInterestAndQuestionDto dto1 = UserWithInterestAndQuestionDto.of(1L,"userId1","nickname1","서울","INTP","M",interests,"안녕");
             given(userService.getMyInfo(any(Authentication.class))).willReturn(dto1);
 
             //When && Then
@@ -603,7 +594,7 @@ class UserControllerTest extends ControllerTestConfig{
         @WithMockUser(username = "1", password = "", roles = "USER")
         public void testGetMyInfoThen500() throws Exception {
             //Given
-            UserWithInterestAndQuestionDto dto1 = UserWithInterestAndQuestionDto.of(1L,"userId1","nickname1","서울","INTP","M",interests, questions,"안녕");
+            UserWithInterestAndQuestionDto dto1 = UserWithInterestAndQuestionDto.of(1L,"userId1","nickname1","서울","INTP","M",interests,"안녕");
             given(userService.getMyInfo(any(Authentication.class))).willReturn(dto1);
             given(userService.getMyInfo(any(Authentication.class)))
                     .willThrow(new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error"));
@@ -652,12 +643,10 @@ class UserControllerTest extends ControllerTestConfig{
         public void testUpdateMyInfoThen200() throws Exception {
             List<String> list = List.of("놀기","게임하기");
             UserUpdateRequestDto dto = new UserUpdateRequestDto("인천","ESTP",list,"안녕하세요");
-            UserWithInterestAndQuestionDto dto1 = UserWithInterestAndQuestionDto.of(1L,"userId1","nickname1","서울","INTP","M",interests, questions,"안녕");
+            UserWithInterestAndQuestionDto dto1 = UserWithInterestAndQuestionDto.of(1L,"userId1","nickname1","서울","INTP","M",interests,"안녕");
 
             List<Interest> list1 = List.of(new Interest(1L, user, "놀기"), new Interest(2L, user, "게임하기"));
-            List<Question> list2 = List.of(new Question(1L, user, true),new Question(2L, user, false));
             user.setInterests(list1);
-            user.setQuestions(list2);
             given(userService.updateMyInfo(any(Authentication.class), eq(dto))).willReturn(user);
 
             //When && Then
@@ -714,12 +703,10 @@ class UserControllerTest extends ControllerTestConfig{
         public void testUpdateMyInfoThen401() throws Exception {
             List<String> list = List.of("놀기","게임하기");
             UserUpdateRequestDto dto = new UserUpdateRequestDto("인천","ESTP",list,"안녕하세요");
-            UserWithInterestAndQuestionDto dto1 = UserWithInterestAndQuestionDto.of(1L,"userId1","nickname1","서울","INTP","M",interests, questions,"안녕");
+            UserWithInterestAndQuestionDto dto1 = UserWithInterestAndQuestionDto.of(1L,"userId1","nickname1","서울","INTP","M",interests,"안녕");
 
             List<Interest> list1 = List.of(new Interest(1L, user, "놀기"), new Interest(2L, user, "게임하기"));
-            List<Question> list2 = List.of(new Question(1L, user, true),new Question(2L, user, false));
             user.setInterests(list1);
-            user.setQuestions(list2);
             given(userService.updateMyInfo(any(Authentication.class), eq(dto))).willReturn(user);
 
             //When && Then
@@ -764,12 +751,10 @@ class UserControllerTest extends ControllerTestConfig{
         public void testUpdateMyInfoThen500() throws Exception {
             List<String> list = List.of("놀기","게임하기");
             UserUpdateRequestDto dto = new UserUpdateRequestDto("인천","ESTP",list,"안녕하세요");
-            UserWithInterestAndQuestionDto dto1 = UserWithInterestAndQuestionDto.of(1L,"userId1","nickname1","서울","INTP","M",interests, questions,"안녕");
+            UserWithInterestAndQuestionDto dto1 = UserWithInterestAndQuestionDto.of(1L,"userId1","nickname1","서울","INTP","M",interests,"안녕");
 
             List<Interest> list1 = List.of(new Interest(1L, user, "놀기"), new Interest(2L, user, "게임하기"));
-            List<Question> list2 = List.of(new Question(1L, user, true),new Question(2L, user, false));
             user.setInterests(list1);
-            user.setQuestions(list2);
             given(userService.updateMyInfo(any(Authentication.class), eq(dto)))
                     .willThrow(new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error"));
 

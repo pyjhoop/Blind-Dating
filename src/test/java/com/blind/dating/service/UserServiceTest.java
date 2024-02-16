@@ -1,17 +1,16 @@
 package com.blind.dating.service;
 
 import com.blind.dating.common.code.UserResponseCode;
-import com.blind.dating.domain.Interest;
-import com.blind.dating.domain.Question;
-import com.blind.dating.domain.UserAccount;
-import com.blind.dating.dto.user.UserIdWithNicknameAndGender;
+import com.blind.dating.domain.interest.Interest;
+import com.blind.dating.domain.user.UserAccount;
+import com.blind.dating.domain.user.UserService;
 import com.blind.dating.dto.user.UserInfoDto;
 import com.blind.dating.dto.user.UserUpdateRequestDto;
 import com.blind.dating.dto.user.UserWithInterestAndQuestionDto;
 import com.blind.dating.exception.ApiException;
-import com.blind.dating.repository.InterestRepository;
-import com.blind.dating.repository.UserAccountRedisRepository;
-import com.blind.dating.repository.UserAccountRepository;
+import com.blind.dating.domain.interest.InterestRepository;
+import com.blind.dating.domain.user.UserAccountRedisRepository;
+import com.blind.dating.domain.user.UserAccountRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

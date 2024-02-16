@@ -1,7 +1,7 @@
 package com.blind.dating.dto.user;
 
-import com.blind.dating.domain.Role;
-import com.blind.dating.domain.UserAccount;
+import com.blind.dating.domain.user.Role;
+import com.blind.dating.domain.user.UserAccount;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.Data;

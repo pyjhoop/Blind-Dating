@@ -1,6 +1,5 @@
 package com.blind.dating.dto.chat;
 
-import com.blind.dating.domain.Chat;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 

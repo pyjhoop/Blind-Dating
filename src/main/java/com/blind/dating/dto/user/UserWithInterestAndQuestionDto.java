@@ -1,13 +1,11 @@
 package com.blind.dating.dto.user;
 
-import com.blind.dating.domain.UserAccount;
+import com.blind.dating.domain.user.UserAccount;
 import com.blind.dating.dto.interest.InterestDto;
-import com.blind.dating.dto.question.QuestionDto;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Data
@@ -21,10 +19,9 @@ public class UserWithInterestAndQuestionDto {
     private String mbti;
     private String gender;
     private List<InterestDto> interests;
-    private List<QuestionDto> questions;
     private String selfIntroduction;
 
-private UserWithInterestAndQuestionDto(Long id, String userId, String nickname, String region, String mbti, String gender, List<InterestDto> interests, List<QuestionDto> questions, String selfIntroduction) {
+private UserWithInterestAndQuestionDto(Long id, String userId, String nickname, String region, String mbti, String gender, List<InterestDto> interests, String selfIntroduction) {
         this.id = id;
         this.userId = userId;
         this.nickname = nickname;
@@ -32,11 +29,10 @@ private UserWithInterestAndQuestionDto(Long id, String userId, String nickname, 
         this.mbti = mbti;
         this.gender = gender;
         this.interests = interests;
-        this.questions = questions;
         this.selfIntroduction = selfIntroduction;
     }
-    public static UserWithInterestAndQuestionDto of(Long id, String userId, String nickname, String region, String mbti, String gender, List<InterestDto> interests, List<QuestionDto> questions, String selfIntroduction) {
-        return new UserWithInterestAndQuestionDto(id, userId, nickname, region, mbti, gender, interests, questions, selfIntroduction);
+    public static UserWithInterestAndQuestionDto of(Long id, String userId, String nickname, String region, String mbti, String gender, List<InterestDto> interests , String selfIntroduction) {
+        return new UserWithInterestAndQuestionDto(id, userId, nickname, region, mbti, gender, interests, selfIntroduction);
     }
 
     public static UserWithInterestAndQuestionDto from(UserAccount user) {
@@ -48,7 +44,6 @@ private UserWithInterestAndQuestionDto(Long id, String userId, String nickname, 
                 user.getMbti(),
                 user.getGender(),
                 user.getInterests().stream().map(InterestDto::from).collect(Collectors.toList()),
-                user.getQuestions().stream().map(QuestionDto::from).collect(Collectors.toList()),
                 user.getSelfIntroduction()
         );
     }

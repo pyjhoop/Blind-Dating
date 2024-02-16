@@ -1,12 +1,12 @@
 package com.blind.dating.controller;
 
 import com.blind.dating.config.SecurityConfig;
+import com.blind.dating.domain.token.TokenController;
 import com.blind.dating.dto.interest.InterestDto;
 import com.blind.dating.dto.question.QuestionDto;
 import com.blind.dating.dto.user.LogInResponse;
-import com.blind.dating.dto.user.UserInfoWithTokens;
 import com.blind.dating.security.TokenProvider;
-import com.blind.dating.service.TokenService;
+import com.blind.dating.domain.token.TokenService;
 import com.blind.dating.util.CookieUtil;
 import com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper;
 import com.epages.restdocs.apispec.ResourceSnippetParameters;
@@ -20,11 +20,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
-import org.springframework.security.core.Authentication;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.web.server.ResponseStatusException;

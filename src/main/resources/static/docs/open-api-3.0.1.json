@@ -174,7 +174,7 @@
                 },
                 "examples" : {
                   "로그인 성공" : {
-                    "value" : "{\r\n  \"code\" : 200,\r\n  \"status\" : \"OK\",\r\n  \"message\" : \"로그인이 성공적으로 진행되었습니다.\",\r\n  \"data\" : {\r\n    \"id\" : null,\r\n    \"userId\" : \"user01\",\r\n    \"nickname\" : \"userNickname\",\r\n    \"region\" : \"서울\",\r\n    \"mbti\" : \"INFP\",\r\n    \"gender\" : \"M\",\r\n    \"interests\" : [ {\r\n      \"id\" : 1,\r\n      \"interestName\" : \"자전거 타기\"\r\n    }, {\r\n      \"id\" : 2,\r\n      \"interestName\" : \"놀기\"\r\n    }, {\r\n      \"id\" : 3,\r\n      \"interestName\" : \"게임하기\"\r\n    } ],\r\n    \"questions\" : [ {\r\n      \"id\" : 1,\r\n      \"status\" : true\r\n    }, {\r\n      \"id\" : 2,\r\n      \"status\" : false\r\n    }, {\r\n      \"id\" : 3,\r\n      \"status\" : true\r\n    } ],\r\n    \"selfIntroduction\" : \"안녕하세요\",\r\n    \"accessToken\" : \"accessToken\"\r\n  }\r\n}"
+                    "value" : "{\r\n  \"code\" : 200,\r\n  \"status\" : \"OK\",\r\n  \"message\" : \"로그인이 성공적으로 진행되었습니다.\",\r\n  \"data\" : {\r\n    \"id\" : 1,\r\n    \"userId\" : \"userId\",\r\n    \"nickname\" : \"nickname\",\r\n    \"region\" : \"서울\",\r\n    \"mbti\" : \"INTP\",\r\n    \"gender\" : \"M\",\r\n    \"interests\" : [ {\r\n      \"id\" : 1,\r\n      \"interestName\" : \"자전거 타기\"\r\n    }, {\r\n      \"id\" : 2,\r\n      \"interestName\" : \"놀기\"\r\n    }, {\r\n      \"id\" : 3,\r\n      \"interestName\" : \"게임하기\"\r\n    } ],\r\n    \"selfIntroduction\" : \"하이요\",\r\n    \"accessToken\" : \"accessToken\"\r\n  }\r\n}"
                   }
                 }
               }
@@ -238,6 +238,334 @@
         }
       }
     },
+    "/api/messages" : {
+      "get" : {
+        "tags" : [ "Message" ],
+        "summary" : "내가 보낸 메시지 조회 API",
+        "description" : "내가 보낸 메시지 조회",
+        "operationId" : "내가 보낸 메시지 조회 - ",
+        "parameters" : [ {
+          "name" : "Authorization",
+          "in" : "header",
+          "description" : "Basic auth credentials",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaXNzIjoiYmxpbmQgZGF0aW5nIHdlYiIsImlhdCI6MTcwODE1MDU5NCwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwODE1NDE5NH0.gJwYTwNMuEjMgU-C2YwFdKnStR72pe5_10xGt7R-xQk"
+        } ],
+        "responses" : {
+          "500" : {
+            "description" : "500",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/메시지리스트 조회 실패 응답"
+                },
+                "examples" : {
+                  "내가 보낸 메시지 조회 - 서버 오류" : {
+                    "value" : "{\r\n  \"code\" : 500,\r\n  \"status\" : \"Internal Server Error\",\r\n  \"message\" : \"Internal Server Error\",\r\n  \"data\" : null\r\n}"
+                  }
+                }
+              }
+            }
+          },
+          "200" : {
+            "description" : "200",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/메시지리스트 조회 응답"
+                },
+                "examples" : {
+                  "내가 보낸 메시지 조회 - 성공" : {
+                    "value" : "{\r\n  \"code\" : 200,\r\n  \"status\" : \"OK\",\r\n  \"message\" : \"내가 보낸 메시지 조회 성공했습니다.\",\r\n  \"data\" : [ {\r\n    \"id\" : 1,\r\n    \"userId\" : 1,\r\n    \"userNickname\" : \"nickname\",\r\n    \"content\" : \"안녕하세요 반갑습니다.\",\r\n    \"status\" : \"WAIT\"\r\n  } ]\r\n}"
+                  }
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "401",
+            "content" : {
+              "application/json;charset=UTF-8" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/메시지리스트 조회 실패 응답"
+                },
+                "examples" : {
+                  "내가 보낸 메시지 조회 - 인증 실패" : {
+                    "value" : "{\r\n  \"code\" : 401,\r\n  \"status\" : \"unAuthorized\",\r\n  \"message\" : \"잘못된 형태의 JWT입니다. 다시 요청해주세요\",\r\n  \"data\" : null\r\n}"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "bearerAuthJWT" : [ ]
+        } ]
+      },
+      "post" : {
+        "tags" : [ "Message" ],
+        "summary" : "메시지 전송 API",
+        "description" : "메시지 전송 서버 오류",
+        "operationId" : "메시지 전송 - ",
+        "parameters" : [ {
+          "name" : "Authorization",
+          "in" : "header",
+          "description" : "Basic auth credentials",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaXNzIjoiYmxpbmQgZGF0aW5nIHdlYiIsImlhdCI6MTcwODE1MDU5NSwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwODE1NDE5NX0.KGJ2h0ibLrAzmHomh6LS3jd-VFpv1qbiASxySxoSGgE"
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json;charset=UTF-8" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/api-messages486549215"
+              },
+              "examples" : {
+                "메시지 전송 - 서버 오류" : {
+                  "value" : "{\r\n  \"receiverId\" : 1,\r\n  \"message\" : \"안녕하세요\"\r\n}"
+                },
+                "메시지 전송 - 성공" : {
+                  "value" : "{\r\n  \"receiverId\" : 1,\r\n  \"message\" : \"안녕하세요\"\r\n}"
+                },
+                "메시지 전송 - 인증 실패" : {
+                  "value" : "{\r\n  \"receiverId\" : 1,\r\n  \"message\" : \"안녕하세요\"\r\n}"
+                }
+              }
+            }
+          }
+        },
+        "responses" : {
+          "500" : {
+            "description" : "500",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/메시지 전송 응답"
+                },
+                "examples" : {
+                  "메시지 전송 - 서버 오류" : {
+                    "value" : "{\r\n  \"code\" : 500,\r\n  \"status\" : \"Internal Server Error\",\r\n  \"message\" : \"Internal Server Error\",\r\n  \"data\" : null\r\n}"
+                  }
+                }
+              }
+            }
+          },
+          "200" : {
+            "description" : "200",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/메시지 전송 응답"
+                },
+                "examples" : {
+                  "메시지 전송 - 성공" : {
+                    "value" : "{\r\n  \"code\" : 200,\r\n  \"status\" : \"OK\",\r\n  \"message\" : \"메시지기 성공적으로 전송되었습니다.\",\r\n  \"data\" : null\r\n}"
+                  }
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "401",
+            "content" : {
+              "application/json;charset=UTF-8" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/메시지 전송 응답"
+                },
+                "examples" : {
+                  "메시지 전송 - 인증 실패" : {
+                    "value" : "{\r\n  \"code\" : 401,\r\n  \"status\" : \"unAuthorized\",\r\n  \"message\" : \"잘못된 형태의 JWT입니다. 다시 요청해주세요\",\r\n  \"data\" : null\r\n}"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "bearerAuthJWT" : [ ]
+        } ]
+      }
+    },
+    "/api/posts" : {
+      "get" : {
+        "tags" : [ "Post" ],
+        "summary" : "게시글 리스트 조회 API",
+        "description" : "게시글 리스트 조회",
+        "operationId" : "게시글 리스트 조회 - ",
+        "parameters" : [ {
+          "name" : "Authorization",
+          "in" : "header",
+          "description" : "Basic auth credentials",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaXNzIjoiYmxpbmQgZGF0aW5nIHdlYiIsImlhdCI6MTcwODE1MDU5OCwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwODE1NDE5OH0.Ty8AVozGNnr43MDc6CUPwYAQKUhLtwIHtYekr2TpVUc"
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json;charset=UTF-8" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/api-posts922381862"
+              },
+              "examples" : {
+                "게시글 리스트 조회 - 서버 오류" : {
+                  "value" : "{\r\n  \"title\" : \"제목이야\",\r\n  \"content\" : \"내용이야\"\r\n}"
+                },
+                "게시글 리스트 조회 - 성공" : {
+                  "value" : "{\r\n  \"title\" : \"제목이야\",\r\n  \"content\" : \"내용이야\"\r\n}"
+                },
+                "게시글 리스트 조회 - 인증 실패" : {
+                  "value" : "{\r\n  \"title\" : \"제목이야\",\r\n  \"content\" : \"내용이야\"\r\n}"
+                }
+              }
+            }
+          }
+        },
+        "responses" : {
+          "500" : {
+            "description" : "500",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/게시글 응답"
+                },
+                "examples" : {
+                  "게시글 리스트 조회 - 서버 오류" : {
+                    "value" : "{\r\n  \"code\" : 500,\r\n  \"status\" : \"Internal Server Error\",\r\n  \"message\" : \"Internal Server Error\",\r\n  \"data\" : null\r\n}"
+                  }
+                }
+              }
+            }
+          },
+          "200" : {
+            "description" : "200",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/게시글 응답"
+                },
+                "examples" : {
+                  "게시글 리스트 조회 - 성공" : {
+                    "value" : "{\r\n  \"code\" : 200,\r\n  \"status\" : \"OK\",\r\n  \"message\" : \"게시글이 성공적으로 조회되었습니다.\",\r\n  \"data\" : {\r\n    \"pageNumber\" : 0,\r\n    \"totalPages\" : 1,\r\n    \"posts\" : [ {\r\n      \"id\" : 1,\r\n      \"user\" : {\r\n        \"id\" : 1,\r\n        \"nickname\" : \"nickname\"\r\n      },\r\n      \"title\" : \"제목이야\",\r\n      \"content\" : \"내용이야\",\r\n      \"hit\" : 0,\r\n      \"view\" : 0,\r\n      \"createdAt\" : \"2024-02-17\"\r\n    } ]\r\n  }\r\n}"
+                  }
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "401",
+            "content" : {
+              "application/json;charset=UTF-8" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/게시글 응답"
+                },
+                "examples" : {
+                  "게시글 리스트 조회 - 인증 실패" : {
+                    "value" : "{\r\n  \"code\" : 401,\r\n  \"status\" : \"unAuthorized\",\r\n  \"message\" : \"잘못된 형태의 JWT입니다. 다시 요청해주세요\",\r\n  \"data\" : null\r\n}"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "bearerAuthJWT" : [ ]
+        } ]
+      },
+      "post" : {
+        "tags" : [ "Post" ],
+        "summary" : "게시글 생성 API",
+        "description" : "게시글 생성",
+        "operationId" : "게시글 생성 - ",
+        "parameters" : [ {
+          "name" : "Authorization",
+          "in" : "header",
+          "description" : "Basic auth credentials",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaXNzIjoiYmxpbmQgZGF0aW5nIHdlYiIsImlhdCI6MTcwODE1MDU5OCwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwODE1NDE5OH0.Ty8AVozGNnr43MDc6CUPwYAQKUhLtwIHtYekr2TpVUc"
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json;charset=UTF-8" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/api-posts922381862"
+              },
+              "examples" : {
+                "게시글 생성 - 서버 오류" : {
+                  "value" : "{\r\n  \"title\" : \"제목이야\",\r\n  \"content\" : \"내용이야\"\r\n}"
+                },
+                "게시글 생성 - 성공" : {
+                  "value" : "{\r\n  \"title\" : \"제목이야\",\r\n  \"content\" : \"내용이야\"\r\n}"
+                },
+                "게시글 생성 - 인증 실패" : {
+                  "value" : "{\r\n  \"title\" : \"제목이야\",\r\n  \"content\" : \"내용이야\"\r\n}"
+                }
+              }
+            }
+          }
+        },
+        "responses" : {
+          "500" : {
+            "description" : "500",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/게시글 응답"
+                },
+                "examples" : {
+                  "게시글 생성 - 서버 오류" : {
+                    "value" : "{\r\n  \"code\" : 500,\r\n  \"status\" : \"Internal Server Error\",\r\n  \"message\" : \"Internal Server Error\",\r\n  \"data\" : null\r\n}"
+                  }
+                }
+              }
+            }
+          },
+          "200" : {
+            "description" : "200",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/게시글 응답"
+                },
+                "examples" : {
+                  "게시글 생성 - 성공" : {
+                    "value" : "{\r\n  \"code\" : 200,\r\n  \"status\" : \"OK\",\r\n  \"message\" : \"게시글이 성공적으로 생성되었습니다.\",\r\n  \"data\" : {\r\n    \"id\" : 1,\r\n    \"user\" : {\r\n      \"id\" : 1,\r\n      \"nickname\" : \"nickname\"\r\n    },\r\n    \"title\" : \"제목이야\",\r\n    \"content\" : \"내용이야\",\r\n    \"hit\" : 0,\r\n    \"view\" : 0,\r\n    \"createdAt\" : \"2024-02-17\"\r\n  }\r\n}"
+                  }
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "401",
+            "content" : {
+              "application/json;charset=UTF-8" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/게시글 응답"
+                },
+                "examples" : {
+                  "게시글 생성 - 인증 실패" : {
+                    "value" : "{\r\n  \"code\" : 401,\r\n  \"status\" : \"unAuthorized\",\r\n  \"message\" : \"잘못된 형태의 JWT입니다. 다시 요청해주세요\",\r\n  \"data\" : null\r\n}"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "bearerAuthJWT" : [ ]
+        } ]
+      }
+    },
     "/api/refresh" : {
       "get" : {
         "tags" : [ "Tokens" ],
@@ -269,7 +597,7 @@
                 },
                 "examples" : {
                   "토큰 재발급 - 성공" : {
-                    "value" : "{\r\n  \"code\" : 200,\r\n  \"status\" : \"OK\",\r\n  \"message\" : \"accessToken이 성공적으로 생성되었습니다.\",\r\n  \"data\" : {\r\n    \"id\" : 1,\r\n    \"userId\" : \"userId\",\r\n    \"nickname\" : \"nickname\",\r\n    \"region\" : \"서울\",\r\n    \"mbti\" : \"INTP\",\r\n    \"gender\" : \"M\",\r\n    \"interests\" : [ {\r\n      \"id\" : 1,\r\n      \"interestName\" : \"자전거 타기\"\r\n    }, {\r\n      \"id\" : 2,\r\n      \"interestName\" : \"놀기\"\r\n    }, {\r\n      \"id\" : 3,\r\n      \"interestName\" : \"게임하기\"\r\n    } ],\r\n    \"questions\" : [ {\r\n      \"id\" : 1,\r\n      \"status\" : true\r\n    }, {\r\n      \"id\" : 2,\r\n      \"status\" : false\r\n    }, {\r\n      \"id\" : 3,\r\n      \"status\" : true\r\n    } ],\r\n    \"selfIntroduction\" : \"하이요\",\r\n    \"accessToken\" : \"accessToken\"\r\n  }\r\n}"
+                    "value" : "{\r\n  \"code\" : 200,\r\n  \"status\" : \"OK\",\r\n  \"message\" : \"accessToken이 성공적으로 생성되었습니다.\",\r\n  \"data\" : {\r\n    \"id\" : 1,\r\n    \"userId\" : \"userId\",\r\n    \"nickname\" : \"nickname\",\r\n    \"region\" : \"서울\",\r\n    \"mbti\" : \"INTP\",\r\n    \"gender\" : \"M\",\r\n    \"interests\" : [ {\r\n      \"id\" : 1,\r\n      \"interestName\" : \"자전거 타기\"\r\n    }, {\r\n      \"id\" : 2,\r\n      \"interestName\" : \"놀기\"\r\n    }, {\r\n      \"id\" : 3,\r\n      \"interestName\" : \"게임하기\"\r\n    } ],\r\n    \"selfIntroduction\" : \"하이요\",\r\n    \"accessToken\" : \"accessToken\"\r\n  }\r\n}"
                   }
                 }
               }
@@ -296,8 +624,8 @@
     "/api/signup" : {
       "post" : {
         "tags" : [ "UserAccount" ],
-        "summary" : "인증 관련 API",
-        "description" : "인증 관련 API",
+        "summary" : "회원가입 API",
+        "description" : "회원가입 API",
         "operationId" : "userId로인한 예외발생회원가입 - 서버 오류회원가입-성공",
         "requestBody" : {
           "content" : {
@@ -307,13 +635,13 @@
               },
               "examples" : {
                 "userId로인한 예외발생" : {
-                  "value" : "{\r\n  \"userId\" : \"use\",\r\n  \"userPassword\" : \"userPass01\",\r\n  \"nickname\" : \"userNickname\",\r\n  \"region\" : \"서울\",\r\n  \"mbti\" : \"INFP\",\r\n  \"gender\" : \"M\",\r\n  \"interests\" : [ \"자전거타기\", \"놀기\", \"게임하기\" ],\r\n  \"questions\" : [ true, false, true ],\r\n  \"selfIntroduction\" : \"안녕하세요\"\r\n}"
+                  "value" : "{\r\n  \"userId\" : \"use\",\r\n  \"userPassword\" : \"userPass01\",\r\n  \"nickname\" : \"userNickname\",\r\n  \"region\" : \"서울\",\r\n  \"mbti\" : \"INFP\",\r\n  \"gender\" : \"M\",\r\n  \"interests\" : [ \"코딩하기\", \"게임하기\" ],\r\n  \"selfIntroduction\" : \"안녕하세요\"\r\n}"
                 },
                 "회원가입 - 서버 오류" : {
-                  "value" : "{\r\n  \"userId\" : \"use\",\r\n  \"userPassword\" : \"userPass01\",\r\n  \"nickname\" : \"userNickname\",\r\n  \"region\" : \"서울\",\r\n  \"mbti\" : \"INFP\",\r\n  \"gender\" : \"M\",\r\n  \"interests\" : [ \"자전거타기\", \"놀기\", \"게임하기\" ],\r\n  \"questions\" : [ true, false, true ],\r\n  \"selfIntroduction\" : \"안녕하세요\"\r\n}"
+                  "value" : "{\r\n  \"userId\" : \"use\",\r\n  \"userPassword\" : \"userPass01\",\r\n  \"nickname\" : \"userNickname\",\r\n  \"region\" : \"서울\",\r\n  \"mbti\" : \"INFP\",\r\n  \"gender\" : \"M\",\r\n  \"interests\" : [ \"코딩하기\", \"게임하기\" ],\r\n  \"selfIntroduction\" : \"안녕하세요\"\r\n}"
                 },
                 "회원가입-성공" : {
-                  "value" : "{\r\n  \"userId\" : \"user01\",\r\n  \"userPassword\" : \"userPass01\",\r\n  \"nickname\" : \"userNickname\",\r\n  \"region\" : \"서울\",\r\n  \"mbti\" : \"INFP\",\r\n  \"gender\" : \"M\",\r\n  \"interests\" : [ \"자전거타기\", \"놀기\", \"게임하기\" ],\r\n  \"questions\" : [ true, false, true ],\r\n  \"selfIntroduction\" : \"안녕하세요\"\r\n}"
+                  "value" : "{\r\n  \"userId\" : \"user01\",\r\n  \"userPassword\" : \"userPass01\",\r\n  \"nickname\" : \"userNickname\",\r\n  \"region\" : \"서울\",\r\n  \"mbti\" : \"INFP\",\r\n  \"gender\" : \"M\",\r\n  \"interests\" : [ \"코딩하기\", \"게임하기\" ],\r\n  \"selfIntroduction\" : \"안녕하세요\"\r\n}"
                 }
               }
             }
@@ -370,7 +698,7 @@
           "schema" : {
             "type" : "string"
           },
-          "example" : "Bearer accessToken"
+          "example" : "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaXNzIjoiYmxpbmQgZGF0aW5nIHdlYiIsImlhdCI6MTcwODE1MDYwNywiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwODE1NDIwN30.FGaKhlPhcLoNL2z2IKeVC1Okk3f9te8ArYltCMI0rWo"
         } ],
         "responses" : {
           "500" : {
@@ -397,7 +725,7 @@
                 },
                 "examples" : {
                   "내정보 조회 - 성공" : {
-                    "value" : "{\r\n  \"code\" : 200,\r\n  \"status\" : \"OK\",\r\n  \"message\" : \"내 정보가 성공적으로 조회되었습니다.\",\r\n  \"data\" : {\r\n    \"id\" : 1,\r\n    \"userId\" : \"userId1\",\r\n    \"nickname\" : \"nickname1\",\r\n    \"region\" : \"서울\",\r\n    \"mbti\" : \"INTP\",\r\n    \"gender\" : \"M\",\r\n    \"interests\" : [ {\r\n      \"id\" : 1,\r\n      \"interestName\" : \"자전거 타기\"\r\n    }, {\r\n      \"id\" : 2,\r\n      \"interestName\" : \"놀기\"\r\n    }, {\r\n      \"id\" : 3,\r\n      \"interestName\" : \"게임하기\"\r\n    } ],\r\n    \"questions\" : [ {\r\n      \"id\" : 1,\r\n      \"status\" : true\r\n    }, {\r\n      \"id\" : 2,\r\n      \"status\" : false\r\n    }, {\r\n      \"id\" : 3,\r\n      \"status\" : true\r\n    } ],\r\n    \"selfIntroduction\" : \"안녕\"\r\n  }\r\n}"
+                    "value" : "{\r\n  \"code\" : 200,\r\n  \"status\" : \"OK\",\r\n  \"message\" : \"내 정보가 성공적으로 수정되었습니다.\",\r\n  \"data\" : {\r\n    \"id\" : 1,\r\n    \"nickname\" : \"nickname\",\r\n    \"region\" : \"서울\",\r\n    \"mbti\" : \"INTP\",\r\n    \"gender\" : \"M\",\r\n    \"interests\" : [ {\r\n      \"id\" : null,\r\n      \"interestName\" : null\r\n    } ],\r\n    \"selfIntroduction\" : \"안녕\",\r\n    \"profile\" : \"change\"\r\n  }\r\n}"
                   }
                 }
               }
@@ -406,19 +734,22 @@
           "401" : {
             "description" : "401",
             "content" : {
-              "application/json;charset=UTF-8" : {
+              "application/json" : {
                 "schema" : {
                   "$ref" : "#/components/schemas/내정보 조회 실패"
                 },
                 "examples" : {
                   "내정보 조회 - 인증 실패" : {
-                    "value" : "{\r\n  \"code\" : 401,\r\n  \"status\" : \"unAuthorized\",\r\n  \"message\" : \"unAuthorized\",\r\n  \"data\" : null\r\n}"
+                    "value" : "{\r\n  \"code\" : 401,\r\n  \"status\" : \"Unauthorization\",\r\n  \"message\" : \"인증에 실패했습니다.\",\r\n  \"data\" : null\r\n}"
                   }
                 }
               }
             }
           }
-        }
+        },
+        "security" : [ {
+          "bearerAuthJWT" : [ ]
+        } ]
       },
       "put" : {
         "tags" : [ "User" ],
@@ -433,7 +764,7 @@
           "schema" : {
             "type" : "string"
           },
-          "example" : "Bearer accessToken"
+          "example" : "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaXNzIjoiYmxpbmQgZGF0aW5nIHdlYiIsImlhdCI6MTcwODE1MDYwNiwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwODE1NDIwNn0.6ybMGEBxtZGdOLSo2H3AM2gDq7eOqOdxaPOJ8_4Ld8c"
         } ],
         "requestBody" : {
           "content" : {
@@ -480,7 +811,7 @@
                 },
                 "examples" : {
                   "내정보 수정 - 성공" : {
-                    "value" : "{\r\n  \"code\" : 200,\r\n  \"status\" : \"OK\",\r\n  \"message\" : \"내 정보가 성공적으로 수정되었습니다.\",\r\n  \"data\" : {\r\n    \"id\" : 1,\r\n    \"userId\" : \"userId\",\r\n    \"nickname\" : \"nickname\",\r\n    \"region\" : \"서울\",\r\n    \"mbti\" : \"INTP\",\r\n    \"gender\" : \"M\",\r\n    \"interests\" : [ {\r\n      \"id\" : 1,\r\n      \"interestName\" : \"놀기\"\r\n    }, {\r\n      \"id\" : 2,\r\n      \"interestName\" : \"게임하기\"\r\n    } ],\r\n    \"questions\" : [ {\r\n      \"id\" : 1,\r\n      \"status\" : true\r\n    }, {\r\n      \"id\" : 2,\r\n      \"status\" : false\r\n    } ],\r\n    \"selfIntroduction\" : \"안녕\"\r\n  }\r\n}"
+                    "value" : "{\r\n  \"code\" : 200,\r\n  \"status\" : \"OK\",\r\n  \"message\" : \"내 정보가 성공적으로 수정되었습니다.\",\r\n  \"data\" : {\r\n    \"id\" : 1,\r\n    \"userId\" : \"userId\",\r\n    \"nickname\" : \"nickname\",\r\n    \"region\" : \"서울\",\r\n    \"mbti\" : \"INTP\",\r\n    \"gender\" : \"M\",\r\n    \"interests\" : [ {\r\n      \"id\" : 1,\r\n      \"interestName\" : \"놀기\"\r\n    }, {\r\n      \"id\" : 2,\r\n      \"interestName\" : \"게임하기\"\r\n    } ],\r\n    \"selfIntroduction\" : \"안녕\"\r\n  }\r\n}"
                   }
                 }
               }
@@ -495,21 +826,92 @@
                 },
                 "examples" : {
                   "내정보 수정 - 인증 실패" : {
-                    "value" : "{\r\n  \"code\" : 401,\r\n  \"status\" : \"unAuthorized\",\r\n  \"message\" : \"unAuthorized\",\r\n  \"data\" : null\r\n}"
+                    "value" : "{\r\n  \"code\" : 401,\r\n  \"status\" : \"unAuthorized\",\r\n  \"message\" : \"잘못된 형태의 JWT입니다. 다시 요청해주세요\",\r\n  \"data\" : null\r\n}"
                   }
                 }
               }
             }
           }
-        }
+        },
+        "security" : [ {
+          "bearerAuthJWT" : [ ]
+        } ]
+      }
+    },
+    "/api/messages/me" : {
+      "get" : {
+        "tags" : [ "Message" ],
+        "summary" : "내게 온 메시지 조회 API",
+        "description" : "내게온 메시지 조회",
+        "operationId" : "내게온 메시지 조회 - ",
+        "parameters" : [ {
+          "name" : "Authorization",
+          "in" : "header",
+          "description" : "Basic auth credentials",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaXNzIjoiYmxpbmQgZGF0aW5nIHdlYiIsImlhdCI6MTcwODE1MDU5NCwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwODE1NDE5NH0.gJwYTwNMuEjMgU-C2YwFdKnStR72pe5_10xGt7R-xQk"
+        } ],
+        "responses" : {
+          "500" : {
+            "description" : "500",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/메시지리스트 조회 실패 응답"
+                },
+                "examples" : {
+                  "내게온 메시지 조회 - 서버 오류" : {
+                    "value" : "{\r\n  \"code\" : 500,\r\n  \"status\" : \"Internal Server Error\",\r\n  \"message\" : \"Internal Server Error\",\r\n  \"data\" : null\r\n}"
+                  }
+                }
+              }
+            }
+          },
+          "200" : {
+            "description" : "200",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/메시지리스트 조회 응답"
+                },
+                "examples" : {
+                  "내게온 메시지 조회 - 성공" : {
+                    "value" : "{\r\n  \"code\" : 200,\r\n  \"status\" : \"OK\",\r\n  \"message\" : \"내게온 메시지 조회 성공했습니다.\",\r\n  \"data\" : [ {\r\n    \"id\" : 1,\r\n    \"userId\" : 1,\r\n    \"userNickname\" : \"nickname\",\r\n    \"content\" : \"안녕하세요 반갑습니다.\",\r\n    \"status\" : \"WAIT\"\r\n  } ]\r\n}"
+                  }
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "401",
+            "content" : {
+              "application/json;charset=UTF-8" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/메시지리스트 조회 실패 응답"
+                },
+                "examples" : {
+                  "내게온 메시지 조회 - 인증 실패" : {
+                    "value" : "{\r\n  \"code\" : 401,\r\n  \"status\" : \"unAuthorized\",\r\n  \"message\" : \"잘못된 형태의 JWT입니다. 다시 요청해주세요\",\r\n  \"data\" : null\r\n}"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "bearerAuthJWT" : [ ]
+        } ]
       }
     },
     "/api/posts/{postId}" : {
       "get" : {
         "tags" : [ "Post" ],
         "summary" : "게시글 단건 조회 API",
-        "description" : "게시글을 단건 조회",
-        "operationId" : "게시글 단건 조회 - 성공",
+        "description" : "게시글 단건 조회",
+        "operationId" : "게시글 단건 조회 - ",
         "parameters" : [ {
           "name" : "postId",
           "in" : "path",
@@ -526,57 +928,22 @@
           "schema" : {
             "type" : "string"
           },
-          "example" : "Bearer accessToken"
-        } ],
-        "responses" : {
-          "200" : {
-            "description" : "200",
-            "content" : {
-              "application/json;charset=UTF-8" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/게시물 단건 조회 응답"
-                },
-                "examples" : {
-                  "게시글 단건 조회 - 성공" : {
-                    "value" : "{\r\n  \"code\" : 200,\r\n  \"status\" : \"OK\",\r\n  \"message\" : \"게시글이 성공적으로 조회되었습니다.\",\r\n  \"data\" : {\r\n    \"id\" : 1,\r\n    \"user\" : {\r\n      \"id\" : 1,\r\n      \"nickname\" : \"nickname\"\r\n    },\r\n    \"title\" : \"제목이야\",\r\n    \"content\" : \"내용이야\",\r\n    \"hit\" : 0,\r\n    \"view\" : 0,\r\n    \"createdAt\" : \"2024-02-16\"\r\n  }\r\n}"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "patch" : {
-        "tags" : [ "Post" ],
-        "summary" : "게시글 수정 API",
-        "description" : "게시글을 수정",
-        "operationId" : "게시글 수정 - 성공",
-        "parameters" : [ {
-          "name" : "postId",
-          "in" : "path",
-          "description" : "",
-          "required" : true,
-          "schema" : {
-            "type" : "string"
-          }
-        }, {
-          "name" : "Authorization",
-          "in" : "header",
-          "description" : "Basic auth credentials",
-          "required" : true,
-          "schema" : {
-            "type" : "string"
-          },
-          "example" : "Bearer accessToken"
+          "example" : "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaXNzIjoiYmxpbmQgZGF0aW5nIHdlYiIsImlhdCI6MTcwODE1MDU5OCwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwODE1NDE5OH0.Ty8AVozGNnr43MDc6CUPwYAQKUhLtwIHtYekr2TpVUc"
         } ],
         "requestBody" : {
           "content" : {
             "application/json;charset=UTF-8" : {
               "schema" : {
-                "$ref" : "#/components/schemas/api-posts-postId922381862"
+                "$ref" : "#/components/schemas/api-posts922381862"
               },
               "examples" : {
-                "게시글 수정 - 성공" : {
+                "게시글 단건 조회 - 서버 오류" : {
+                  "value" : "{\r\n  \"title\" : \"제목이야\",\r\n  \"content\" : \"내용이야\"\r\n}"
+                },
+                "게시글 단건 조회 - 성공" : {
+                  "value" : "{\r\n  \"title\" : \"제목이야\",\r\n  \"content\" : \"내용이야\"\r\n}"
+                },
+                "게시글 단건 조회 - 인증 실패" : {
                   "value" : "{\r\n  \"title\" : \"제목이야\",\r\n  \"content\" : \"내용이야\"\r\n}"
                 }
               }
@@ -584,22 +951,149 @@
           }
         },
         "responses" : {
+          "500" : {
+            "description" : "500",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/게시글 응답"
+                },
+                "examples" : {
+                  "게시글 단건 조회 - 서버 오류" : {
+                    "value" : "{\r\n  \"code\" : 500,\r\n  \"status\" : \"Internal Server Error\",\r\n  \"message\" : \"Internal Server Error\",\r\n  \"data\" : null\r\n}"
+                  }
+                }
+              }
+            }
+          },
           "200" : {
             "description" : "200",
             "content" : {
-              "application/json;charset=UTF-8" : {
+              "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/게시물 수정 응답"
+                  "$ref" : "#/components/schemas/게시글 응답"
                 },
                 "examples" : {
-                  "게시글 수정 - 성공" : {
-                    "value" : "{\r\n  \"code\" : 200,\r\n  \"status\" : \"OK\",\r\n  \"message\" : \"게시글이 성공적으로 수정되었습니다.\",\r\n  \"data\" : {\r\n    \"id\" : 1,\r\n    \"user\" : {\r\n      \"id\" : 1,\r\n      \"nickname\" : \"nickname\"\r\n    },\r\n    \"title\" : \"제목이야\",\r\n    \"content\" : \"내용이야\",\r\n    \"hit\" : 0,\r\n    \"view\" : 0,\r\n    \"createdAt\" : \"2024-02-16\"\r\n  }\r\n}"
+                  "게시글 단건 조회 - 성공" : {
+                    "value" : "{\r\n  \"code\" : 200,\r\n  \"status\" : \"OK\",\r\n  \"message\" : \"게시글이 성공적으로 조회되었습니다.\",\r\n  \"data\" : {\r\n    \"id\" : 1,\r\n    \"user\" : {\r\n      \"id\" : 1,\r\n      \"nickname\" : \"nickname\"\r\n    },\r\n    \"title\" : \"제목이야\",\r\n    \"content\" : \"내용이야\",\r\n    \"hit\" : 0,\r\n    \"view\" : 0,\r\n    \"createdAt\" : \"2024-02-17\"\r\n  }\r\n}"
+                  }
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "401",
+            "content" : {
+              "application/json;charset=UTF-8" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/게시글 응답"
+                },
+                "examples" : {
+                  "게시글 단건 조회 - 인증 실패" : {
+                    "value" : "{\r\n  \"code\" : 401,\r\n  \"status\" : \"unAuthorized\",\r\n  \"message\" : \"잘못된 형태의 JWT입니다. 다시 요청해주세요\",\r\n  \"data\" : null\r\n}"
                   }
                 }
               }
             }
           }
-        }
+        },
+        "security" : [ {
+          "bearerAuthJWT" : [ ]
+        } ]
+      },
+      "patch" : {
+        "tags" : [ "Post" ],
+        "summary" : "게시글 수정 API",
+        "description" : "게시글 수정시",
+        "operationId" : "게시글 수정 - ",
+        "parameters" : [ {
+          "name" : "postId",
+          "in" : "path",
+          "description" : "",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "Authorization",
+          "in" : "header",
+          "description" : "Basic auth credentials",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaXNzIjoiYmxpbmQgZGF0aW5nIHdlYiIsImlhdCI6MTcwODE1MDU5OCwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwODE1NDE5OH0.Ty8AVozGNnr43MDc6CUPwYAQKUhLtwIHtYekr2TpVUc"
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json;charset=UTF-8" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/api-posts922381862"
+              },
+              "examples" : {
+                "게시글 수정 - 서버 오류" : {
+                  "value" : "{\r\n  \"title\" : \"제목이야\",\r\n  \"content\" : \"내용이야\"\r\n}"
+                },
+                "게시글 수정 - 성공" : {
+                  "value" : "{\r\n  \"title\" : \"제목이야\",\r\n  \"content\" : \"내용이야\"\r\n}"
+                },
+                "게시글 수정 - 인증 실패" : {
+                  "value" : "{\r\n  \"title\" : \"제목이야\",\r\n  \"content\" : \"내용이야\"\r\n}"
+                }
+              }
+            }
+          }
+        },
+        "responses" : {
+          "500" : {
+            "description" : "500",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/게시글 응답"
+                },
+                "examples" : {
+                  "게시글 수정 - 서버 오류" : {
+                    "value" : "{\r\n  \"code\" : 500,\r\n  \"status\" : \"Internal Server Error\",\r\n  \"message\" : \"Internal Server Error\",\r\n  \"data\" : null\r\n}"
+                  }
+                }
+              }
+            }
+          },
+          "200" : {
+            "description" : "200",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/게시글 응답"
+                },
+                "examples" : {
+                  "게시글 수정 - 성공" : {
+                    "value" : "{\r\n  \"code\" : 200,\r\n  \"status\" : \"OK\",\r\n  \"message\" : \"게시글이 성공적으로 수정되었습니다.\",\r\n  \"data\" : {\r\n    \"id\" : 1,\r\n    \"user\" : {\r\n      \"id\" : 1,\r\n      \"nickname\" : \"nickname\"\r\n    },\r\n    \"title\" : \"제목이야\",\r\n    \"content\" : \"내용이야\",\r\n    \"hit\" : 0,\r\n    \"view\" : 0,\r\n    \"createdAt\" : \"2024-02-17\"\r\n  }\r\n}"
+                  }
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "401",
+            "content" : {
+              "application/json;charset=UTF-8" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/게시글 응답"
+                },
+                "examples" : {
+                  "게시글 수정 - 인증 실패" : {
+                    "value" : "{\r\n  \"code\" : 401,\r\n  \"status\" : \"unAuthorized\",\r\n  \"message\" : \"잘못된 형태의 JWT입니다. 다시 요청해주세요\",\r\n  \"data\" : null\r\n}"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "bearerAuthJWT" : [ ]
+        } ]
       }
     },
     "/api/users/all" : {
@@ -616,7 +1110,7 @@
           "schema" : {
             "type" : "string"
           },
-          "example" : "Bearer accessToken"
+          "example" : "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaXNzIjoiYmxpbmQgZGF0aW5nIHdlYiIsImlhdCI6MTcwODE1MDYwNywiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwODE1NDIwN30.FGaKhlPhcLoNL2z2IKeVC1Okk3f9te8ArYltCMI0rWo"
         } ],
         "responses" : {
           "500" : {
@@ -643,7 +1137,7 @@
                 },
                 "examples" : {
                   "전체 유저 조회 - 성공" : {
-                    "value" : "{\r\n  \"code\" : 200,\r\n  \"status\" : \"OK\",\r\n  \"message\" : \"추천유저가 성공적으로 조회되었습니다.\",\r\n  \"data\" : {\r\n    \"pageNumber\" : 0,\r\n    \"totalPages\" : 1,\r\n    \"content\" : [ {\r\n      \"id\" : 1,\r\n      \"nickname\" : \"nickname1\",\r\n      \"region\" : \"서울\",\r\n      \"mbti\" : \"INTP\",\r\n      \"gender\" : \"M\",\r\n      \"interests\" : [ {\r\n        \"id\" : 1,\r\n        \"interestName\" : \"자전거 타기\"\r\n      }, {\r\n        \"id\" : 2,\r\n        \"interestName\" : \"놀기\"\r\n      }, {\r\n        \"id\" : 3,\r\n        \"interestName\" : \"게임하기\"\r\n      } ],\r\n      \"questions\" : [ {\r\n        \"id\" : 1,\r\n        \"status\" : true\r\n      }, {\r\n        \"id\" : 2,\r\n        \"status\" : false\r\n      }, {\r\n        \"id\" : 3,\r\n        \"status\" : true\r\n      } ],\r\n      \"selfIntroduction\" : \"하이요\"\r\n    } ]\r\n  }\r\n}"
+                    "value" : "{\r\n  \"code\" : 200,\r\n  \"status\" : \"OK\",\r\n  \"message\" : \"추천유저가 성공적으로 조회되었습니다.\",\r\n  \"data\" : {\r\n    \"pageNumber\" : 0,\r\n    \"totalPages\" : 1,\r\n    \"content\" : [ {\r\n      \"id\" : 1,\r\n      \"nickname\" : \"nickname1\",\r\n      \"region\" : \"서울\",\r\n      \"mbti\" : \"INTP\",\r\n      \"gender\" : \"M\",\r\n      \"interests\" : [ {\r\n        \"id\" : 1,\r\n        \"interestName\" : \"자전거 타기\"\r\n      }, {\r\n        \"id\" : 2,\r\n        \"interestName\" : \"놀기\"\r\n      }, {\r\n        \"id\" : 3,\r\n        \"interestName\" : \"게임하기\"\r\n      } ],\r\n      \"selfIntroduction\" : \"하이요\"\r\n    } ]\r\n  }\r\n}"
                   }
                 }
               }
@@ -652,19 +1146,22 @@
           "401" : {
             "description" : "401",
             "content" : {
-              "application/json;charset=UTF-8" : {
+              "application/json" : {
                 "schema" : {
                   "$ref" : "#/components/schemas/유저 리스트 조회 실패"
                 },
                 "examples" : {
                   "전체 유저 조회 - 인증 실패" : {
-                    "value" : "{\r\n  \"code\" : 401,\r\n  \"status\" : \"unAuthorized\",\r\n  \"message\" : \"unAuthorized\",\r\n  \"data\" : null\r\n}"
+                    "value" : "{\r\n  \"code\" : 401,\r\n  \"status\" : \"Unauthorization\",\r\n  \"message\" : \"인증에 실패했습니다.\",\r\n  \"data\" : null\r\n}"
                   }
                 }
               }
             }
           }
-        }
+        },
+        "security" : [ {
+          "bearerAuthJWT" : [ ]
+        } ]
       }
     },
     "/api/users/female" : {
@@ -681,7 +1178,7 @@
           "schema" : {
             "type" : "string"
           },
-          "example" : "Bearer accessToken"
+          "example" : "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaXNzIjoiYmxpbmQgZGF0aW5nIHdlYiIsImlhdCI6MTcwODE1MDYwNywiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwODE1NDIwN30.FGaKhlPhcLoNL2z2IKeVC1Okk3f9te8ArYltCMI0rWo"
         } ],
         "responses" : {
           "500" : {
@@ -708,7 +1205,7 @@
                 },
                 "examples" : {
                   "여성 유저 조회 - 성공" : {
-                    "value" : "{\r\n  \"code\" : 200,\r\n  \"status\" : \"OK\",\r\n  \"message\" : \"추천유저가 성공적으로 조회되었습니다.\",\r\n  \"data\" : {\r\n    \"pageNumber\" : 0,\r\n    \"totalPages\" : 1,\r\n    \"content\" : [ {\r\n      \"id\" : 1,\r\n      \"nickname\" : \"nickname1\",\r\n      \"region\" : \"서울\",\r\n      \"mbti\" : \"INTP\",\r\n      \"gender\" : \"W\",\r\n      \"interests\" : [ {\r\n        \"id\" : 1,\r\n        \"interestName\" : \"자전거 타기\"\r\n      }, {\r\n        \"id\" : 2,\r\n        \"interestName\" : \"놀기\"\r\n      }, {\r\n        \"id\" : 3,\r\n        \"interestName\" : \"게임하기\"\r\n      } ],\r\n      \"questions\" : [ {\r\n        \"id\" : 1,\r\n        \"status\" : true\r\n      }, {\r\n        \"id\" : 2,\r\n        \"status\" : false\r\n      }, {\r\n        \"id\" : 3,\r\n        \"status\" : true\r\n      } ],\r\n      \"selfIntroduction\" : \"하이요\"\r\n    } ]\r\n  }\r\n}"
+                    "value" : "{\r\n  \"code\" : 200,\r\n  \"status\" : \"OK\",\r\n  \"message\" : \"추천유저가 성공적으로 조회되었습니다.\",\r\n  \"data\" : {\r\n    \"pageNumber\" : 0,\r\n    \"totalPages\" : 1,\r\n    \"content\" : [ {\r\n      \"id\" : 1,\r\n      \"nickname\" : \"nickname1\",\r\n      \"region\" : \"서울\",\r\n      \"mbti\" : \"INTP\",\r\n      \"gender\" : \"W\",\r\n      \"interests\" : [ {\r\n        \"id\" : 1,\r\n        \"interestName\" : \"자전거 타기\"\r\n      }, {\r\n        \"id\" : 2,\r\n        \"interestName\" : \"놀기\"\r\n      }, {\r\n        \"id\" : 3,\r\n        \"interestName\" : \"게임하기\"\r\n      } ],\r\n      \"selfIntroduction\" : \"하이요\"\r\n    } ]\r\n  }\r\n}"
                   }
                 }
               }
@@ -717,19 +1214,22 @@
           "401" : {
             "description" : "401",
             "content" : {
-              "application/json;charset=UTF-8" : {
+              "application/json" : {
                 "schema" : {
                   "$ref" : "#/components/schemas/유저 리스트 조회 실패"
                 },
                 "examples" : {
                   "여성 유저 조회 - 인증 실패" : {
-                    "value" : "{\r\n  \"code\" : 401,\r\n  \"status\" : \"unAuthorized\",\r\n  \"message\" : \"unAuthorized\",\r\n  \"data\" : null\r\n}"
+                    "value" : "{\r\n  \"code\" : 401,\r\n  \"status\" : \"Unauthorization\",\r\n  \"message\" : \"인증에 실패했습니다.\",\r\n  \"data\" : null\r\n}"
                   }
                 }
               }
             }
           }
-        }
+        },
+        "security" : [ {
+          "bearerAuthJWT" : [ ]
+        } ]
       }
     },
     "/api/users/male" : {
@@ -746,7 +1246,7 @@
           "schema" : {
             "type" : "string"
           },
-          "example" : "Bearer accessToken"
+          "example" : "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaXNzIjoiYmxpbmQgZGF0aW5nIHdlYiIsImlhdCI6MTcwODE1MDYwNywiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwODE1NDIwN30.FGaKhlPhcLoNL2z2IKeVC1Okk3f9te8ArYltCMI0rWo"
         } ],
         "responses" : {
           "500" : {
@@ -773,7 +1273,83 @@
                 },
                 "examples" : {
                   "남성 유저 조회 - 성공" : {
-                    "value" : "{\r\n  \"code\" : 200,\r\n  \"status\" : \"OK\",\r\n  \"message\" : \"추천유저가 성공적으로 조회되었습니다.\",\r\n  \"data\" : {\r\n    \"pageNumber\" : 0,\r\n    \"totalPages\" : 1,\r\n    \"content\" : [ {\r\n      \"id\" : 1,\r\n      \"nickname\" : \"nickname1\",\r\n      \"region\" : \"서울\",\r\n      \"mbti\" : \"INTP\",\r\n      \"gender\" : \"M\",\r\n      \"interests\" : [ {\r\n        \"id\" : 1,\r\n        \"interestName\" : \"자전거 타기\"\r\n      }, {\r\n        \"id\" : 2,\r\n        \"interestName\" : \"놀기\"\r\n      }, {\r\n        \"id\" : 3,\r\n        \"interestName\" : \"게임하기\"\r\n      } ],\r\n      \"questions\" : [ {\r\n        \"id\" : 1,\r\n        \"status\" : true\r\n      }, {\r\n        \"id\" : 2,\r\n        \"status\" : false\r\n      }, {\r\n        \"id\" : 3,\r\n        \"status\" : true\r\n      } ],\r\n      \"selfIntroduction\" : \"하이요\"\r\n    } ]\r\n  }\r\n}"
+                    "value" : "{\r\n  \"code\" : 200,\r\n  \"status\" : \"OK\",\r\n  \"message\" : \"추천유저가 성공적으로 조회되었습니다.\",\r\n  \"data\" : {\r\n    \"pageNumber\" : 0,\r\n    \"totalPages\" : 1,\r\n    \"content\" : [ {\r\n      \"id\" : 1,\r\n      \"nickname\" : \"nickname1\",\r\n      \"region\" : \"서울\",\r\n      \"mbti\" : \"INTP\",\r\n      \"gender\" : \"M\",\r\n      \"interests\" : [ {\r\n        \"id\" : 1,\r\n        \"interestName\" : \"자전거 타기\"\r\n      }, {\r\n        \"id\" : 2,\r\n        \"interestName\" : \"놀기\"\r\n      }, {\r\n        \"id\" : 3,\r\n        \"interestName\" : \"게임하기\"\r\n      } ],\r\n      \"selfIntroduction\" : \"하이요\"\r\n    } ]\r\n  }\r\n}"
+                  }
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "401",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/유저 리스트 조회 실패"
+                },
+                "examples" : {
+                  "남성 유저 조회 - 인증 실패" : {
+                    "value" : "{\r\n  \"code\" : 401,\r\n  \"status\" : \"Unauthorization\",\r\n  \"message\" : \"인증에 실패했습니다.\",\r\n  \"data\" : null\r\n}"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "bearerAuthJWT" : [ ]
+        } ]
+      }
+    },
+    "/api/messages/{messageId}/accept" : {
+      "patch" : {
+        "tags" : [ "Message" ],
+        "summary" : "메시지 수락 API",
+        "description" : "메시지 수락",
+        "operationId" : "메시지 수락 - ",
+        "parameters" : [ {
+          "name" : "messageId",
+          "in" : "path",
+          "description" : "",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "Authorization",
+          "in" : "header",
+          "description" : "Basic auth credentials",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaXNzIjoiYmxpbmQgZGF0aW5nIHdlYiIsImlhdCI6MTcwODE1MDU5NSwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwODE1NDE5NX0.KGJ2h0ibLrAzmHomh6LS3jd-VFpv1qbiASxySxoSGgE"
+        } ],
+        "responses" : {
+          "500" : {
+            "description" : "500",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/메시지 수락 응답"
+                },
+                "examples" : {
+                  "메시지 수락 - 서버 에러" : {
+                    "value" : "{\r\n  \"code\" : 500,\r\n  \"status\" : \"Internal Server Error\",\r\n  \"message\" : \"Internal Server Error\",\r\n  \"data\" : null\r\n}"
+                  }
+                }
+              }
+            }
+          },
+          "200" : {
+            "description" : "200",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/메시지 수락 응답"
+                },
+                "examples" : {
+                  "메시지 수락 - 성공" : {
+                    "value" : "{\r\n  \"code\" : 200,\r\n  \"status\" : \"OK\",\r\n  \"message\" : \"메시지를 수락해 채팅방이 성공적으로 생성되었습니다.\",\r\n  \"data\" : null\r\n}"
                   }
                 }
               }
@@ -784,22 +1360,237 @@
             "content" : {
               "application/json;charset=UTF-8" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/유저 리스트 조회 실패"
+                  "$ref" : "#/components/schemas/메시지 수락 응답"
                 },
                 "examples" : {
-                  "남성 유저 조회 - 인증 실패" : {
-                    "value" : "{\r\n  \"code\" : 401,\r\n  \"status\" : \"unAuthorized\",\r\n  \"message\" : \"unAuthorized\",\r\n  \"data\" : null\r\n}"
+                  "메시지 수락 - 인증 실패" : {
+                    "value" : "{\r\n  \"code\" : 401,\r\n  \"status\" : \"unAuthorized\",\r\n  \"message\" : \"잘못된 형태의 JWT입니다. 다시 요청해주세요\",\r\n  \"data\" : null\r\n}"
                   }
                 }
               }
             }
           }
-        }
+        },
+        "security" : [ {
+          "bearerAuthJWT" : [ ]
+        } ]
+      }
+    },
+    "/api/messages/{messageId}/reject" : {
+      "patch" : {
+        "tags" : [ "Message" ],
+        "summary" : "메시지 거절 API",
+        "description" : "메시지 거절",
+        "operationId" : "메시지 거절 - ",
+        "parameters" : [ {
+          "name" : "messageId",
+          "in" : "path",
+          "description" : "",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "Authorization",
+          "in" : "header",
+          "description" : "Basic auth credentials",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaXNzIjoiYmxpbmQgZGF0aW5nIHdlYiIsImlhdCI6MTcwODE1MDU5NSwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwODE1NDE5NX0.KGJ2h0ibLrAzmHomh6LS3jd-VFpv1qbiASxySxoSGgE"
+        } ],
+        "responses" : {
+          "500" : {
+            "description" : "500",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/메시지 수락 응답"
+                },
+                "examples" : {
+                  "메시지 거절 - 서버 에러" : {
+                    "value" : "{\r\n  \"code\" : 500,\r\n  \"status\" : \"Internal Server Error\",\r\n  \"message\" : \"Internal Server Error\",\r\n  \"data\" : null\r\n}"
+                  }
+                }
+              }
+            }
+          },
+          "200" : {
+            "description" : "200",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/메시지 거절 응답"
+                },
+                "examples" : {
+                  "메시지 거절 - 성공" : {
+                    "value" : "{\r\n  \"code\" : 200,\r\n  \"status\" : \"OK\",\r\n  \"message\" : \"메시지 거절에 성공했습니다.\",\r\n  \"data\" : null\r\n}"
+                  }
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "401",
+            "content" : {
+              "application/json;charset=UTF-8" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/메시지 거절 응답"
+                },
+                "examples" : {
+                  "메시지 거절 - 인증 실패" : {
+                    "value" : "{\r\n  \"code\" : 401,\r\n  \"status\" : \"unAuthorized\",\r\n  \"message\" : \"잘못된 형태의 JWT입니다. 다시 요청해주세요\",\r\n  \"data\" : null\r\n}"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "bearerAuthJWT" : [ ]
+        } ]
       }
     }
   },
   "components" : {
     "schemas" : {
+      "회원가입 요청" : {
+        "title" : "회원가입 요청",
+        "type" : "object",
+        "properties" : {
+          "userPassword" : {
+            "type" : "string",
+            "description" : "비밀번호"
+          },
+          "gender" : {
+            "type" : "string",
+            "description" : "성별"
+          },
+          "nickname" : {
+            "type" : "string",
+            "description" : "닉네임"
+          },
+          "mbti" : {
+            "type" : "string",
+            "description" : "MBTI"
+          },
+          "selfIntroduction" : {
+            "type" : "string",
+            "description" : "자기소개"
+          },
+          "interests" : {
+            "type" : "array",
+            "description" : "관심사",
+            "items" : {
+              "oneOf" : [ {
+                "type" : "object"
+              }, {
+                "type" : "boolean"
+              }, {
+                "type" : "string"
+              }, {
+                "type" : "number"
+              } ]
+            }
+          },
+          "region" : {
+            "type" : "string",
+            "description" : "사는 지역"
+          },
+          "userId" : {
+            "type" : "string",
+            "description" : "유저 아이디"
+          }
+        }
+      },
+      "게시글 응답" : {
+        "title" : "게시글 응답",
+        "type" : "object",
+        "properties" : {
+          "code" : {
+            "type" : "number",
+            "description" : "응답 코드"
+          },
+          "message" : {
+            "type" : "string",
+            "description" : "응답 메시지"
+          },
+          "status" : {
+            "type" : "string",
+            "description" : "응답 상태"
+          }
+        }
+      },
+      "내정보 수정 성공" : {
+        "title" : "내정보 수정 성공",
+        "type" : "object",
+        "properties" : {
+          "code" : {
+            "type" : "number",
+            "description" : "응답 코드"
+          },
+          "data" : {
+            "type" : "object",
+            "properties" : {
+              "gender" : {
+                "type" : "string",
+                "description" : "성별"
+              },
+              "nickname" : {
+                "type" : "string",
+                "description" : "닉네임"
+              },
+              "mbti" : {
+                "type" : "string",
+                "description" : "MBTI"
+              },
+              "selfIntroduction" : {
+                "type" : "string",
+                "description" : "자기소개"
+              },
+              "id" : {
+                "type" : "number",
+                "description" : "유저 유니크 번호"
+              },
+              "interests" : {
+                "type" : "array",
+                "description" : "관심사 리스트",
+                "items" : {
+                  "type" : "object",
+                  "properties" : {
+                    "id" : {
+                      "type" : "number",
+                      "description" : "관심사 아이디"
+                    },
+                    "interestName" : {
+                      "type" : "string",
+                      "description" : "관심사 명"
+                    }
+                  }
+                }
+              },
+              "region" : {
+                "type" : "string",
+                "description" : "사는 지역"
+              },
+              "userId" : {
+                "type" : "string",
+                "description" : "유저 아이디"
+              }
+            },
+            "description" : "응답 데이터"
+          },
+          "message" : {
+            "type" : "string",
+            "description" : "응답 메시지"
+          },
+          "status" : {
+            "type" : "string",
+            "description" : "응답 상태"
+          }
+        }
+      },
       "중복아이디 체크 응답" : {
         "title" : "중복아이디 체크 응답",
         "type" : "object",
@@ -832,6 +1623,106 @@
           },
           "data" : {
             "type" : "string",
+            "description" : "응답 데이터"
+          },
+          "message" : {
+            "type" : "string",
+            "description" : "응답 메시지"
+          },
+          "status" : {
+            "type" : "string",
+            "description" : "응답 상태"
+          }
+        }
+      },
+      "메시지 수락 응답" : {
+        "title" : "메시지 수락 응답",
+        "type" : "object",
+        "properties" : {
+          "code" : {
+            "type" : "number",
+            "description" : "응답 코드"
+          },
+          "message" : {
+            "type" : "string",
+            "description" : "응답 메시지"
+          },
+          "status" : {
+            "type" : "string",
+            "description" : "응답 상태"
+          }
+        }
+      },
+      "유저 리스트 조회" : {
+        "title" : "유저 리스트 조회",
+        "type" : "object",
+        "properties" : {
+          "code" : {
+            "type" : "number",
+            "description" : "응답 코드"
+          },
+          "data" : {
+            "type" : "object",
+            "properties" : {
+              "pageNumber" : {
+                "type" : "number",
+                "description" : "페이지 번호"
+              },
+              "totalPages" : {
+                "type" : "number",
+                "description" : "총 페이지 수"
+              },
+              "content" : {
+                "type" : "array",
+                "description" : "유저정보",
+                "items" : {
+                  "type" : "object",
+                  "properties" : {
+                    "gender" : {
+                      "type" : "string",
+                      "description" : "성별"
+                    },
+                    "nickname" : {
+                      "type" : "string",
+                      "description" : "닉네임"
+                    },
+                    "mbti" : {
+                      "type" : "string",
+                      "description" : "MBTI"
+                    },
+                    "selfIntroduction" : {
+                      "type" : "string",
+                      "description" : "자기소개"
+                    },
+                    "id" : {
+                      "type" : "number",
+                      "description" : "유저 유니크 아이디"
+                    },
+                    "interests" : {
+                      "type" : "array",
+                      "description" : "관심사 리스트",
+                      "items" : {
+                        "type" : "object",
+                        "properties" : {
+                          "id" : {
+                            "type" : "number",
+                            "description" : "관심사 아이디"
+                          },
+                          "interestName" : {
+                            "type" : "string",
+                            "description" : "관심사 명"
+                          }
+                        }
+                      }
+                    },
+                    "region" : {
+                      "type" : "string",
+                      "description" : "사는 지역"
+                    }
+                  }
+                }
+              }
+            },
             "description" : "응답 데이터"
           },
           "message" : {
@@ -879,6 +1770,24 @@
               }
             },
             "description" : "응답 데이터"
+          },
+          "message" : {
+            "type" : "string",
+            "description" : "응답 메시지"
+          },
+          "status" : {
+            "type" : "string",
+            "description" : "응답 상태"
+          }
+        }
+      },
+      "메시지 전송 응답" : {
+        "title" : "메시지 전송 응답",
+        "type" : "object",
+        "properties" : {
+          "code" : {
+            "type" : "number",
+            "description" : "응답 코드"
           },
           "message" : {
             "type" : "string",
@@ -951,85 +1860,8 @@
           }
         }
       },
-      "회원가입 요청" : {
-        "title" : "회원가입 요청",
-        "type" : "object",
-        "properties" : {
-          "userPassword" : {
-            "type" : "string",
-            "description" : "비밀번호"
-          },
-          "gender" : {
-            "type" : "string",
-            "description" : "성별"
-          },
-          "questions" : {
-            "type" : "array",
-            "description" : "질문에 대한 답변",
-            "items" : {
-              "oneOf" : [ {
-                "type" : "object"
-              }, {
-                "type" : "boolean"
-              }, {
-                "type" : "string"
-              }, {
-                "type" : "number"
-              } ]
-            }
-          },
-          "nickname" : {
-            "type" : "string",
-            "description" : "닉네임"
-          },
-          "mbti" : {
-            "type" : "string",
-            "description" : "MBTI"
-          },
-          "selfIntroduction" : {
-            "type" : "string",
-            "description" : "자기소개"
-          },
-          "interests" : {
-            "type" : "array",
-            "description" : "관심사",
-            "items" : {
-              "oneOf" : [ {
-                "type" : "object"
-              }, {
-                "type" : "boolean"
-              }, {
-                "type" : "string"
-              }, {
-                "type" : "number"
-              } ]
-            }
-          },
-          "region" : {
-            "type" : "string",
-            "description" : "사는 지역"
-          },
-          "userId" : {
-            "type" : "string",
-            "description" : "유저 아이디"
-          }
-        }
-      },
-      "api-posts-postId922381862" : {
-        "type" : "object",
-        "properties" : {
-          "title" : {
-            "type" : "string",
-            "description" : "게시글 제목"
-          },
-          "content" : {
-            "type" : "string",
-            "description" : "게시글 내용"
-          }
-        }
-      },
-      "게시물 수정 응답" : {
-        "title" : "게시물 수정 응답",
+      "메시지리스트 조회 응답" : {
+        "title" : "메시지리스트 조회 응답",
         "type" : "object",
         "properties" : {
           "code" : {
@@ -1037,47 +1869,33 @@
             "description" : "응답 코드"
           },
           "data" : {
-            "type" : "object",
-            "properties" : {
-              "createdAt" : {
-                "type" : "string",
-                "description" : "게시글 생성일"
-              },
-              "view" : {
-                "type" : "number",
-                "description" : "게시글 조회수"
-              },
-              "hit" : {
-                "type" : "number",
-                "description" : "게시글 추천수"
-              },
-              "id" : {
-                "type" : "number",
-                "description" : "게시글 번호"
-              },
-              "title" : {
-                "type" : "string",
-                "description" : "게시글 제목"
-              },
-              "user" : {
-                "type" : "object",
-                "properties" : {
-                  "nickname" : {
-                    "type" : "string",
-                    "description" : "게시글 작성자 닉네임"
-                  },
-                  "id" : {
-                    "type" : "number",
-                    "description" : "게시글 작성자 번호"
-                  }
+            "type" : "array",
+            "description" : "응답 데이터",
+            "items" : {
+              "type" : "object",
+              "properties" : {
+                "userNickname" : {
+                  "type" : "string",
+                  "description" : "보낸 유저 닉네임"
+                },
+                "id" : {
+                  "type" : "number",
+                  "description" : "메시지 번호"
+                },
+                "userId" : {
+                  "type" : "number",
+                  "description" : "보낸 유저의 번호"
+                },
+                "content" : {
+                  "type" : "string",
+                  "description" : "메시지 내용"
+                },
+                "status" : {
+                  "type" : "string",
+                  "description" : "메시지 상태"
                 }
-              },
-              "content" : {
-                "type" : "string",
-                "description" : "게시글 내용"
               }
-            },
-            "description" : "응답 데이터"
+            }
           },
           "message" : {
             "type" : "string",
@@ -1089,22 +1907,8 @@
           }
         }
       },
-      "로그인 요청" : {
-        "title" : "로그인 요청",
-        "type" : "object",
-        "properties" : {
-          "userPassword" : {
-            "type" : "string",
-            "description" : "비밀번호"
-          },
-          "userId" : {
-            "type" : "string",
-            "description" : "유저 아이디"
-          }
-        }
-      },
-      "내정보 수정 성공" : {
-        "title" : "내정보 수정 성공",
+      "토큰 재발급 성공" : {
+        "title" : "토큰 재발급 성공",
         "type" : "object",
         "properties" : {
           "code" : {
@@ -1117,23 +1921,6 @@
               "gender" : {
                 "type" : "string",
                 "description" : "성별"
-              },
-              "questions" : {
-                "type" : "array",
-                "description" : "질의 답변 리스트",
-                "items" : {
-                  "type" : "object",
-                  "properties" : {
-                    "id" : {
-                      "type" : "number",
-                      "description" : "질의 답변 아이디"
-                    },
-                    "status" : {
-                      "type" : "boolean",
-                      "description" : "질의 답변 상태"
-                    }
-                  }
-                }
               },
               "nickname" : {
                 "type" : "string",
@@ -1150,266 +1937,6 @@
               "id" : {
                 "type" : "number",
                 "description" : "유저 유니크 번호"
-              },
-              "interests" : {
-                "type" : "array",
-                "description" : "관심사 리스트",
-                "items" : {
-                  "type" : "object",
-                  "properties" : {
-                    "id" : {
-                      "type" : "number",
-                      "description" : "관심사 아이디"
-                    },
-                    "interestName" : {
-                      "type" : "string",
-                      "description" : "관심사 명"
-                    }
-                  }
-                }
-              },
-              "region" : {
-                "type" : "string",
-                "description" : "사는 지역"
-              },
-              "userId" : {
-                "type" : "string",
-                "description" : "유저 아이디"
-              }
-            },
-            "description" : "응답 데이터"
-          },
-          "message" : {
-            "type" : "string",
-            "description" : "응답 메시지"
-          },
-          "status" : {
-            "type" : "string",
-            "description" : "응답 상태"
-          }
-        }
-      },
-      "유저 리스트 조회" : {
-        "title" : "유저 리스트 조회",
-        "type" : "object",
-        "properties" : {
-          "code" : {
-            "type" : "number",
-            "description" : "응답 코드"
-          },
-          "data" : {
-            "type" : "object",
-            "properties" : {
-              "pageNumber" : {
-                "type" : "number",
-                "description" : "페이지 번호"
-              },
-              "totalPages" : {
-                "type" : "number",
-                "description" : "총 페이지 수"
-              },
-              "content" : {
-                "type" : "array",
-                "description" : "유저정보",
-                "items" : {
-                  "type" : "object",
-                  "properties" : {
-                    "gender" : {
-                      "type" : "string",
-                      "description" : "성별"
-                    },
-                    "questions" : {
-                      "type" : "array",
-                      "description" : "질의 답변 리스트",
-                      "items" : {
-                        "type" : "object",
-                        "properties" : {
-                          "id" : {
-                            "type" : "number",
-                            "description" : "질의 답변 아이디"
-                          },
-                          "status" : {
-                            "type" : "boolean",
-                            "description" : "질의 답변 상태"
-                          }
-                        }
-                      }
-                    },
-                    "nickname" : {
-                      "type" : "string",
-                      "description" : "닉네임"
-                    },
-                    "mbti" : {
-                      "type" : "string",
-                      "description" : "MBTI"
-                    },
-                    "selfIntroduction" : {
-                      "type" : "string",
-                      "description" : "자기소개"
-                    },
-                    "id" : {
-                      "type" : "number",
-                      "description" : "유저 유니크 아이디"
-                    },
-                    "interests" : {
-                      "type" : "array",
-                      "description" : "관심사 리스트",
-                      "items" : {
-                        "type" : "object",
-                        "properties" : {
-                          "id" : {
-                            "type" : "number",
-                            "description" : "관심사 아이디"
-                          },
-                          "interestName" : {
-                            "type" : "string",
-                            "description" : "관심사 명"
-                          }
-                        }
-                      }
-                    },
-                    "region" : {
-                      "type" : "string",
-                      "description" : "사는 지역"
-                    }
-                  }
-                }
-              }
-            },
-            "description" : "응답 데이터"
-          },
-          "message" : {
-            "type" : "string",
-            "description" : "응답 메시지"
-          },
-          "status" : {
-            "type" : "string",
-            "description" : "응답 상태"
-          }
-        }
-      },
-      "게시물 단건 조회 응답" : {
-        "title" : "게시물 단건 조회 응답",
-        "type" : "object",
-        "properties" : {
-          "code" : {
-            "type" : "number",
-            "description" : "응답 코드"
-          },
-          "data" : {
-            "type" : "object",
-            "properties" : {
-              "createdAt" : {
-                "type" : "string",
-                "description" : "게시글 생성일"
-              },
-              "view" : {
-                "type" : "number",
-                "description" : "게시글 조회수"
-              },
-              "hit" : {
-                "type" : "number",
-                "description" : "게시글 추천수"
-              },
-              "id" : {
-                "type" : "number",
-                "description" : "게시글 번호"
-              },
-              "title" : {
-                "type" : "string",
-                "description" : "게시글 제목"
-              },
-              "user" : {
-                "type" : "object",
-                "properties" : {
-                  "nickname" : {
-                    "type" : "string",
-                    "description" : "게시글 작성자 닉네임"
-                  },
-                  "id" : {
-                    "type" : "number",
-                    "description" : "게시글 작성자 번호"
-                  }
-                }
-              },
-              "content" : {
-                "type" : "string",
-                "description" : "게시글 내용"
-              }
-            },
-            "description" : "응답 데이터"
-          },
-          "message" : {
-            "type" : "string",
-            "description" : "응답 메시지"
-          },
-          "status" : {
-            "type" : "string",
-            "description" : "응답 상태"
-          }
-        }
-      },
-      "내정보 조회 실패" : {
-        "title" : "내정보 조회 실패",
-        "type" : "object",
-        "properties" : {
-          "code" : {
-            "type" : "number",
-            "description" : "응답 코드"
-          },
-          "message" : {
-            "type" : "string",
-            "description" : "응답 메시지"
-          },
-          "status" : {
-            "type" : "string",
-            "description" : "응답 상태"
-          }
-        }
-      },
-      "로그인 성공 응답" : {
-        "title" : "로그인 성공 응답",
-        "type" : "object",
-        "properties" : {
-          "code" : {
-            "type" : "number",
-            "description" : "응답 코드"
-          },
-          "data" : {
-            "type" : "object",
-            "properties" : {
-              "gender" : {
-                "type" : "string",
-                "description" : "성별"
-              },
-              "questions" : {
-                "type" : "array",
-                "description" : "질의 답변 리스트",
-                "items" : {
-                  "type" : "object",
-                  "properties" : {
-                    "id" : {
-                      "type" : "number",
-                      "description" : "질의 답변 아이디"
-                    },
-                    "status" : {
-                      "type" : "boolean",
-                      "description" : "질의 답변 상태"
-                    }
-                  }
-                }
-              },
-              "nickname" : {
-                "type" : "string",
-                "description" : "닉네임"
-              },
-              "mbti" : {
-                "type" : "string",
-                "description" : "MBTI"
-              },
-              "selfIntroduction" : {
-                "type" : "string",
-                "description" : "자기소개"
               },
               "accessToken" : {
                 "type" : "string",
@@ -1453,6 +1980,114 @@
           }
         }
       },
+      "api-posts922381862" : {
+        "type" : "object",
+        "properties" : {
+          "title" : {
+            "type" : "string",
+            "description" : "게시글 제목"
+          },
+          "content" : {
+            "type" : "string",
+            "description" : "게시글 내용"
+          }
+        }
+      },
+      "로그인 요청" : {
+        "title" : "로그인 요청",
+        "type" : "object",
+        "properties" : {
+          "userPassword" : {
+            "type" : "string",
+            "description" : "비밀번호"
+          },
+          "userId" : {
+            "type" : "string",
+            "description" : "유저 아이디"
+          }
+        }
+      },
+      "api-messages486549215" : {
+        "type" : "object"
+      },
+      "내정보 조회 성공" : {
+        "title" : "내정보 조회 성공",
+        "type" : "object",
+        "properties" : {
+          "code" : {
+            "type" : "number",
+            "description" : "응답 코드"
+          },
+          "data" : {
+            "type" : "object",
+            "properties" : {
+              "gender" : {
+                "type" : "string",
+                "description" : "성별"
+              },
+              "profile" : {
+                "type" : "string",
+                "description" : "프로필 이미지"
+              },
+              "nickname" : {
+                "type" : "string",
+                "description" : "닉네임"
+              },
+              "mbti" : {
+                "type" : "string",
+                "description" : "MBTI"
+              },
+              "selfIntroduction" : {
+                "type" : "string",
+                "description" : "자기소개"
+              },
+              "id" : {
+                "type" : "number",
+                "description" : "유저 유니크 번호"
+              },
+              "interests" : {
+                "type" : "array",
+                "description" : "관심사 리스트",
+                "items" : {
+                  "type" : "object",
+                  "properties" : { }
+                }
+              },
+              "region" : {
+                "type" : "string",
+                "description" : "사는 지역"
+              }
+            },
+            "description" : "응답 데이터"
+          },
+          "message" : {
+            "type" : "string",
+            "description" : "응답 메시지"
+          },
+          "status" : {
+            "type" : "string",
+            "description" : "응답 상태"
+          }
+        }
+      },
+      "내정보 조회 실패" : {
+        "title" : "내정보 조회 실패",
+        "type" : "object",
+        "properties" : {
+          "code" : {
+            "type" : "number",
+            "description" : "응답 코드"
+          },
+          "message" : {
+            "type" : "string",
+            "description" : "응답 메시지"
+          },
+          "status" : {
+            "type" : "string",
+            "description" : "응답 상태"
+          }
+        }
+      },
       "닉네임 중복체크 요청" : {
         "title" : "닉네임 중복체크 요청",
         "type" : "object",
@@ -1460,6 +2095,24 @@
           "nickname" : {
             "type" : "string",
             "description" : "닉네임"
+          }
+        }
+      },
+      "메시지리스트 조회 실패 응답" : {
+        "title" : "메시지리스트 조회 실패 응답",
+        "type" : "object",
+        "properties" : {
+          "code" : {
+            "type" : "number",
+            "description" : "응답 코드"
+          },
+          "message" : {
+            "type" : "string",
+            "description" : "응답 메시지"
+          },
+          "status" : {
+            "type" : "string",
+            "description" : "응답 상태"
           }
         }
       },
@@ -1481,8 +2134,8 @@
           }
         }
       },
-      "토큰 재발급 성공" : {
-        "title" : "토큰 재발급 성공",
+      "로그인 성공 응답" : {
+        "title" : "로그인 성공 응답",
         "type" : "object",
         "properties" : {
           "code" : {
@@ -1495,23 +2148,6 @@
               "gender" : {
                 "type" : "string",
                 "description" : "성별"
-              },
-              "questions" : {
-                "type" : "array",
-                "description" : "질의 답변 리스트",
-                "items" : {
-                  "type" : "object",
-                  "properties" : {
-                    "id" : {
-                      "type" : "number",
-                      "description" : "질의 답변 아이디"
-                    },
-                    "status" : {
-                      "type" : "boolean",
-                      "description" : "질의 답변 상태"
-                    }
-                  }
-                }
               },
               "nickname" : {
                 "type" : "string",
@@ -1589,81 +2225,13 @@
           }
         }
       },
-      "내정보 조회 성공" : {
-        "title" : "내정보 조회 성공",
+      "메시지 거절 응답" : {
+        "title" : "메시지 거절 응답",
         "type" : "object",
         "properties" : {
           "code" : {
             "type" : "number",
             "description" : "응답 코드"
-          },
-          "data" : {
-            "type" : "object",
-            "properties" : {
-              "gender" : {
-                "type" : "string",
-                "description" : "성별"
-              },
-              "questions" : {
-                "type" : "array",
-                "description" : "질의 답변 리스트",
-                "items" : {
-                  "type" : "object",
-                  "properties" : {
-                    "id" : {
-                      "type" : "number",
-                      "description" : "질의 답변 아이디"
-                    },
-                    "status" : {
-                      "type" : "boolean",
-                      "description" : "질의 답변 상태"
-                    }
-                  }
-                }
-              },
-              "nickname" : {
-                "type" : "string",
-                "description" : "닉네임"
-              },
-              "mbti" : {
-                "type" : "string",
-                "description" : "MBTI"
-              },
-              "selfIntroduction" : {
-                "type" : "string",
-                "description" : "자기소개"
-              },
-              "id" : {
-                "type" : "number",
-                "description" : "유저 유니크 번호"
-              },
-              "interests" : {
-                "type" : "array",
-                "description" : "관심사 리스트",
-                "items" : {
-                  "type" : "object",
-                  "properties" : {
-                    "id" : {
-                      "type" : "number",
-                      "description" : "관심사 아이디"
-                    },
-                    "interestName" : {
-                      "type" : "string",
-                      "description" : "관심사 명"
-                    }
-                  }
-                }
-              },
-              "region" : {
-                "type" : "string",
-                "description" : "사는 지역"
-              },
-              "userId" : {
-                "type" : "string",
-                "description" : "유저 아이디"
-              }
-            },
-            "description" : "응답 데이터"
           },
           "message" : {
             "type" : "string",
@@ -1710,6 +2278,13 @@
             "description" : "응답 상태"
           }
         }
+      }
+    },
+    "securitySchemes" : {
+      "bearerAuthJWT" : {
+        "type" : "http",
+        "scheme" : "bearer",
+        "bearerFormat" : "JWT"
       }
     }
   }

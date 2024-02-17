@@ -2,7 +2,7 @@ package com.blind.dating.domain.token;
 
 import com.blind.dating.common.code.TokenResponseCode;
 import com.blind.dating.domain.user.UserAccount;
-import com.blind.dating.dto.user.LogInResponse;
+import com.blind.dating.domain.user.dto.LogInResponse;
 import com.blind.dating.exception.ApiException;
 import com.blind.dating.domain.user.UserAccountRepository;
 import com.blind.dating.security.TokenProvider;

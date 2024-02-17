@@ -1,7 +1,8 @@
 package com.blind.dating.domain.user;
 
 import com.blind.dating.common.code.ResponseCode;
-import com.blind.dating.dto.user.*;
+import com.blind.dating.domain.user.dto.LogInResponse;
+import com.blind.dating.domain.user.dto.UserRequestDto;
 import com.blind.dating.exception.ApiException;
 import com.blind.dating.domain.token.RefreshTokenRepository;
 import com.blind.dating.security.TokenProvider;
@@ -48,7 +49,6 @@ public class UserAccountService {
         UserAccount user = dto.toRegisterEntity(bCryptPasswordEncoder.encode(dto.getUserPassword()));
 
         user.setInterests(interestService.saveInterest(user, dto.getInterests()));
-
         return userAccountRepository.save(user);
     }
 
@@ -77,7 +77,7 @@ public class UserAccountService {
 
             return LogInResponse.from(user, accessToken, refreshToken);
         }else{
-            throw new RuntimeException("Not Found UserInfo");
+            throw new ApiException(UserResponseCode.NOT_MATCH_PASSWORD);
         }
     }
 
@@ -90,7 +90,6 @@ public class UserAccountService {
         Boolean status = userAccountRepository.existsByUserId(userId);
 
         return (status) ? UserResponseCode.EXIST_USER_ID : UserResponseCode.NOT_EXIST_USER_ID;
-
     }
 
     /**

@@ -41,7 +41,6 @@ public class UserAccount extends BaseEntity {
     @Column(nullable = false, length = 100)
     private String region;
 
-
     @Setter
     @Column(length = 20)
     private String mbti;
@@ -59,11 +58,17 @@ public class UserAccount extends BaseEntity {
     @Setter
     private LocalDateTime recentLogin;
 
-    @Setter
-    private String role;
+    @Setter @Enumerated(EnumType.STRING)
+    private Role role;
 
     @Setter
     private String social;
+
+    @Setter
+    private String originProfile;
+
+    @Setter
+    private String changedProfile;
 
     @OneToMany(mappedBy = "userAccount", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @ToString.Exclude @Setter
@@ -73,7 +78,7 @@ public class UserAccount extends BaseEntity {
 
     protected UserAccount(){}
 
-    private UserAccount(String userId, String userPassword, String nickname, String region, String mbti, String gender,Boolean deleted, String selfIntroduction, LocalDateTime recentLogin, String role) {
+    private UserAccount(String userId, String userPassword, String nickname, String region, String mbti, String gender,Boolean deleted, String selfIntroduction, LocalDateTime recentLogin, Role role) {
         this.userId = userId;
         this.userPassword = userPassword;
         this.nickname = nickname;
@@ -86,7 +91,7 @@ public class UserAccount extends BaseEntity {
         this.role = role;
     }
 
-    public static UserAccount of(String userId, String userPassword, String nickname, String region, String mbti, String gender, Boolean deleted, String selfIntroduction, LocalDateTime recentLogin, String role) {
+    public static UserAccount of(String userId, String userPassword, String nickname, String region, String mbti, String gender, Boolean deleted, String selfIntroduction, LocalDateTime recentLogin, Role role) {
         return new UserAccount(userId, userPassword, nickname, region, mbti, gender,deleted, selfIntroduction, recentLogin, role);
     }
 

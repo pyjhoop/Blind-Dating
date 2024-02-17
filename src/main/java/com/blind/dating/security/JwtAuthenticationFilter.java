@@ -1,5 +1,7 @@
 package com.blind.dating.security;
 
+import com.blind.dating.common.code.UserResponseCode;
+import com.blind.dating.exception.ApiException;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.FilterChain;
@@ -34,23 +36,27 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException, ServletException {
         if(!noAuthenticate(request))
         {
-            //엑세스 토큰
-            String token = parseBearerToken(request);
+            try {
+                String token = parseBearerToken(request);
 
-            // 토큰 검증하기 JWT이므로 인가 서버에 요청하지 않아도됨
-            validateToken(token, request);
-            // setContext 에 인증객체 저장하기.
-            Authentication authentication = tokenProvider.getAuthentication(token);
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+                // 토큰 검증하기 JWT이므로 인가 서버에 요청하지 않아도됨
+                validateToken(token, request);
+                // setContext 에 인증객체 저장하기.
+                Authentication authentication = tokenProvider.getAuthentication(token);
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+
+            }catch (Exception e) {
+            }
+            //엑세스 토큰
 
         }
         filterChain.doFilter(request,response);
     }
 
     private void validateToken(String token, HttpServletRequest request) {
-        Key key = Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
 
         try {
+            Key key = Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
         } 
         catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {

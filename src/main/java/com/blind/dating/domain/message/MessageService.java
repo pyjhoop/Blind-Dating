@@ -43,7 +43,8 @@ public class MessageService {
     }
 
     @Transactional
-    public void acceptMessage(Long userId, Long messageId) {
+    public void acceptMessage(Authentication authentication, Long messageId) {
+        Long userId = Long.valueOf((String) authentication.getPrincipal());
         Message message = messageRepository.findByIdAndStatus(messageId, MessageStatus.WAIT)
                 .orElseThrow(()-> new ApiException(MessageResponseCode.MESSAGE_NOT_FOUNT));
 
@@ -64,7 +65,8 @@ public class MessageService {
     }
 
     @Transactional
-    public void rejectMessage(Long userId, Long messageId) {
+    public void rejectMessage(Authentication authentication, Long messageId) {
+        Long userId = Long.valueOf((String) authentication.getPrincipal());
         Message message = messageRepository.findById(messageId)
                 .orElseThrow(()-> new ApiException(MessageResponseCode.MESSAGE_NOT_FOUNT));
 
@@ -73,13 +75,16 @@ public class MessageService {
     }
 
     @Transactional(readOnly = true)
-    public List<MessageResponseDto> getMessageToMe(Long userId) {
+    public List<MessageResponseDto> getMessageToMe(Authentication authentication) {
+        Long userId = Long.valueOf((String) authentication.getPrincipal());
         return messageRepository.findAllByReceiverIdAndStatus(userId, MessageStatus.WAIT)
                 .stream().map(MessageResponseDto::From).toList();
     }
 
     @Transactional(readOnly = true)
-    public List<MessageResponseDto> getMessageFromMe(Long userId) {
+    public List<MessageResponseDto> getMessageFromMe(Authentication authentication) {
+        Long userId = Long.valueOf((String) authentication.getPrincipal());
+
         UserAccount user = userAccountRepository.findById(userId)
                 .orElseThrow(()-> new ApiException(UserResponseCode.USER_NOT_FOUND));
         return messageRepository.findAllByUserAccount(user)

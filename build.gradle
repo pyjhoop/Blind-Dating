@@ -113,7 +113,6 @@ jacocoTestReport {
 							'**/util/**',
 							'**/handler/**',
 							'**/repository/**',
-							'**/domain/**',
 							'**/common/**'
 					])
 				})

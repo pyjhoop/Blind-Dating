@@ -1,4 +1,4 @@
-package com.blind.dating.dto.user;
+package com.blind.dating.domain.user.dto;
 
 import com.blind.dating.domain.user.UserAccount;
 import com.blind.dating.dto.interest.InterestDto;

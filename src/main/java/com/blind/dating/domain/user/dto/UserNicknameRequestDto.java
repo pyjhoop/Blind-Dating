@@ -1,4 +1,4 @@
-package com.blind.dating.dto.user;
+package com.blind.dating.domain.user.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

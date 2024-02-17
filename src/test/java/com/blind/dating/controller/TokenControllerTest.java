@@ -3,7 +3,7 @@ package com.blind.dating.controller;
 import com.blind.dating.config.SecurityConfig;
 import com.blind.dating.domain.token.TokenController;
 import com.blind.dating.dto.interest.InterestDto;
-import com.blind.dating.dto.user.LogInResponse;
+import com.blind.dating.domain.user.dto.LogInResponse;
 import com.blind.dating.security.TokenProvider;
 import com.blind.dating.domain.token.TokenService;
 import com.blind.dating.util.CookieUtil;
@@ -97,9 +97,6 @@ class TokenControllerTest extends ControllerTestConfig{
                                                     fieldWithPath("data.interests").description("관심사 리스트"),
                                                     fieldWithPath("data.interests[].id").description("관심사 아이디"),
                                                     fieldWithPath("data.interests[].interestName").description("관심사 명"),
-                                                    fieldWithPath("data.questions").description("질의 답변 리스트"),
-                                                    fieldWithPath("data.questions[].id").description("질의 답변 아이디"),
-                                                    fieldWithPath("data.questions[].status").description("질의 답변 상태"),
                                                     fieldWithPath("data.selfIntroduction").description("자기소개"),
                                                     fieldWithPath("data.accessToken").description("AccessToken")
                                             ).responseSchema(Schema.schema("토큰 재발급 성공")).build()

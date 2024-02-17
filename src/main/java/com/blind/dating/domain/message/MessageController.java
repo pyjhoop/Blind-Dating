@@ -17,7 +17,7 @@ import java.util.List;
 public class MessageController {
     private final MessageService messageService;
 
-    //TODO 메시지 보내기 상대방이 이미 보냈으면 바로 채팅방 만들어야 겠네
+    // 메시지 보내기 상대방이 이미 보냈으면 바로 채팅방 만들어야 겠네
     @PostMapping("/messages")
     public ResponseEntity<?> postMessage(
             Authentication authentication,
@@ -30,15 +30,13 @@ public class MessageController {
                 .body(Api.OK(MessageResponseCode.POST_MESSAGE_SUCCESS));
     }
 
-    //TODO 메시지 수락하기 
+    //메시지 수락하기
     @PatchMapping("/messages/{messageId}/accept")
     public ResponseEntity<?> acceptMessage(
             @PathVariable Long messageId,
             Authentication authentication
     ) {
-        Long userId = Long.valueOf((String) authentication.getPrincipal());
-        messageService.acceptMessage(userId, messageId);
-
+        messageService.acceptMessage(authentication, messageId);
         return ResponseEntity.ok()
                 .body(Api.OK(MessageResponseCode.ACCEPT_MESSAGE_SUCCESS));
     }
@@ -49,8 +47,7 @@ public class MessageController {
             @PathVariable Long messageId,
             Authentication authentication
     ) {
-        Long userId = Long.valueOf((String) authentication.getPrincipal());
-        messageService.rejectMessage(userId, messageId);
+        messageService.rejectMessage(authentication, messageId);
         return ResponseEntity.ok()
                 .body(Api.OK(MessageResponseCode.REJECT_MESSAGE_SUCCESS));
     }
@@ -60,8 +57,7 @@ public class MessageController {
     public ResponseEntity<?> getMessageToMe(
             Authentication authentication
     ) {
-        Long userId = Long.valueOf((String) authentication.getPrincipal());
-        List<MessageResponseDto> list = messageService.getMessageToMe(userId);
+        List<MessageResponseDto> list = messageService.getMessageToMe(authentication);
 
         return ResponseEntity.ok()
                 .body(Api.OK(MessageResponseCode.GET_MESSAGE_TOME_SUCCESS, list));
@@ -72,8 +68,7 @@ public class MessageController {
     public ResponseEntity<?> getMessageFromMe(
             Authentication authentication
     ) {
-        Long userId = Long.valueOf((String) authentication.getPrincipal());
-        List<MessageResponseDto> list = messageService.getMessageFromMe(userId);
+        List<MessageResponseDto> list = messageService.getMessageFromMe(authentication);
 
         return ResponseEntity.ok()
                 .body(Api.OK(MessageResponseCode.GET_MESSAGE_FROMME_SUCCESS, list));

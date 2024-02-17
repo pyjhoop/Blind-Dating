@@ -4,7 +4,7 @@ import com.blind.dating.common.code.TokenResponseCode;
 import com.blind.dating.domain.interest.Interest;
 import com.blind.dating.domain.token.TokenService;
 import com.blind.dating.domain.user.UserAccount;
-import com.blind.dating.dto.user.LogInResponse;
+import com.blind.dating.domain.user.dto.LogInResponse;
 import com.blind.dating.exception.ApiException;
 import com.blind.dating.domain.token.RefreshTokenRepository;
 import com.blind.dating.domain.user.UserAccountRepository;

@@ -2,7 +2,8 @@ package com.blind.dating.domain.token;
 
 import com.blind.dating.common.Api;
 import com.blind.dating.common.code.TokenResponseCode;
-import com.blind.dating.dto.user.*;
+import com.blind.dating.domain.user.dto.LogInResponse;
+import com.blind.dating.domain.user.dto.LogInResponseDto;
 import com.blind.dating.util.CookieUtil;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;

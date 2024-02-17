@@ -1,13 +1,13 @@
 package com.blind.dating.domain.user;
 
 import com.blind.dating.common.code.UserResponseCode;
-import com.blind.dating.domain.user.UserAccount;
 import com.blind.dating.common.Api;
+import com.blind.dating.domain.user.dto.UserInfo;
 import com.blind.dating.dto.user.UserInfoDto;
 import com.blind.dating.dto.user.UserInfoWithPageInfo;
-import com.blind.dating.dto.user.UserUpdateRequestDto;
+import com.blind.dating.domain.user.dto.UserUpdateRequestDto;
 import com.blind.dating.dto.user.UserWithInterestAndQuestionDto;
-import com.blind.dating.domain.user.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,6 +16,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
@@ -70,14 +71,14 @@ public class UserController {
             Authentication authentication
     ){
         // 내정보 조회하기
-        UserWithInterestAndQuestionDto userInfo = userService.getMyInfo(authentication);
+        UserInfo userInfo = userService.getMyInfo(authentication);
 
         return ResponseEntity.ok()
-                .body(Api.OK(UserResponseCode.GET_USER_INFO_SUCCESS, userInfo));
+                .body(Api.OK(UserResponseCode.UPDATE_USER_INFO_SUCCESS, userInfo));
     }
 
     @PutMapping("/users")
-    public ResponseEntity<Api<UserWithInterestAndQuestionDto>> updateMyInfo(
+    public ResponseEntity<Api<?>> updateMyInfo(
             Authentication authentication
             , @RequestBody UserUpdateRequestDto dto
     ){
@@ -88,6 +89,18 @@ public class UserController {
 
         return ResponseEntity.ok()
                 .body(Api.OK(UserResponseCode.UPDATE_USER_INFO_SUCCESS, userInfo));
+    }
+
+    @PostMapping("/users/{userId}/profile")
+    public ResponseEntity<?> updateProfile(
+            @RequestParam("uploadFile") MultipartFile uploadFile,
+            @PathVariable Long userId,
+            HttpServletRequest request
+    ) {
+        userService.updateProfile(userId, uploadFile, request);
+
+        return ResponseEntity.ok()
+                .body(Api.OK(UserResponseCode.UPDATE_PROFILE_SUCCESS));
     }
 
 }

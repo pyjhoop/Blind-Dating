@@ -1,7 +1,8 @@
-package com.blind.dating.dto.user;
+package com.blind.dating.domain.user.dto;
 
 import com.blind.dating.domain.user.Role;
 import com.blind.dating.domain.user.UserAccount;
+import com.blind.dating.dto.user.UserAccountDto;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.Data;
@@ -37,9 +38,6 @@ public class UserRequestDto {
 
     @NotNull(message = "관심사는 필수 입력 값입니다.")
     private List<String> interests;
-
-    @NotNull(message = "답변은 필수 입력 값입니다.")
-    private List<Boolean> questions;
 
     @NotNull(message = "자기소개는 필수 입력 값입니다.")
     private String selfIntroduction;
@@ -94,7 +92,7 @@ public class UserRequestDto {
                 false,
                 selfIntroduction,
                 LocalDateTime.now(),
-                Role.USER.getValue()
+                Role.USER
         );
     }
 

@@ -1,7 +1,7 @@
 package com.blind.dating.domain.user;
 
 import com.blind.dating.common.code.ResponseCode;
-import com.blind.dating.dto.user.*;
+import com.blind.dating.domain.user.dto.*;
 import com.blind.dating.common.Api;
 import com.blind.dating.util.CookieUtil;
 import com.blind.dating.common.code.UserResponseCode;
@@ -26,7 +26,7 @@ public class UserAccountController {
     private final UserAccountService userAccountService;
 
     @PostMapping("/signup")
-    public ResponseEntity<Api> registerUser(
+    public ResponseEntity<?> registerUser(
             @RequestBody @Valid UserRequestDto dto,
             BindingResult bindingResult
             ) throws MethodArgumentNotValidException {
@@ -82,6 +82,10 @@ public class UserAccountController {
         return ResponseEntity.ok()
                 .body(Api.OK(code, code.getStatus()));
     }
+
+    
+
+
 
 
 }

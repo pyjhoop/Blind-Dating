@@ -6,8 +6,8 @@ import com.blind.dating.domain.interest.Interest;
 import com.blind.dating.domain.interest.InterestService;
 import com.blind.dating.domain.user.UserAccount;
 import com.blind.dating.domain.user.UserAccountService;
-import com.blind.dating.dto.user.LogInResponse;
-import com.blind.dating.dto.user.UserRequestDto;
+import com.blind.dating.domain.user.dto.LogInResponse;
+import com.blind.dating.domain.user.dto.UserRequestDto;
 import com.blind.dating.exception.ApiException;
 import com.blind.dating.domain.token.RefreshTokenRepository;
 import com.blind.dating.domain.user.UserAccountRedisRepository;
@@ -56,7 +56,6 @@ class UserAccountServiceTest {
     void setting(){
         dto = UserRequestDto.of("userId","userPass01","userNickname","서울","INFP","M","안녕하세요");
         dto.setInterests(List.of("자전거타기","놀기","게임하기"));
-        dto.setQuestions(List.of(true, false, true));
         user = dto.toEntity();
         user.setRecentLogin(LocalDateTime.now());
         user.setDeleted(false);
@@ -134,16 +133,34 @@ class UserAccountServiceTest {
         String password = "userPass01";
         LogInResponse response = LogInResponse.from(user,"accessToken","refreshToken");
 
-        given(userAccountRepository.findByUserId(userId)).willReturn(Optional.of(user));
-        given(bCryptPasswordEncoder.matches(password, user.getUserPassword())).willReturn(false);
+        given(userAccountRepository.findByUserId(userId)).willReturn(Optional.empty());
         // When
-        RuntimeException exception = assertThrows(RuntimeException.class, ()->{
+        ApiException exception = assertThrows(ApiException.class, ()->{
             LogInResponse user1 = userAccountService.getLoginInfo(userId, password);
         });
 
         // Then
-        assertThat(exception.getMessage()).isEqualTo("Not Found UserInfo");
+        assertThat(exception.getResponseCode()).isEqualTo(UserResponseCode.LOGIN_FAIL);
         verify(tokenProvider, never()).create(user);
+    }
+
+    @DisplayName("로그인시 비밀번호 매치 실패")
+    @Test
+    void givenLoginInfo_whenLogin_thenReturnLogInPasswordMismatch(){
+        //given
+        String userId = "userId";
+        String password = "userPass01";
+        LogInResponse response = LogInResponse.from(user,"accessToken","refreshToken");
+
+        given(userAccountRepository.findByUserId(userId)).willReturn(Optional.of(user));
+        given(bCryptPasswordEncoder.matches(password, user.getUserPassword())).willReturn(false);
+        // When
+        ApiException exception = assertThrows(ApiException.class, ()->{
+            LogInResponse user1 = userAccountService.getLoginInfo(userId, password);
+        });
+
+        // Then
+        assertThat(exception.getResponseCode()).isEqualTo(UserResponseCode.NOT_MATCH_PASSWORD);
     }
 
     @DisplayName("유저정보 조회 실패로 로그인 실패 - 테스트")

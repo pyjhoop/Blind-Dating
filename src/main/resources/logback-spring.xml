@@ -12,6 +12,7 @@
     </springProfile>
 
     <springProfile name="prod">
+        <include resource="console-appender.xml"/>
         <include resource="file-info-appender.xml"/>
         <include resource="file-error-appender.xml"/>
         <include resource="file-warn-appender.xml"/>

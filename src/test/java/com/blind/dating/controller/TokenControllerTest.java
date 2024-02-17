@@ -1,12 +1,11 @@
 package com.blind.dating.controller;
 
 import com.blind.dating.config.SecurityConfig;
+import com.blind.dating.domain.token.TokenController;
 import com.blind.dating.dto.interest.InterestDto;
-import com.blind.dating.dto.question.QuestionDto;
-import com.blind.dating.dto.user.LogInResponse;
-import com.blind.dating.dto.user.UserInfoWithTokens;
+import com.blind.dating.domain.user.dto.LogInResponse;
 import com.blind.dating.security.TokenProvider;
-import com.blind.dating.service.TokenService;
+import com.blind.dating.domain.token.TokenService;
 import com.blind.dating.util.CookieUtil;
 import com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper;
 import com.epages.restdocs.apispec.ResourceSnippetParameters;
@@ -20,11 +19,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
-import org.springframework.security.core.Authentication;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.web.server.ResponseStatusException;
@@ -56,10 +53,8 @@ class TokenControllerTest extends ControllerTestConfig{
     void setting() {
         List<InterestDto> interests = List.of(InterestDto.of(1L,"자전거 타기"),
                 InterestDto.of(2L, "놀기"), InterestDto.of(3L,"게임하기"));
-        List<QuestionDto> questions = List.of(new QuestionDto(1L,true), new QuestionDto(2L, false),
-                new QuestionDto(3L, true));
 
-        logInResponse = new LogInResponse(1L, "userId","nickname","서울","INTP","M", interests, questions,"하이요","accessToken","refreshToken");
+        logInResponse = new LogInResponse(1L, "userId","nickname","서울","INTP","M", interests,"하이요","accessToken","refreshToken");
         cookie = new Cookie("refreshToken", "refreshToken");
     }
 
@@ -102,9 +97,6 @@ class TokenControllerTest extends ControllerTestConfig{
                                                     fieldWithPath("data.interests").description("관심사 리스트"),
                                                     fieldWithPath("data.interests[].id").description("관심사 아이디"),
                                                     fieldWithPath("data.interests[].interestName").description("관심사 명"),
-                                                    fieldWithPath("data.questions").description("질의 답변 리스트"),
-                                                    fieldWithPath("data.questions[].id").description("질의 답변 아이디"),
-                                                    fieldWithPath("data.questions[].status").description("질의 답변 상태"),
                                                     fieldWithPath("data.selfIntroduction").description("자기소개"),
                                                     fieldWithPath("data.accessToken").description("AccessToken")
                                             ).responseSchema(Schema.schema("토큰 재발급 성공")).build()

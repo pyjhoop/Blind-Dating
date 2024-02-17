@@ -1,8 +1,9 @@
 package com.blind.dating.service;
 
-import com.blind.dating.domain.Interest;
-import com.blind.dating.domain.UserAccount;
-import com.blind.dating.repository.InterestRepository;
+import com.blind.dating.domain.interest.Interest;
+import com.blind.dating.domain.interest.InterestService;
+import com.blind.dating.domain.user.UserAccount;
+import com.blind.dating.domain.interest.InterestRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,8 +15,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.BDDMockito.given;
 
 @DisplayName("InterestService -테스트")
 @ExtendWith(MockitoExtension.class)

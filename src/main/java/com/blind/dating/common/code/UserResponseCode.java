@@ -7,7 +7,7 @@ import lombok.Getter;
 @AllArgsConstructor
 @Getter
 public enum UserResponseCode implements ResponseCode {
-    AUTHORIZE_FAIL(401,"해당 리소스에 대한 접근 권한이 없습니다.","Unauthorization"),
+    AUTHORIZE_FAIL(401,"인증에 실패했습니다.","Unauthorization"),
     REGISTER_SUCCESS(200,"회원가입이 성공적으로 진행되었습니다.", "OK"),
     LOGIN_SUCCESS(200,"로그인이 성공적으로 진행되었습니다.","OK"),
     LOGIN_FAIL(404,"로그인에 실패했습니다.","Not Found"),
@@ -21,6 +21,9 @@ public enum UserResponseCode implements ResponseCode {
     GET_USER_INFO_FAIL(404, "내 정보 조회에 실패했습니다.","Not Found"),
     USER_NOT_FOUND(404, "내 정보 조회에 실패했습니다.","Not Found"),
     UPDATE_USER_INFO_SUCCESS(200,"내 정보가 성공적으로 수정되었습니다.","OK"),
+    UPDATE_PROFILE_SUCCESS(200,"프로필이 성공적으로 수정되었습니다.","OK"),
+    UPDATE_PROFILE_FAIL(500,"내부 오류로 프로필 수정이 실패했습니다.","Internal Server Error"),
+    NOT_MATCH_PASSWORD(400, "비밀번호가 일치하지 않습니다.", "Bad Request"),
     UPDATE_USER_INFO_FAIL(400,"내 정보 수정중 예외가 발생했습니다..","Bad Request");
 
     private final int code;

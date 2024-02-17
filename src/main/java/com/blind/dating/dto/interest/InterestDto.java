@@ -1,6 +1,6 @@
 package com.blind.dating.dto.interest;
 
-import com.blind.dating.domain.Interest;
+import com.blind.dating.domain.interest.Interest;
 import lombok.*;
 
 @Getter

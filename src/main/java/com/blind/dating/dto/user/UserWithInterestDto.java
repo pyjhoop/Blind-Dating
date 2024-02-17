@@ -1,6 +1,6 @@
 package com.blind.dating.dto.user;
 
-import com.blind.dating.domain.UserAccount;
+import com.blind.dating.domain.user.UserAccount;
 import com.blind.dating.dto.interest.InterestDto;
 import lombok.Data;
 import lombok.NoArgsConstructor;

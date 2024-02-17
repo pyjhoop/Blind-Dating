@@ -1,5 +1,6 @@
 package com.blind.dating.service;
 
+import com.blind.dating.domain.redis.RedisSubscriber;
 import com.blind.dating.dto.chat.ChatDto;
 import com.blind.dating.dto.chat.ChatListWithUserId;
 import com.fasterxml.jackson.databind.ObjectMapper;

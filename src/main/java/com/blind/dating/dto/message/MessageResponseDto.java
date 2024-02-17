@@ -1,7 +1,6 @@
 package com.blind.dating.dto.message;
 
-import com.blind.dating.domain.Message;
-import com.blind.dating.dto.user.UserInfoDto;
+import com.blind.dating.domain.message.Message;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

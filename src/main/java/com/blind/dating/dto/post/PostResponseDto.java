@@ -1,12 +1,9 @@
 package com.blind.dating.dto.post;
 
-import com.blind.dating.domain.Post;
-import com.blind.dating.domain.UserAccount;
-import jakarta.persistence.*;
+import com.blind.dating.domain.post.Post;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.time.LocalDate;
 

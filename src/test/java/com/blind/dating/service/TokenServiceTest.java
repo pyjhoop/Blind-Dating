@@ -1,14 +1,13 @@
 package com.blind.dating.service;
 
 import com.blind.dating.common.code.TokenResponseCode;
-import com.blind.dating.domain.Interest;
-import com.blind.dating.domain.Question;
-import com.blind.dating.domain.UserAccount;
-import com.blind.dating.dto.user.LogInResponse;
-import com.blind.dating.dto.user.UserInfoWithTokens;
+import com.blind.dating.domain.interest.Interest;
+import com.blind.dating.domain.token.TokenService;
+import com.blind.dating.domain.user.UserAccount;
+import com.blind.dating.domain.user.dto.LogInResponse;
 import com.blind.dating.exception.ApiException;
-import com.blind.dating.repository.RefreshTokenRepository;
-import com.blind.dating.repository.UserAccountRepository;
+import com.blind.dating.domain.token.RefreshTokenRepository;
+import com.blind.dating.domain.user.UserAccountRepository;
 import com.blind.dating.security.TokenProvider;
 import jakarta.servlet.http.Cookie;
 import org.junit.jupiter.api.DisplayName;
@@ -17,7 +16,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.test.context.support.WithMockUser;
 
 
 import java.util.List;
@@ -73,7 +71,6 @@ class TokenServiceTest {
         //Given
         UserAccount user = UserAccount.of("qweeqw","asdfdf", "nickname","asdf","asdf","M","하이요");
         user.setInterests(List.of(new Interest()));
-        user.setQuestions(List.of(new Question()));
         given(userAccountRepository.findById(1L)).willReturn(Optional.of(user));
         given(tokenProvider.create(user)).willReturn("access");
         given(tokenProvider.refreshToken(user)).willReturn("refresh");

@@ -1,6 +1,5 @@
 package com.blind.dating.dto.user;
 
-import com.blind.dating.domain.UserAccount;
 import lombok.*;
 
 @Getter

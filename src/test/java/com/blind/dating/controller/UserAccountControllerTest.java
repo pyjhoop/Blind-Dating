@@ -2,16 +2,12 @@ package com.blind.dating.controller;
 
 import com.blind.dating.common.code.UserResponseCode;
 import com.blind.dating.config.SecurityConfig;
-import com.blind.dating.domain.Interest;
-import com.blind.dating.domain.Question;
-import com.blind.dating.domain.UserAccount;
+import com.blind.dating.domain.interest.Interest;
+import com.blind.dating.domain.user.*;
+import com.blind.dating.domain.user.dto.*;
 import com.blind.dating.dto.interest.InterestDto;
-import com.blind.dating.dto.question.QuestionDto;
-import com.blind.dating.dto.user.*;
 import com.blind.dating.security.JwtAuthenticationFilter;
 import com.blind.dating.security.TokenProvider;
-import com.blind.dating.service.CustomUserDetailsService;
-import com.blind.dating.service.UserAccountService;
 import com.blind.dating.util.CookieUtil;
 import com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper;
 import com.epages.restdocs.apispec.ResourceSnippetParameters;
@@ -22,15 +18,12 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.Test;
 import org.mockito.Spy;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -71,14 +64,11 @@ class UserAccountControllerTest extends ControllerTestConfig{
     @BeforeEach
     void setting(){
         dto = UserRequestDto.of("user01","userPass01","userNickname","서울","INFP","M","안녕하세요");
-        dto.setInterests(List.of("자전거타기","놀기","게임하기"));
-        dto.setQuestions(List.of(true, false, true));
-        user = dto.toEntity();
+        dto.setInterests(List.of("코딩하기","게임하기"));
+        user = new UserAccount(1L, "userId","password","nickname","서울","INTP","M",false,"하이요",null, Role.USER,"K","origin", "change", null);
         user.setRecentLogin(LocalDateTime.now());
-        user.setDeleted(false);
         user.setUserPassword(bCryptPasswordEncoder.encode(dto.getUserPassword()));
         user.setInterests(List.of(new Interest()));
-        user.setQuestions(List.of(new Question()));
     }
 
     @Nested
@@ -88,7 +78,7 @@ class UserAccountControllerTest extends ControllerTestConfig{
         @Test
         void givenUserRequest_whenRegister_thenSuccess() throws Exception {
 
-            given(userAccountService.register(any(UserRequestDto.class))).willReturn(dto.toEntity());
+            given(userAccountService.register(any(UserRequestDto.class))).willReturn(user);
 
             ResultActions actions = mockMvc.perform(
                     RestDocumentationRequestBuilders.post("/api/signup")
@@ -111,7 +101,6 @@ class UserAccountControllerTest extends ControllerTestConfig{
                                                     fieldWithPath("mbti").description("MBTI"),
                                                     fieldWithPath("gender").description("성별"),
                                                     fieldWithPath("interests").description("관심사"),
-                                                    fieldWithPath("questions").description("질문에 대한 답변"),
                                                     fieldWithPath("selfIntroduction").description("자기소개")
                                             ).requestSchema(Schema.schema("회원가입 요청"))
                                             .responseFields(
@@ -145,7 +134,7 @@ class UserAccountControllerTest extends ControllerTestConfig{
                             resource(
                                     ResourceSnippetParameters.builder()
                                             .description("회원가입 API")
-                                            .tag("UserAccount").description("인증 관련 API")
+                                            .tag("UserAccount").description("회원가입 API")
                                             .requestFields(
                                                     fieldWithPath("userId").description("유저 아이디"),
                                                     fieldWithPath("userPassword").description("비밀번호"),
@@ -154,7 +143,6 @@ class UserAccountControllerTest extends ControllerTestConfig{
                                                     fieldWithPath("mbti").description("MBTI"),
                                                     fieldWithPath("gender").description("성별"),
                                                     fieldWithPath("interests").description("관심사"),
-                                                    fieldWithPath("questions").description("질문에 대한 답변"),
                                                     fieldWithPath("selfIntroduction").description("자기소개")
                                             ).requestSchema(Schema.schema("회원가입 요청"))
                                             .responseFields(
@@ -195,7 +183,7 @@ class UserAccountControllerTest extends ControllerTestConfig{
                             resource(
                                     ResourceSnippetParameters.builder()
                                             .description("회원가입 API")
-                                            .tag("UserAccount").description("인증 관련 API")
+                                            .tag("UserAccount").description("회원가입 API")
                                             .requestFields(
                                                     fieldWithPath("userId").description("유저 아이디"),
                                                     fieldWithPath("userPassword").description("비밀번호"),
@@ -204,7 +192,6 @@ class UserAccountControllerTest extends ControllerTestConfig{
                                                     fieldWithPath("mbti").description("MBTI"),
                                                     fieldWithPath("gender").description("성별"),
                                                     fieldWithPath("interests").description("관심사"),
-                                                    fieldWithPath("questions").description("질문에 대한 답변"),
                                                     fieldWithPath("selfIntroduction").description("자기소개")
                                             ).requestSchema(Schema.schema("회원가입 요청"))
                                             .responseFields(
@@ -236,12 +223,9 @@ class UserAccountControllerTest extends ControllerTestConfig{
             LoginInputDto loginDto = new LoginInputDto(userId, userPassword);
             List<InterestDto> interests = List.of(InterestDto.of(1L,"자전거 타기"),
                     InterestDto.of(2L, "놀기"), InterestDto.of(3L,"게임하기"));
-            List<QuestionDto> questions = List.of(new QuestionDto(1L,true), new QuestionDto(2L, false),
-                    new QuestionDto(3L, true));
 
             LogInResponse response = LogInResponse.from(user, "accessToken", "refreshToken");
             response.setInterests(interests);
-            response.setQuestions(questions);
 
             given(userAccountService.getLoginInfo(userId, userPassword)).willReturn(response);
 
@@ -276,9 +260,6 @@ class UserAccountControllerTest extends ControllerTestConfig{
                                                     fieldWithPath("data.interests").description("관심사 리스트"),
                                                     fieldWithPath("data.interests[].id").description("관심사 아이디"),
                                                     fieldWithPath("data.interests[].interestName").description("관심사 명"),
-                                                    fieldWithPath("data.questions").description("질의 답변 리스트"),
-                                                    fieldWithPath("data.questions[].id").description("질의 답변 아이디"),
-                                                    fieldWithPath("data.questions[].status").description("질의 답변 상태"),
                                                     fieldWithPath("data.selfIntroduction").description("자기소개"),
                                                     fieldWithPath("data.accessToken").description("AccessToken")
                                             ).responseSchema(Schema.schema("로그인 성공 응답")).build()
@@ -386,8 +367,8 @@ class UserAccountControllerTest extends ControllerTestConfig{
                             preprocessResponse(prettyPrint()),
                             resource(
                                     ResourceSnippetParameters.builder()
-                                            .description("중복아이디 체크 API")
-                                            .tag("UserAccount").description("인증 관련 API")
+                                            .description("아이디 중복 체크")
+                                            .tag("UserAccount").description("아이디 중복 체크 API")
                                             .requestFields(
                                                     fieldWithPath("userId").description("유저 아이디")
                                             ).requestSchema(Schema.schema("아이디 중복체크 요청"))
@@ -423,8 +404,8 @@ class UserAccountControllerTest extends ControllerTestConfig{
                             preprocessResponse(prettyPrint()),
                             resource(
                                     ResourceSnippetParameters.builder()
-                                            .description("중복아이디 체크 API")
-                                            .tag("UserAccount").description("인증 관련 API")
+                                            .description("아이디 중복 체크")
+                                            .tag("UserAccount").description("아이디 중복 체크 API")
                                             .requestFields(
                                                     fieldWithPath("userId").description("유저 아이디")
                                             ).requestSchema(Schema.schema("아이디 중복체크 요청"))

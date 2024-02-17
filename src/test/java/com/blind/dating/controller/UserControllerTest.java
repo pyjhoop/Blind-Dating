@@ -1,30 +1,34 @@
 package com.blind.dating.controller;
 
+import com.blind.dating.common.Api;
+import com.blind.dating.common.code.UserResponseCode;
 import com.blind.dating.config.SecurityConfig;
-import com.blind.dating.domain.Interest;
-import com.blind.dating.domain.Question;
-import com.blind.dating.domain.Role;
-import com.blind.dating.domain.UserAccount;
+import com.blind.dating.domain.interest.Interest;
+import com.blind.dating.domain.user.Role;
+import com.blind.dating.domain.user.UserAccount;
+import com.blind.dating.domain.user.UserController;
+import com.blind.dating.domain.user.dto.UserInfo;
 import com.blind.dating.dto.interest.InterestDto;
-import com.blind.dating.dto.post.PostResponseDto;
-import com.blind.dating.dto.question.QuestionDto;
 import com.blind.dating.dto.user.UserInfoDto;
-import com.blind.dating.dto.user.UserUpdateRequestDto;
+import com.blind.dating.domain.user.dto.UserUpdateRequestDto;
 import com.blind.dating.dto.user.UserWithInterestAndQuestionDto;
+import com.blind.dating.domain.user.UserAccountRedisRepository;
 import com.blind.dating.exception.ApiException;
-import com.blind.dating.repository.UserAccountRedisRepository;
 import com.blind.dating.security.TokenProvider;
-import com.blind.dating.service.UserService;
+import com.blind.dating.domain.user.UserService;
 import com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper;
 import com.epages.restdocs.apispec.ResourceSnippetParameters;
 import com.epages.restdocs.apispec.Schema;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.Test;
+import org.mockito.Spy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -32,14 +36,17 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
@@ -49,15 +56,18 @@ import static com.epages.restdocs.apispec.ResourceDocumentation.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.*;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.content;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @DisplayName("UserController -테스트")
 @WebMvcTest(UserController.class)
 @Import(SecurityConfig.class)
+@ActiveProfiles("test")
 class UserControllerTest extends ControllerTestConfig{
 
     @Autowired
@@ -67,26 +77,25 @@ class UserControllerTest extends ControllerTestConfig{
 
 
     @MockBean private UserService userService;
-    @MockBean private TokenProvider tokenProvider;
+    @SpyBean
+    private TokenProvider tokenProvider;
     @MockBean private UserAccountRedisRepository userAccountRedisRepository;
 
     private UserAccount user;
     private Authentication authentication;
     List<InterestDto> interests;
-    List<QuestionDto> questions;
     private UserInfoDto dto;
+    private String accessToken;
 
     @BeforeEach
     void setUp(){
-        user = new UserAccount(1L,"userId","userPassword","nickname","서울","INTP","M",false, "안녕", LocalDateTime.now(), Role.USER.getValue(),null,null,null);
-        user.setQuestions(List.of(new Question()));
+        user = new UserAccount(1L,"userId","userPassword","nickname","서울","INTP","M",false, "안녕", LocalDateTime.now(), Role.USER,null,"origin","change", null);
         user.setInterests(List.of(new Interest()));
         authentication = new UsernamePasswordAuthenticationToken("1",user.getUserPassword());
         interests = List.of(InterestDto.of(1L,"자전거 타기"),
                 InterestDto.of(2L, "놀기"), InterestDto.of(3L,"게임하기"));
-        questions = List.of(new QuestionDto(1L,true), new QuestionDto(2L, false),
-                new QuestionDto(3L, true));
-        dto = new UserInfoDto(1L, "nickname1","서울","INTP","M", interests, questions, "하이요");
+        dto = new UserInfoDto(1L, "nickname1","서울","INTP","M", interests, "하이요");
+        accessToken = tokenProvider.create(user);
 
     }
 
@@ -95,19 +104,19 @@ class UserControllerTest extends ControllerTestConfig{
     class MaleAndFemaleUser {
         @DisplayName("조회 성공")
         @Test
-        @WithMockUser(username = "1", password = "", roles = "USER")
         void testGetMaileAndFemaleUsersThenReturn200() throws Exception {
             // Given
             Pageable pageable = PageRequest.of(0, 1);
             Page<UserInfoDto> page = new PageImpl<>(List.of(dto), pageable,1L);
 
-            given(userService.getMaleAndFemaleUsers(any(Pageable.class), any(Authentication.class))).willReturn(page);
+            when(userService.getMaleAndFemaleUsers(any(Pageable.class), any(Authentication.class))).thenReturn(page);
 
             ResultActions actions = mvc.perform(
                     RestDocumentationRequestBuilders.get("/api/users/all")
                             .contentType(MediaType.APPLICATION_JSON)
                             .accept(MediaType.APPLICATION_JSON)
-                            .header("Authorization", "Bearer "+"accessToken")
+                            .principal(authentication)
+                            .header("Authorization", "Bearer "+accessToken)
             ).andDo(
                     MockMvcRestDocumentationWrapper.document("전체 유저 조회 - 성공",
                             preprocessRequest(prettyPrint()),
@@ -136,9 +145,6 @@ class UserControllerTest extends ControllerTestConfig{
                                                     fieldWithPath("data.content[].interests").description("관심사 리스트"),
                                                     fieldWithPath("data.content[].interests[].id").description("관심사 아이디"),
                                                     fieldWithPath("data.content[].interests[].interestName").description("관심사 명"),
-                                                    fieldWithPath("data.content[].questions").description("질의 답변 리스트"),
-                                                    fieldWithPath("data.content[].questions[].id").description("질의 답변 아이디"),
-                                                    fieldWithPath("data.content[].questions[].status").description("질의 답변 상태"),
                                                     fieldWithPath("data.content[].selfIntroduction").description("자기소개")
                                             ).responseSchema(Schema.schema("유저 리스트 조회")).build()
                             )
@@ -152,15 +158,14 @@ class UserControllerTest extends ControllerTestConfig{
         void testGetMaileAndFemaleUsersThenReturn401() throws Exception {
             // Given
             Pageable pageable = PageRequest.of(0, 1);
-            Page<UserInfoDto> page = new PageImpl<>(List.of(dto), pageable,1L);
-
-            given(userService.getMaleAndFemaleUsers(any(Pageable.class), any(Authentication.class))).willReturn(page);
+            given(userService.getMaleAndFemaleUsers(any(Pageable.class), any(Authentication.class)))
+                    .willThrow(new ApiException(UserResponseCode.AUTHORIZE_FAIL));
 
             ResultActions actions = mvc.perform(
                     RestDocumentationRequestBuilders.get("/api/users/all")
                             .contentType(MediaType.APPLICATION_JSON)
                             .accept(MediaType.APPLICATION_JSON)
-                            .header("Authorization", "Bearer "+"accessToken")
+                            .header("Authorization", "Bearer "+accessToken)
             ).andDo(
                     MockMvcRestDocumentationWrapper.document("전체 유저 조회 - 인증 실패",
                             preprocessRequest(prettyPrint()),
@@ -191,8 +196,6 @@ class UserControllerTest extends ControllerTestConfig{
         void testGetMaileAndFemaleUsersThenReturn500() throws Exception {
             // Given
             Pageable pageable = PageRequest.of(0, 1);
-            Page<UserInfoDto> page = new PageImpl<>(List.of(dto), pageable,1L);
-
 
             given(userService.getMaleAndFemaleUsers(any(Pageable.class), any(Authentication.class)))
                     .willThrow(new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error"));
@@ -201,7 +204,8 @@ class UserControllerTest extends ControllerTestConfig{
                     RestDocumentationRequestBuilders.get("/api/users/all")
                             .contentType(MediaType.APPLICATION_JSON)
                             .accept(MediaType.APPLICATION_JSON)
-                            .header("Authorization", "Bearer "+"accessToken")
+                            .principal(authentication)
+                            .header("Authorization", "Bearer "+accessToken)
             ).andDo(
                     MockMvcRestDocumentationWrapper.document("전체 유저 조회 - 서버 에러",
                             preprocessRequest(prettyPrint()),
@@ -245,7 +249,7 @@ class UserControllerTest extends ControllerTestConfig{
                     RestDocumentationRequestBuilders.get("/api/users/male")
                             .contentType(MediaType.APPLICATION_JSON)
                             .accept(MediaType.APPLICATION_JSON)
-                            .header("Authorization", "Bearer "+"accessToken")
+                            .header("Authorization", "Bearer "+accessToken)
             ).andDo(
                     MockMvcRestDocumentationWrapper.document("남성 유저 조회 - 성공",
                             preprocessRequest(prettyPrint()),
@@ -274,9 +278,6 @@ class UserControllerTest extends ControllerTestConfig{
                                                     fieldWithPath("data.content[].interests").description("관심사 리스트"),
                                                     fieldWithPath("data.content[].interests[].id").description("관심사 아이디"),
                                                     fieldWithPath("data.content[].interests[].interestName").description("관심사 명"),
-                                                    fieldWithPath("data.content[].questions").description("질의 답변 리스트"),
-                                                    fieldWithPath("data.content[].questions[].id").description("질의 답변 아이디"),
-                                                    fieldWithPath("data.content[].questions[].status").description("질의 답변 상태"),
                                                     fieldWithPath("data.content[].selfIntroduction").description("자기소개")
                                             ).responseSchema(Schema.schema("유저 리스트 조회")).build()
                             )
@@ -290,16 +291,16 @@ class UserControllerTest extends ControllerTestConfig{
         void testGetMaileUsersThenReturn401() throws Exception {
             // Given
             Pageable pageable = PageRequest.of(0, 1);
-            Page<UserInfoDto> page = new PageImpl<>(List.of(dto), pageable,1L);
 
-            given(userService.getMaleUsers(any(Pageable.class), any(Authentication.class))).willReturn(page);
+            given(userService.getMaleUsers(any(Pageable.class), any(Authentication.class)))
+                    .willThrow(new ApiException(UserResponseCode.AUTHORIZE_FAIL));
 
 
             ResultActions actions = mvc.perform(
                     RestDocumentationRequestBuilders.get("/api/users/male")
                             .contentType(MediaType.APPLICATION_JSON)
                             .accept(MediaType.APPLICATION_JSON)
-                            .header("Authorization", "Bearer "+"accessToken")
+                            .header("Authorization", "Bearer "+accessToken)
             ).andDo(
                     MockMvcRestDocumentationWrapper.document("남성 유저 조회 - 인증 실패",
                             preprocessRequest(prettyPrint()),
@@ -329,9 +330,6 @@ class UserControllerTest extends ControllerTestConfig{
         @WithMockUser(username = "1", password = "", roles = "USER")
         void testGetMaileUsersThenReturn500() throws Exception {
             // Given
-            Pageable pageable = PageRequest.of(0, 1);
-            Page<UserInfoDto> page = new PageImpl<>(List.of(dto), pageable,1L);
-
             given(userService.getMaleUsers(any(Pageable.class), any(Authentication.class)))
                     .willThrow(new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error"));
 
@@ -339,7 +337,7 @@ class UserControllerTest extends ControllerTestConfig{
                     RestDocumentationRequestBuilders.get("/api/users/male")
                             .contentType(MediaType.APPLICATION_JSON)
                             .accept(MediaType.APPLICATION_JSON)
-                            .header("Authorization", "Bearer "+"accessToken")
+                            .header("Authorization", "Bearer "+accessToken)
             ).andDo(
                     MockMvcRestDocumentationWrapper.document("남성 유저 조회 - 서버 에러",
                             preprocessRequest(prettyPrint()),
@@ -372,7 +370,6 @@ class UserControllerTest extends ControllerTestConfig{
     class FemaleUser {
         @DisplayName("조회 성공")
         @Test
-        @WithMockUser(username = "1", password = "", roles = "USER")
         void testGetFemaleUsersThen200() throws Exception {
             // Given
             Pageable pageable = PageRequest.of(0, 1);
@@ -385,7 +382,7 @@ class UserControllerTest extends ControllerTestConfig{
                     RestDocumentationRequestBuilders.get("/api/users/female")
                             .contentType(MediaType.APPLICATION_JSON)
                             .accept(MediaType.APPLICATION_JSON)
-                            .header("Authorization", "Bearer "+"accessToken")
+                            .header("Authorization", "Bearer "+accessToken)
             ).andDo(
                     MockMvcRestDocumentationWrapper.document("여성 유저 조회 - 성공",
                             preprocessRequest(prettyPrint()),
@@ -414,9 +411,6 @@ class UserControllerTest extends ControllerTestConfig{
                                                     fieldWithPath("data.content[].interests").description("관심사 리스트"),
                                                     fieldWithPath("data.content[].interests[].id").description("관심사 아이디"),
                                                     fieldWithPath("data.content[].interests[].interestName").description("관심사 명"),
-                                                    fieldWithPath("data.content[].questions").description("질의 답변 리스트"),
-                                                    fieldWithPath("data.content[].questions[].id").description("질의 답변 아이디"),
-                                                    fieldWithPath("data.content[].questions[].status").description("질의 답변 상태"),
                                                     fieldWithPath("data.content[].selfIntroduction").description("자기소개")
                                             ).responseSchema(Schema.schema("유저 리스트 조회")).build()
                             )
@@ -433,13 +427,14 @@ class UserControllerTest extends ControllerTestConfig{
             Pageable pageable = PageRequest.of(0, 1);
             Page<UserInfoDto> page = new PageImpl<>(List.of(dto), pageable,1L);
 
-            given(userService.getFemaleUsers(any(Pageable.class), any(Authentication.class))).willReturn(page);
+            given(userService.getFemaleUsers(any(Pageable.class), any(Authentication.class)))
+                    .willThrow(new ApiException(UserResponseCode.AUTHORIZE_FAIL));
 
             ResultActions actions = mvc.perform(
                     RestDocumentationRequestBuilders.get("/api/users/female")
                             .contentType(MediaType.APPLICATION_JSON)
                             .accept(MediaType.APPLICATION_JSON)
-                            .header("Authorization", "Bearer "+"accessToken")
+                            .header("Authorization", "Bearer "+accessToken)
             ).andDo(
                     MockMvcRestDocumentationWrapper.document("여성 유저 조회 - 인증 실패",
                             preprocessRequest(prettyPrint()),
@@ -465,12 +460,8 @@ class UserControllerTest extends ControllerTestConfig{
         }
         @DisplayName("서버 에러")
         @Test
-        @WithMockUser(username = "1", password = "", roles = "USER")
         void testGetFemaleUsersThenReturn500() throws Exception {
             // Given
-            Pageable pageable = PageRequest.of(0, 1);
-            Page<UserInfoDto> page = new PageImpl<>(List.of(dto), pageable,1L);
-
             given(userService.getFemaleUsers(any(Pageable.class), any(Authentication.class)))
                     .willThrow(new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error"));
 
@@ -478,7 +469,7 @@ class UserControllerTest extends ControllerTestConfig{
                     RestDocumentationRequestBuilders.get("/api/users/female")
                             .contentType(MediaType.APPLICATION_JSON)
                             .accept(MediaType.APPLICATION_JSON)
-                            .header("Authorization", "Bearer "+"accessToken")
+                            .header("Authorization", "Bearer "+accessToken)
             ).andDo(
                     MockMvcRestDocumentationWrapper.document("여성 유저 조회 - 서버 에러",
                             preprocessRequest(prettyPrint()),
@@ -512,10 +503,9 @@ class UserControllerTest extends ControllerTestConfig{
     class GetMyInfo{
         @DisplayName("성공")
         @Test
-        @WithMockUser(username = "1", password = "", roles = "USER")
         public void testGetMyInfoThen200() throws Exception {
             //Given
-            UserWithInterestAndQuestionDto dto1 = UserWithInterestAndQuestionDto.of(1L,"userId1","nickname1","서울","INTP","M",interests, questions,"안녕");
+            UserInfo dto1 = UserInfo.from(user);
             given(userService.getMyInfo(any(Authentication.class))).willReturn(dto1);
 
             //When && Then
@@ -523,7 +513,7 @@ class UserControllerTest extends ControllerTestConfig{
                     RestDocumentationRequestBuilders.get("/api/users")
                             .contentType(MediaType.APPLICATION_JSON)
                             .accept(MediaType.APPLICATION_JSON)
-                            .header("Authorization", "Bearer "+"accessToken")
+                            .header("Authorization", "Bearer "+accessToken)
             ).andDo(
                     MockMvcRestDocumentationWrapper.document("내정보 조회 - 성공",
                             preprocessRequest(prettyPrint()),
@@ -542,7 +532,6 @@ class UserControllerTest extends ControllerTestConfig{
                                                     fieldWithPath("message").description("응답 메시지"),
                                                     fieldWithPath("data").description("응답 데이터"),
                                                     fieldWithPath("data.id").description("유저 유니크 번호"),
-                                                    fieldWithPath("data.userId").description("유저 아이디"),
                                                     fieldWithPath("data.nickname").description("닉네임"),
                                                     fieldWithPath("data.region").description("사는 지역"),
                                                     fieldWithPath("data.mbti").description("MBTI"),
@@ -550,10 +539,8 @@ class UserControllerTest extends ControllerTestConfig{
                                                     fieldWithPath("data.interests").description("관심사 리스트"),
                                                     fieldWithPath("data.interests[].id").description("관심사 아이디"),
                                                     fieldWithPath("data.interests[].interestName").description("관심사 명"),
-                                                    fieldWithPath("data.questions").description("질의 답변 리스트"),
-                                                    fieldWithPath("data.questions[].id").description("질의 답변 아이디"),
-                                                    fieldWithPath("data.questions[].status").description("질의 답변 상태"),
-                                                    fieldWithPath("data.selfIntroduction").description("자기소개")
+                                                    fieldWithPath("data.selfIntroduction").description("자기소개"),
+                                                    fieldWithPath("data.profile").description("프로필 이미지")
                                             ).responseSchema(Schema.schema("내정보 조회 성공")).build()
                             )
                     )
@@ -565,15 +552,16 @@ class UserControllerTest extends ControllerTestConfig{
         @Test
         public void testGetMyInfoThen401() throws Exception {
             //Given
-            UserWithInterestAndQuestionDto dto1 = UserWithInterestAndQuestionDto.of(1L,"userId1","nickname1","서울","INTP","M",interests, questions,"안녕");
-            given(userService.getMyInfo(any(Authentication.class))).willReturn(dto1);
+            UserInfo dto1 = UserInfo.from(user);
+            given(userService.getMyInfo(any(Authentication.class)))
+                    .willThrow(new ApiException(UserResponseCode.AUTHORIZE_FAIL));
 
             //When && Then
             ResultActions actions = mvc.perform(
                     RestDocumentationRequestBuilders.get("/api/users")
                             .contentType(MediaType.APPLICATION_JSON)
                             .accept(MediaType.APPLICATION_JSON)
-                            .header("Authorization", "Bearer "+"accessToken")
+                            .header("Authorization", "Bearer "+accessToken)
             ).andDo(
                     MockMvcRestDocumentationWrapper.document("내정보 조회 - 인증 실패",
                             preprocessRequest(prettyPrint()),
@@ -600,10 +588,9 @@ class UserControllerTest extends ControllerTestConfig{
 
         @DisplayName("서버 에러")
         @Test
-        @WithMockUser(username = "1", password = "", roles = "USER")
         public void testGetMyInfoThen500() throws Exception {
             //Given
-            UserWithInterestAndQuestionDto dto1 = UserWithInterestAndQuestionDto.of(1L,"userId1","nickname1","서울","INTP","M",interests, questions,"안녕");
+            UserInfo dto1 = UserInfo.from(user);
             given(userService.getMyInfo(any(Authentication.class))).willReturn(dto1);
             given(userService.getMyInfo(any(Authentication.class)))
                     .willThrow(new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error"));
@@ -614,7 +601,7 @@ class UserControllerTest extends ControllerTestConfig{
                     RestDocumentationRequestBuilders.get("/api/users")
                             .contentType(MediaType.APPLICATION_JSON)
                             .accept(MediaType.APPLICATION_JSON)
-                            .header("Authorization", "Bearer "+"accessToken")
+                            .header("Authorization", "Bearer "+accessToken)
             ).andDo(
                     MockMvcRestDocumentationWrapper.document("내정보 조회 - 서버 에러",
                             preprocessRequest(prettyPrint()),
@@ -648,16 +635,13 @@ class UserControllerTest extends ControllerTestConfig{
     class UpdateMyInfo{
         @DisplayName("성공")
         @Test
-        @WithMockUser(username = "1", password = "", roles = "USER")
         public void testUpdateMyInfoThen200() throws Exception {
             List<String> list = List.of("놀기","게임하기");
             UserUpdateRequestDto dto = new UserUpdateRequestDto("인천","ESTP",list,"안녕하세요");
-            UserWithInterestAndQuestionDto dto1 = UserWithInterestAndQuestionDto.of(1L,"userId1","nickname1","서울","INTP","M",interests, questions,"안녕");
+            UserWithInterestAndQuestionDto dto1 = UserWithInterestAndQuestionDto.of(1L,"userId1","nickname1","서울","INTP","M",interests,"안녕");
 
             List<Interest> list1 = List.of(new Interest(1L, user, "놀기"), new Interest(2L, user, "게임하기"));
-            List<Question> list2 = List.of(new Question(1L, user, true),new Question(2L, user, false));
             user.setInterests(list1);
-            user.setQuestions(list2);
             given(userService.updateMyInfo(any(Authentication.class), eq(dto))).willReturn(user);
 
             //When && Then
@@ -665,7 +649,7 @@ class UserControllerTest extends ControllerTestConfig{
                     RestDocumentationRequestBuilders.put("/api/users")
                             .contentType(MediaType.APPLICATION_JSON)
                             .accept(MediaType.APPLICATION_JSON)
-                            .header("Authorization", "Bearer "+"accessToken")
+                            .header("Authorization", "Bearer "+accessToken)
                             .content(objectMapper.writeValueAsString(dto))
             ).andDo(
                     MockMvcRestDocumentationWrapper.document("내정보 수정 - 성공",
@@ -698,9 +682,6 @@ class UserControllerTest extends ControllerTestConfig{
                                                     fieldWithPath("data.interests").description("관심사 리스트"),
                                                     fieldWithPath("data.interests[].id").description("관심사 아이디"),
                                                     fieldWithPath("data.interests[].interestName").description("관심사 명"),
-                                                    fieldWithPath("data.questions").description("질의 답변 리스트"),
-                                                    fieldWithPath("data.questions[].id").description("질의 답변 아이디"),
-                                                    fieldWithPath("data.questions[].status").description("질의 답변 상태"),
                                                     fieldWithPath("data.selfIntroduction").description("자기소개")
                                             ).responseSchema(Schema.schema("내정보 수정 성공")).build()
                             )
@@ -714,13 +695,12 @@ class UserControllerTest extends ControllerTestConfig{
         public void testUpdateMyInfoThen401() throws Exception {
             List<String> list = List.of("놀기","게임하기");
             UserUpdateRequestDto dto = new UserUpdateRequestDto("인천","ESTP",list,"안녕하세요");
-            UserWithInterestAndQuestionDto dto1 = UserWithInterestAndQuestionDto.of(1L,"userId1","nickname1","서울","INTP","M",interests, questions,"안녕");
+            UserWithInterestAndQuestionDto dto1 = UserWithInterestAndQuestionDto.of(1L,"userId1","nickname1","서울","INTP","M",interests,"안녕");
 
             List<Interest> list1 = List.of(new Interest(1L, user, "놀기"), new Interest(2L, user, "게임하기"));
-            List<Question> list2 = List.of(new Question(1L, user, true),new Question(2L, user, false));
             user.setInterests(list1);
-            user.setQuestions(list2);
-            given(userService.updateMyInfo(any(Authentication.class), eq(dto))).willReturn(user);
+            given(userService.updateMyInfo(any(Authentication.class), eq(dto)))
+                    .willThrow(new ApiException(UserResponseCode.AUTHORIZE_FAIL));
 
             //When && Then
             ResultActions actions = mvc.perform(
@@ -760,16 +740,13 @@ class UserControllerTest extends ControllerTestConfig{
 
         @DisplayName("서버 오류")
         @Test
-        @WithMockUser(username = "1", password = "", roles = "USER")
         public void testUpdateMyInfoThen500() throws Exception {
             List<String> list = List.of("놀기","게임하기");
             UserUpdateRequestDto dto = new UserUpdateRequestDto("인천","ESTP",list,"안녕하세요");
-            UserWithInterestAndQuestionDto dto1 = UserWithInterestAndQuestionDto.of(1L,"userId1","nickname1","서울","INTP","M",interests, questions,"안녕");
+            UserWithInterestAndQuestionDto dto1 = UserWithInterestAndQuestionDto.of(1L,"userId1","nickname1","서울","INTP","M",interests,"안녕");
 
             List<Interest> list1 = List.of(new Interest(1L, user, "놀기"), new Interest(2L, user, "게임하기"));
-            List<Question> list2 = List.of(new Question(1L, user, true),new Question(2L, user, false));
             user.setInterests(list1);
-            user.setQuestions(list2);
             given(userService.updateMyInfo(any(Authentication.class), eq(dto)))
                     .willThrow(new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error"));
 
@@ -778,7 +755,7 @@ class UserControllerTest extends ControllerTestConfig{
                     RestDocumentationRequestBuilders.put("/api/users")
                             .contentType(MediaType.APPLICATION_JSON)
                             .accept(MediaType.APPLICATION_JSON)
-                            .header("Authorization", "Bearer "+"accessToken")
+                            .header("Authorization", "Bearer "+accessToken)
                             .content(objectMapper.writeValueAsString(dto))
             ).andDo(
                     MockMvcRestDocumentationWrapper.document("내정보 수정 - 서버 오류",

@@ -1,7 +1,7 @@
 package com.blind.dating.dto.chat;
 
-import com.blind.dating.domain.ChatRoom;
-import com.blind.dating.domain.UserAccount;
+import com.blind.dating.domain.chatRoom.ChatRoom;
+import com.blind.dating.domain.user.UserAccount;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import lombok.NoArgsConstructor;

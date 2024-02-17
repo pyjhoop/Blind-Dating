@@ -1,7 +1,8 @@
 package com.blind.dating.service;
 
-import com.blind.dating.domain.UserAccount;
-import com.blind.dating.repository.UserAccountRepository;
+import com.blind.dating.domain.user.CustomUserDetailsService;
+import com.blind.dating.domain.user.UserAccount;
+import com.blind.dating.domain.user.UserAccountRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -9,7 +10,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.util.Optional;
 

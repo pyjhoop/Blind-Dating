@@ -23,7 +23,7 @@ public class StompWebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/stomp/chat","/stomp/chatroom")
-                .setAllowedOrigins("http://localhost:5500","http://127.0.0.1:5500", "http://127.0.0.1:3000","http://localhost:3000", "http://localhost:80","https://fe-zeta.vercel.app")
+                .setAllowedOrigins("https://blind-dating-fe.vercel.app","http://localhost:5500","http://127.0.0.1:5500", "http://127.0.0.1:3000","http://localhost:3000", "http://localhost:80","https://fe-zeta.vercel.app")
                 .withSockJS();
     }
 

@@ -34,7 +34,7 @@ public class SecurityConfig {
                                 .requestMatchers( "/swagger-ui/**","/v3/api-docs/**","/docs/**").permitAll()
                                 .requestMatchers("/api/login","/api/signup","/api/profile","/api/refresh", "/api/logout").permitAll()
                                 .requestMatchers("/chat/rooms","/chat/room","/stomp/chat/**","/sub/**","/pub/**","/stomp/chatroom/**").permitAll()
-                                .requestMatchers("/api/check-nickname/**","/api/check-userId","/api/test").permitAll()
+                                .requestMatchers("/api/check-nickname/**","/api/check-userId","/api/test","/actuator/**").permitAll()
                                 .anyRequest().authenticated()
                 )
 //                .headers(header->header.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin))

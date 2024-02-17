@@ -34,3 +34,11 @@ springdoc:
 jwt:
   secret_key: ${secret-key}
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: prometheus, health, info, loggers
+  metrics:
+    tags:
+      application: ${spring.application.name}

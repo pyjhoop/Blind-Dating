@@ -8,7 +8,7 @@
   "servers" : [ {
     "url" : "http://localhost:8081"
   }, {
-    "url" : "http://blind-dating.site:8081"
+    "url" : "https://blind-dating.site"
   } ],
   "tags" : [ ],
   "paths" : {
@@ -252,7 +252,7 @@
           "schema" : {
             "type" : "string"
           },
-          "example" : "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaXNzIjoiYmxpbmQgZGF0aW5nIHdlYiIsImlhdCI6MTcwODE1MDU5NCwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwODE1NDE5NH0.gJwYTwNMuEjMgU-C2YwFdKnStR72pe5_10xGt7R-xQk"
+          "example" : "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaXNzIjoiYmxpbmQgZGF0aW5nIHdlYiIsImlhdCI6MTcwODE1MTM3MywiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwODE1NDk3M30.WAoIa32-YZ6apM9dTqG-o9dw6XijwnI5xzz5hOmgnPY"
         } ],
         "responses" : {
           "500" : {
@@ -318,7 +318,7 @@
           "schema" : {
             "type" : "string"
           },
-          "example" : "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaXNzIjoiYmxpbmQgZGF0aW5nIHdlYiIsImlhdCI6MTcwODE1MDU5NSwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwODE1NDE5NX0.KGJ2h0ibLrAzmHomh6LS3jd-VFpv1qbiASxySxoSGgE"
+          "example" : "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaXNzIjoiYmxpbmQgZGF0aW5nIHdlYiIsImlhdCI6MTcwODE1MTM3NCwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwODE1NDk3NH0.cfE48sheHREPvr7-KOd2rmdQTfBPNl3bvWxDRQKb7Fw"
         } ],
         "requestBody" : {
           "content" : {
@@ -406,7 +406,7 @@
           "schema" : {
             "type" : "string"
           },
-          "example" : "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaXNzIjoiYmxpbmQgZGF0aW5nIHdlYiIsImlhdCI6MTcwODE1MDU5OCwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwODE1NDE5OH0.Ty8AVozGNnr43MDc6CUPwYAQKUhLtwIHtYekr2TpVUc"
+          "example" : "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaXNzIjoiYmxpbmQgZGF0aW5nIHdlYiIsImlhdCI6MTcwODE1MTM3NiwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwODE1NDk3Nn0.azujTdjT4aiDgE6_9TYeB_2ttvm1w6gm-LdvHEnR2Hg"
         } ],
         "requestBody" : {
           "content" : {
@@ -492,7 +492,7 @@
           "schema" : {
             "type" : "string"
           },
-          "example" : "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaXNzIjoiYmxpbmQgZGF0aW5nIHdlYiIsImlhdCI6MTcwODE1MDU5OCwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwODE1NDE5OH0.Ty8AVozGNnr43MDc6CUPwYAQKUhLtwIHtYekr2TpVUc"
+          "example" : "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaXNzIjoiYmxpbmQgZGF0aW5nIHdlYiIsImlhdCI6MTcwODE1MTM3NywiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwODE1NDk3N30.5Z2d3raK4azefedQRkjrPaR1sU-oNk-GSxQmtVg7GCk"
         } ],
         "requestBody" : {
           "content" : {
@@ -698,7 +698,7 @@
           "schema" : {
             "type" : "string"
           },
-          "example" : "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaXNzIjoiYmxpbmQgZGF0aW5nIHdlYiIsImlhdCI6MTcwODE1MDYwNywiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwODE1NDIwN30.FGaKhlPhcLoNL2z2IKeVC1Okk3f9te8ArYltCMI0rWo"
+          "example" : "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaXNzIjoiYmxpbmQgZGF0aW5nIHdlYiIsImlhdCI6MTcwODE1MTM4NSwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwODE1NDk4NX0.D4vn0ACBXcwrLDy6_-BDCEyDYSWwn_wv8Nh2LJPsn7E"
         } ],
         "responses" : {
           "500" : {
@@ -764,7 +764,7 @@
           "schema" : {
             "type" : "string"
           },
-          "example" : "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaXNzIjoiYmxpbmQgZGF0aW5nIHdlYiIsImlhdCI6MTcwODE1MDYwNiwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwODE1NDIwNn0.6ybMGEBxtZGdOLSo2H3AM2gDq7eOqOdxaPOJ8_4Ld8c"
+          "example" : "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaXNzIjoiYmxpbmQgZGF0aW5nIHdlYiIsImlhdCI6MTcwODE1MTM4NCwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwODE1NDk4NH0.kaSQ1skJeWzXOSaPEe4YINQz4G3R56Qj-N1ORBCYw4s"
         } ],
         "requestBody" : {
           "content" : {
@@ -852,7 +852,7 @@
           "schema" : {
             "type" : "string"
           },
-          "example" : "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaXNzIjoiYmxpbmQgZGF0aW5nIHdlYiIsImlhdCI6MTcwODE1MDU5NCwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwODE1NDE5NH0.gJwYTwNMuEjMgU-C2YwFdKnStR72pe5_10xGt7R-xQk"
+          "example" : "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaXNzIjoiYmxpbmQgZGF0aW5nIHdlYiIsImlhdCI6MTcwODE1MTM3MywiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwODE1NDk3M30.WAoIa32-YZ6apM9dTqG-o9dw6XijwnI5xzz5hOmgnPY"
         } ],
         "responses" : {
           "500" : {
@@ -928,7 +928,7 @@
           "schema" : {
             "type" : "string"
           },
-          "example" : "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaXNzIjoiYmxpbmQgZGF0aW5nIHdlYiIsImlhdCI6MTcwODE1MDU5OCwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwODE1NDE5OH0.Ty8AVozGNnr43MDc6CUPwYAQKUhLtwIHtYekr2TpVUc"
+          "example" : "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaXNzIjoiYmxpbmQgZGF0aW5nIHdlYiIsImlhdCI6MTcwODE1MTM3NywiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwODE1NDk3N30.5Z2d3raK4azefedQRkjrPaR1sU-oNk-GSxQmtVg7GCk"
         } ],
         "requestBody" : {
           "content" : {
@@ -1022,7 +1022,7 @@
           "schema" : {
             "type" : "string"
           },
-          "example" : "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaXNzIjoiYmxpbmQgZGF0aW5nIHdlYiIsImlhdCI6MTcwODE1MDU5OCwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwODE1NDE5OH0.Ty8AVozGNnr43MDc6CUPwYAQKUhLtwIHtYekr2TpVUc"
+          "example" : "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaXNzIjoiYmxpbmQgZGF0aW5nIHdlYiIsImlhdCI6MTcwODE1MTM3NywiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwODE1NDk3N30.5Z2d3raK4azefedQRkjrPaR1sU-oNk-GSxQmtVg7GCk"
         } ],
         "requestBody" : {
           "content" : {
@@ -1110,7 +1110,7 @@
           "schema" : {
             "type" : "string"
           },
-          "example" : "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaXNzIjoiYmxpbmQgZGF0aW5nIHdlYiIsImlhdCI6MTcwODE1MDYwNywiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwODE1NDIwN30.FGaKhlPhcLoNL2z2IKeVC1Okk3f9te8ArYltCMI0rWo"
+          "example" : "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaXNzIjoiYmxpbmQgZGF0aW5nIHdlYiIsImlhdCI6MTcwODE1MTM4NSwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwODE1NDk4NX0.D4vn0ACBXcwrLDy6_-BDCEyDYSWwn_wv8Nh2LJPsn7E"
         } ],
         "responses" : {
           "500" : {
@@ -1178,7 +1178,7 @@
           "schema" : {
             "type" : "string"
           },
-          "example" : "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaXNzIjoiYmxpbmQgZGF0aW5nIHdlYiIsImlhdCI6MTcwODE1MDYwNywiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwODE1NDIwN30.FGaKhlPhcLoNL2z2IKeVC1Okk3f9te8ArYltCMI0rWo"
+          "example" : "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaXNzIjoiYmxpbmQgZGF0aW5nIHdlYiIsImlhdCI6MTcwODE1MTM4NSwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwODE1NDk4NX0.D4vn0ACBXcwrLDy6_-BDCEyDYSWwn_wv8Nh2LJPsn7E"
         } ],
         "responses" : {
           "500" : {
@@ -1246,7 +1246,7 @@
           "schema" : {
             "type" : "string"
           },
-          "example" : "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaXNzIjoiYmxpbmQgZGF0aW5nIHdlYiIsImlhdCI6MTcwODE1MDYwNywiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwODE1NDIwN30.FGaKhlPhcLoNL2z2IKeVC1Okk3f9te8ArYltCMI0rWo"
+          "example" : "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaXNzIjoiYmxpbmQgZGF0aW5nIHdlYiIsImlhdCI6MTcwODE1MTM4NSwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwODE1NDk4NX0.D4vn0ACBXcwrLDy6_-BDCEyDYSWwn_wv8Nh2LJPsn7E"
         } ],
         "responses" : {
           "500" : {
@@ -1322,7 +1322,7 @@
           "schema" : {
             "type" : "string"
           },
-          "example" : "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaXNzIjoiYmxpbmQgZGF0aW5nIHdlYiIsImlhdCI6MTcwODE1MDU5NSwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwODE1NDE5NX0.KGJ2h0ibLrAzmHomh6LS3jd-VFpv1qbiASxySxoSGgE"
+          "example" : "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaXNzIjoiYmxpbmQgZGF0aW5nIHdlYiIsImlhdCI6MTcwODE1MTM3NCwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwODE1NDk3NH0.cfE48sheHREPvr7-KOd2rmdQTfBPNl3bvWxDRQKb7Fw"
         } ],
         "responses" : {
           "500" : {
@@ -1398,7 +1398,7 @@
           "schema" : {
             "type" : "string"
           },
-          "example" : "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaXNzIjoiYmxpbmQgZGF0aW5nIHdlYiIsImlhdCI6MTcwODE1MDU5NSwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwODE1NDE5NX0.KGJ2h0ibLrAzmHomh6LS3jd-VFpv1qbiASxySxoSGgE"
+          "example" : "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaXNzIjoiYmxpbmQgZGF0aW5nIHdlYiIsImlhdCI6MTcwODE1MTM3NCwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwODE1NDk3NH0.cfE48sheHREPvr7-KOd2rmdQTfBPNl3bvWxDRQKb7Fw"
         } ],
         "responses" : {
           "500" : {
@@ -1735,24 +1735,6 @@
           }
         }
       },
-      "내정보 수정 실패" : {
-        "title" : "내정보 수정 실패",
-        "type" : "object",
-        "properties" : {
-          "code" : {
-            "type" : "number",
-            "description" : "응답 코드"
-          },
-          "message" : {
-            "type" : "string",
-            "description" : "응답 메시지"
-          },
-          "status" : {
-            "type" : "string",
-            "description" : "응답 상태"
-          }
-        }
-      },
       "회원가입 실패 응답" : {
         "title" : "회원가입 실패 응답",
         "type" : "object",
@@ -1770,6 +1752,24 @@
               }
             },
             "description" : "응답 데이터"
+          },
+          "message" : {
+            "type" : "string",
+            "description" : "응답 메시지"
+          },
+          "status" : {
+            "type" : "string",
+            "description" : "응답 상태"
+          }
+        }
+      },
+      "내정보 수정 실패" : {
+        "title" : "내정보 수정 실패",
+        "type" : "object",
+        "properties" : {
+          "code" : {
+            "type" : "number",
+            "description" : "응답 코드"
           },
           "message" : {
             "type" : "string",

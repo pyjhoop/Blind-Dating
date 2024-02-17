@@ -161,7 +161,7 @@ bootJar{
 openapi3 {
 	servers = [
 			{url = "http://localhost:8081"},
-			{url = "http://blind-dating.site:8081"}
+			{url = "https://blind-dating.site"}
 	]
 	title = 'Blind-Dating API 문서'
 	description = '블라인드 데이팅 API 문서입니다.'

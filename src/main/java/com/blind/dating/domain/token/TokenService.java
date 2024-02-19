@@ -18,7 +18,7 @@ public class TokenService {
 
     private final UserAccountRepository userAccountRepository;
     private final TokenProvider tokenProvider;
-    private final RefreshTokenRepository refreshTokenRepository;
+//    private final RefreshTokenRepository refreshTokenRepository;
 
 
     /**
@@ -28,9 +28,9 @@ public class TokenService {
      */
     public String validRefreshToken(Cookie cookie){
         String userId = tokenProvider.validateAndGetUserId(cookie.getValue());
-        String refreshToken = refreshTokenRepository.getRefreshToken(userId);
+//        String refreshToken = refreshTokenRepository.getRefreshToken(userId);
 
-        if(refreshToken == null) throw new ApiException(TokenResponseCode.NOT_FOUND_REFRESH_TOKEN);
+//        if(refreshToken == null) throw new ApiException(TokenResponseCode.NOT_FOUND_REFRESH_TOKEN);
         return userId;
     }
 
@@ -46,7 +46,7 @@ public class TokenService {
 
         String accessToken = tokenProvider.create(user);
         String refreshToken = tokenProvider.refreshToken(user);
-        refreshTokenRepository.save(userId, refreshToken);
+//        refreshTokenRepository.save(userId, refreshToken);
 
         return LogInResponse.from(user, accessToken, refreshToken);
     }

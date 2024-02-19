@@ -3,7 +3,7 @@ package com.blind.dating.handler;
 import com.blind.dating.domain.chat.ChatRepository;
 import com.blind.dating.domain.chatRoom.ChattingRoomRepository;
 import com.blind.dating.domain.readChat.ReadChatRepository;
-import com.blind.dating.domain.redis.SessionRedisRepository;
+import com.blind.dating.config.socket.WebSocketSessionManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.Message;
@@ -28,7 +28,7 @@ public class CustomWebSocketInterceptor implements ChannelInterceptor {
     private final SessionHandler sessionHandler;
     private final ChatRepository chatRepository;
     private final ReadChatRepository readChatRepository;
-    private final SessionRedisRepository sessionRedisRepository;
+    private final WebSocketSessionManager websocketSessionManager;
     private final ChattingRoomRepository chattingRoomRepository;
 
     @Override
@@ -55,7 +55,7 @@ public class CustomWebSocketInterceptor implements ChannelInterceptor {
                 map.put("userId",userId);
                 accessor.setSessionAttributes(map);
 
-                sessionRedisRepository.saveUserId(roomId, userId);
+//                sessionRedisRepository.saveUserId(roomId, userId);
 
                 break;
             case DISCONNECT:
@@ -64,7 +64,7 @@ public class CustomWebSocketInterceptor implements ChannelInterceptor {
                 String roomId1 = (String) message.getHeaders().get("roomId");
                 System.out.println("User ID: " + userId1 + ", Room ID: " + roomId1);
 
-                sessionRedisRepository.removeUserId(roomId1, userId1);
+//                sessionRedisRepository.removeUserId(roomId1, userId1);
 
                 break;
             default:

@@ -1,7 +1,7 @@
 package com.blind.dating.domain.chat;
 
 import com.blind.dating.dto.chat.*;
-import com.blind.dating.domain.redis.SessionRedisRepository;
+import com.blind.dating.config.socket.WebSocketSessionManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Controller;
 public class StompChatController {
 
     private final ChatService chatService;
-    private final SessionRedisRepository sessionRedisRepository;
+    private final WebSocketSessionManager websocketSessionManager;
 
 
     @MessageMapping(value = "/chat/{roomId}/message")
@@ -25,7 +25,7 @@ public class StompChatController {
     @MessageMapping(value = "/chat/{roomId}/disconnect")
     public void disconnect(ChatRequestDto dto){
         System.out.println("동작");
-        sessionRedisRepository.removeUserId(dto.getChatRoomId(), dto.getWriterId());
+//        sessionRedisRepository.removeUserId(dto.getChatRoomId(), dto.getWriterId());
     }
 
 }

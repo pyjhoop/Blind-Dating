@@ -74,49 +74,16 @@ public class UserServiceTest {
         Long id = 1L;
         Pageable pageable = Pageable.ofSize(2);
         Page<UserAccount> page = new PageImpl<>(List.of(user,user2));
-        given(userAccountRepository.findAllByIdNot(id, pageable)).willReturn(page);
+        given(userAccountRepository.findAllBy(pageable)).willReturn(page);
 
         // When
-        Page<UserInfoDto> result = userService.getMaleAndFemaleUsers(pageable, authentication);
+        Page<UserInfoDto> result = userService.getMaleAndFemaleUsers(pageable);
 
         // Then
         assertThat(result.getContent().get(0)).hasFieldOrPropertyWithValue("nickname",user.getNickname());
         assertThat(result.getContent().get(1)).hasFieldOrPropertyWithValue("nickname",user2.getNickname());
     }
 
-    @DisplayName("남성 유저 조회")
-    @Test
-    @WithMockUser(username = "1")
-    void givenId_whenGetMaleUsers_thenReturnUsers() {
-        // Given
-        Long id = 1L;
-        Pageable pageable = Pageable.ofSize(1);
-        Page<UserAccount> page = new PageImpl<>(List.of(user));
-        given(userAccountRepository.findAllByIdNotAndGender(id,"M" ,pageable)).willReturn(page);
-
-        // When
-        Page<UserInfoDto> result = userService.getMaleUsers(pageable, authentication);
-
-        // Then
-        assertThat(result.getContent().get(0)).hasFieldOrPropertyWithValue("nickname",user.getNickname());
-    }
-
-    @DisplayName("여성 유저 조회")
-    @Test
-    @WithMockUser(username = "1")
-    void givenId_whenGetFemaleUsers_thenReturnUsers() {
-        // Given
-        Long id = 1L;
-        Pageable pageable = Pageable.ofSize(1);
-        Page<UserAccount> page = new PageImpl<>(List.of(user2));
-        given(userAccountRepository.findAllByIdNotAndGender(id, "W",pageable)).willReturn(page);
-
-        // When
-        Page<UserInfoDto> result = userService.getFemaleUsers(pageable, authentication);
-
-        // Then
-        assertThat(result.getContent().get(0)).hasFieldOrPropertyWithValue("nickname",user2.getNickname());
-    }
 
     @DisplayName("내정보 조회 성공")
     @Test

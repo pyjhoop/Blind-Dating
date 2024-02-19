@@ -15,24 +15,21 @@ import java.util.Objects;
 public class Interest {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "interestId")
     private Long id;
 
-    @ManyToOne
-    private UserAccount userAccount;
 
     @Setter
     @Column(nullable = false, length = 50)
     private String interestName;
 
-
-    private Interest(UserAccount userAccount, String interestName) {
-        this.userAccount = userAccount;
-        this.interestName = interestName;
+    private Interest (Long id) {
+        this.id = id;
+    }
+    public static Interest of(Long id) {
+        return new Interest(id);
     }
 
-    public static Interest of(UserAccount userAccount, String interestName){
-        return new Interest(userAccount, interestName);
-    }
 
     @Override
     public boolean equals(Object o) {

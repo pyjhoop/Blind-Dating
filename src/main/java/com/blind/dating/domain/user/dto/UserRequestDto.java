@@ -37,7 +37,7 @@ public class UserRequestDto {
     private String gender;
 
     @NotNull(message = "관심사는 필수 입력 값입니다.")
-    private List<String> interests;
+    private List<Long> interests;
 
     @NotNull(message = "자기소개는 필수 입력 값입니다.")
     private String selfIntroduction;

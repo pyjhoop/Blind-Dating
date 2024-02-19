@@ -70,8 +70,7 @@ public class UserAccount extends BaseEntity {
     @Setter
     private String changedProfile;
 
-    @OneToMany(mappedBy = "userAccount", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @ToString.Exclude @Setter
+    @ManyToMany @Setter
     private List<Interest> interests;
 
 

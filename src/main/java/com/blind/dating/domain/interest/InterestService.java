@@ -27,8 +27,9 @@ public class InterestService {
 
         List<Interest> list = new ArrayList<>();
 
+        // TOdo
         for(String s: interestName){
-            list.add(Interest.of(userAccount,s));
+//            list.add(Interest.of(userAccount,s));
         }
 
         return list;

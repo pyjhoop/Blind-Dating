@@ -24,8 +24,9 @@ public class LogInResponse {
     private String selfIntroduction;
     private String accessToken;
     private String refreshToken;
+    private String profile;
 
-    private LogInResponse(Long id, String userId, String nickname, String region, String mbti, String gender, List<InterestDto> interests, String selfIntroduction) {
+    private LogInResponse(Long id, String userId, String nickname, String region, String mbti, String gender, List<InterestDto> interests, String selfIntroduction, String profile) {
         this.id = id;
         this.userId = userId;
         this.nickname = nickname;
@@ -34,6 +35,7 @@ public class LogInResponse {
         this.gender = gender;
         this.interests = interests;
         this.selfIntroduction = selfIntroduction;
+        this.profile = profile;
     }
 
     public static LogInResponse from(UserAccount user, String accessToken, String refreshToken) {
@@ -47,7 +49,8 @@ public class LogInResponse {
                 user.getInterests().stream().map(InterestDto::from).collect(Collectors.toList()),
                 user.getSelfIntroduction(),
                 accessToken,
-                refreshToken
+                refreshToken,
+                user.getChangedProfile()
         );
     }
 }

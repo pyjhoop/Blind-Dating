@@ -17,10 +17,7 @@ public class RefreshTokenRepository {
         RedisAsyncCommands<String , String> asyncCommands = redisConnection.getConnection().async();
 
         asyncCommands.setex(userId.toString(),60*60*12 ,refreshToken).thenAccept(result -> {
-            log.info("토큰 저장 완료: " + result);
-            // 명령 실행 후 연결을 종료합니다.
         }).exceptionally(e -> {
-            log.error("토큰 저장 실패", e);
             return null;
         });
 

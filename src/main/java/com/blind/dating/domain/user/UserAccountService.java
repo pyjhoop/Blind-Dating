@@ -1,6 +1,8 @@
 package com.blind.dating.domain.user;
 
 import com.blind.dating.common.code.ResponseCode;
+import com.blind.dating.domain.interest.Interest;
+import com.blind.dating.domain.interest.InterestRepository;
 import com.blind.dating.domain.user.dto.LogInResponse;
 import com.blind.dating.domain.user.dto.UserRequestDto;
 import com.blind.dating.exception.ApiException;
@@ -18,6 +20,7 @@ import org.springframework.validation.FieldError;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Slf4j
@@ -30,6 +33,7 @@ public class UserAccountService {
     private final TokenProvider tokenProvider;
     private final InterestService interestService;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final InterestRepository interestRepository;
 
     /**
      * 회원가입 서비스 로직
@@ -37,7 +41,7 @@ public class UserAccountService {
      * @return UserInfoWithTokens
      */
     @Transactional
-    public UserAccount register(UserRequestDto dto){
+    public void register(UserRequestDto dto){
 
         // 아이디 존재하는지 체크
         String userId = dto.getUserId();
@@ -46,9 +50,9 @@ public class UserAccountService {
         }
         // 유저 저장하기
         UserAccount user = dto.toRegisterEntity(bCryptPasswordEncoder.encode(dto.getUserPassword()));
-
-        user.setInterests(interestService.saveInterest(user, dto.getInterests()));
-        return userAccountRepository.save(user);
+        userAccountRepository.save(user);
+        List<Interest> interests = interestRepository.findAllByIdIn(dto.getInterests());
+        user.setInterests(interests);
     }
 
     /**

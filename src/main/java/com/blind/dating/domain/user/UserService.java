@@ -124,15 +124,17 @@ public class UserService {
         System.out.println("originName");
 
         try{
-            String path = request.getServletContext().getRealPath("/upload");
+            String path = "C:\\upload";
             File directory = new File(path);
 
             if(!directory.exists()) {
+                System.out.println("여기 실행 안됨");
                 directory.mkdirs();
             }
 
             originName = uploadFile.getOriginalFilename();
-            saveName = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
+            saveName = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date())+originName;
+            System.out.println(path+"/"+saveName);
 
             uploadFile.transferTo(new File(path+"/"+saveName));
         }catch (IOException e){

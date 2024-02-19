@@ -58,7 +58,7 @@ dependencies {
 	runtimeOnly 'com.mysql:mysql-connector-j'
 
 	implementation 'org.springframework.boot:spring-boot-starter-websocket'
-	implementation group: 'org.webjars', name: 'stomp-websocket', version: '2.3.3-1'
+//	implementation group: 'org.webjars', name: 'stomp-websocket', version: '2.3.3-1'
 
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 	implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'

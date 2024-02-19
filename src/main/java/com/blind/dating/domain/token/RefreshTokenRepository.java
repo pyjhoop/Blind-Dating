@@ -1,35 +1,37 @@
 package com.blind.dating.domain.token;
 
-import com.blind.dating.dto.RefreshToken;
+import com.blind.dating.config.redis.RedisConnection;
+import io.lettuce.core.api.async.RedisAsyncCommands;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
-import java.util.concurrent.TimeUnit;
-
 @RequiredArgsConstructor
+@Slf4j
 @Repository
 public class RefreshTokenRepository {
 
-    private final RedisTemplate redisTemplate;
+    private final RedisConnection redisConnection;
 
+    public void save(Long userId, String refreshToken){
+        RedisAsyncCommands<String , String> asyncCommands = redisConnection.getConnection().async();
 
-    public String save(String userId, String refreshToken){
-        ValueOperations<String , String> value = redisTemplate.opsForValue();
-        value.set(userId, refreshToken);
-        redisTemplate.expire(userId, 7L, TimeUnit.DAYS);
-        return userId;
+        asyncCommands.setex(userId.toString(),60*60*12 ,refreshToken).thenAccept(result -> {
+            log.info("토큰 저장 완료: " + result);
+            // 명령 실행 후 연결을 종료합니다.
+        }).exceptionally(e -> {
+            log.error("토큰 저장 실패", e);
+            return null;
+        });
+
     }
 
     public String getRefreshToken(String userId){
-        ValueOperations<String, String> value = redisTemplate.opsForValue();
-        String refreshToken = value.get(userId);
-        return refreshToken;
+        return redisConnection.getConnection().sync().get(userId);
     }
 
     public void deleteRefreshToken(String userId){
-        redisTemplate.delete(userId);
+        redisConnection.getConnection().async().del(userId);
     }
 
 }

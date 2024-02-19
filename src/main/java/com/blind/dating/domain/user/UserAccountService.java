@@ -30,7 +30,6 @@ public class UserAccountService {
     private final TokenProvider tokenProvider;
     private final InterestService interestService;
     private final RefreshTokenRepository refreshTokenRepository;
-    private final UserAccountRedisRepository userAccountRedisRepository;
 
     /**
      * 회원가입 서비스 로직
@@ -73,7 +72,7 @@ public class UserAccountService {
             String refreshToken = tokenProvider.refreshToken(user);
 
             //refresh Token 캐싱하기
-            refreshTokenRepository.save(String.valueOf(user.getId()), refreshToken);
+            refreshTokenRepository.save(user.getId(), refreshToken);
 
             return LogInResponse.from(user, accessToken, refreshToken);
         }else{

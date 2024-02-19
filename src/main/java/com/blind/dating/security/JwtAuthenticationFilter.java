@@ -30,13 +30,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final TokenProvider tokenProvider;
 
-    String[] noAuthenticationUrlList = {"/api/signup","/api/login", "/api/check-userId","/api/check-nickname","/swagger-ui","/api/test","/docs","/actuator"};
+    String[] noAuthenticationUrlList = {"/uploads","/room","/rooms","/api/signup","/api/login", "/api/check-userId","/api/check-nickname","/swagger-ui","/api/test","/docs","/actuator"};
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException, ServletException {
         if(!noAuthenticate(request))
         {
+
             try {
+
                 String token = parseBearerToken(request);
 
                 // 토큰 검증하기 JWT이므로 인가 서버에 요청하지 않아도됨
@@ -90,7 +92,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String requestUri = request.getRequestURI();
 
         for(String uri: noAuthenticationUrlList){
-            if(uri.contains(requestUri))
+            if(requestUri.contains(uri))
                 return true;
         }
 

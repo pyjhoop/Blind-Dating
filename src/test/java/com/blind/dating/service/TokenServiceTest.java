@@ -24,6 +24,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doThrow;
 
 @DisplayName("토큰 서비스 - 테스트")
 @ExtendWith(MockitoExtension.class)
@@ -41,7 +42,6 @@ class TokenServiceTest {
         //Given
         Cookie cookie = new Cookie("refreshToken","refreshToken");
         given(tokenProvider.validateAndGetUserId(cookie.getValue())).willReturn("1");
-        given(refreshTokenRepository.getRefreshToken("1")).willReturn("refreshToken");
 
         //When
         String userId = tokenService.validRefreshToken(cookie);
@@ -50,19 +50,6 @@ class TokenServiceTest {
         assertThat(userId).isEqualTo("1");
     }
 
-    @DisplayName("리프레시 토큰 예외 발생 - 테스트")
-    @Test
-    void givenCookie_whenValidateRefreshToken_thenThrowException() {
-        Cookie cookie = new Cookie("refreshToken","refreshToken");
-        given(tokenProvider.validateAndGetUserId(cookie.getValue())).willReturn("1");
-        given(refreshTokenRepository.getRefreshToken("1")).willReturn(null);
-
-        ApiException exception = assertThrows(ApiException.class, ()->{
-            tokenService.validRefreshToken(cookie);
-        });
-
-        assertThat(exception.getResponseCode()).isEqualTo(TokenResponseCode.NOT_FOUND_REFRESH_TOKEN);
-    }
 
 
     @DisplayName("리프레시 토큰 업데이트 - 테스트")

@@ -67,10 +67,10 @@ public class UserAccountController {
                 .body(Api.OK(UserResponseCode.LOGOUT_SUCCESS, null));
     }
 
-    @PostMapping("/check-userId")
+    @PostMapping("/check-email")
     public ResponseEntity<Api> checkUserId(@RequestBody UserIdRequestDto dto){
 
-        UserResponseCode code = userAccountService.checkUserId(dto.getUserId());
+        UserResponseCode code = userAccountService.checkUserEmail(dto.getEmail());
         return ResponseEntity.ok()
                 .body(Api.OK(code, code.getStatus()));
     }

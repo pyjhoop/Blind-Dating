@@ -37,7 +37,7 @@ public class LogInResponseDto {
     public static LogInResponseDto from(LogInResponse response) {
         return new LogInResponseDto(
                 response.getId(),
-                response.getUserId(),
+                response.getEmail(),
                 response.getNickname(),
                 response.getRegion(),
                 response.getMbti(),

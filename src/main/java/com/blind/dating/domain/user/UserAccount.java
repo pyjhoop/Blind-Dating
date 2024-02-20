@@ -13,7 +13,7 @@ import java.util.*;
 @Getter
 @ToString(callSuper = true)
 @Table(indexes = {
-        @Index(columnList = "userId"),
+        @Index(columnList = "email"),
         @Index(columnList = "nickname"),
         @Index(columnList = "gender")
 })
@@ -27,8 +27,8 @@ public class UserAccount extends BaseEntity {
     private Long id;
 
     @Setter
-    @Column(nullable = false, length = 50, unique = true)
-    private String userId;
+    @Column(nullable = false, length = 200, unique = true)
+    private String email;
 
     @Setter
     private String userPassword;
@@ -77,8 +77,8 @@ public class UserAccount extends BaseEntity {
 
     protected UserAccount(){}
 
-    private UserAccount(String userId, String userPassword, String nickname, String region, String mbti, String gender,Boolean deleted, String selfIntroduction, LocalDateTime recentLogin, Role role) {
-        this.userId = userId;
+    private UserAccount(String email, String userPassword, String nickname, String region, String mbti, String gender,Boolean deleted, String selfIntroduction, LocalDateTime recentLogin, Role role) {
+        this.email = email;
         this.userPassword = userPassword;
         this.nickname = nickname;
         this.region = region;
@@ -90,12 +90,12 @@ public class UserAccount extends BaseEntity {
         this.role = role;
     }
 
-    public static UserAccount of(String userId, String userPassword, String nickname, String region, String mbti, String gender, Boolean deleted, String selfIntroduction, LocalDateTime recentLogin, Role role) {
-        return new UserAccount(userId, userPassword, nickname, region, mbti, gender,deleted, selfIntroduction, recentLogin, role);
+    public static UserAccount of(String email, String userPassword, String nickname, String region, String mbti, String gender, Boolean deleted, String selfIntroduction, LocalDateTime recentLogin, Role role) {
+        return new UserAccount(email, userPassword, nickname, region, mbti, gender,deleted, selfIntroduction, recentLogin, role);
     }
 
-    private UserAccount(String userId, String userPassword, String nickname, String region, String mbti, String gender, String selfIntroduction) {
-        this.userId = userId;
+    private UserAccount(String email, String userPassword, String nickname, String region, String mbti, String gender, String selfIntroduction) {
+        this.email = email;
         this.userPassword = userPassword;
         this.nickname = nickname;
         this.region = region;
@@ -103,8 +103,8 @@ public class UserAccount extends BaseEntity {
         this.gender = gender;
         this.selfIntroduction = selfIntroduction;
     }
-    public static UserAccount of(String userId, String userPassword, String nickname, String region, String mbti, String gender, String selfIntroduction) {
-        return new UserAccount(userId, userPassword, nickname, region, mbti, gender, selfIntroduction);
+    public static UserAccount of(String email, String userPassword, String nickname, String region, String mbti, String gender, String selfIntroduction) {
+        return new UserAccount(email, userPassword, nickname, region, mbti, gender, selfIntroduction);
     }
 
     @Override

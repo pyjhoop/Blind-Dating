@@ -17,13 +17,11 @@ public interface UserAccountRepository extends JpaRepository<UserAccount, Long> 
     //특정 성별을 제외한 유저 조회
     Page<UserAccount> findAllByIdNotAndGender(Long id, String gender, Pageable pageable);
 
-    Optional<UserAccount> findByUserId(String userId);
+    Optional<UserAccount> findByEmail(String email);
 
-    Boolean existsByUserId(String userId);
+    Boolean existsByEmail(String email);
 
     Boolean existsByNickname(String nickname);
-
-    Page<UserAccount> findAllByUserIdAndGender(String userId, String gender, Pageable pageable);
 
     Page<UserAccount> findAllByGenderAndInterestsInAndDeleted(String gender, List<Interest> interests, Pageable pageable, Boolean status);
 

@@ -34,6 +34,7 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doThrow;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -63,9 +64,9 @@ class UserAccountControllerTest extends ControllerTestConfig{
     private UserAccount user;
     @BeforeEach
     void setting(){
-        dto = UserRequestDto.of("user01","userPass01","userNickname","서울","INFP","M","안녕하세요");
-        dto.setInterests(List.of("코딩하기","게임하기"));
-        user = new UserAccount(1L, "userId","password","nickname","서울","INTP","M",false,"하이요",null, Role.USER,"K","origin", "change", null);
+        dto = UserRequestDto.of("user01@gmail.com","userPass01","userNickname","서울","INFP","M","안녕하세요");
+        dto.setInterests(List.of(1L,2L));
+        user = new UserAccount(1L, "userId","password","nickname","서울","INTP","M",false,"하이요",null, Role.USER,"K","/profile", "/profile", null);
         user.setRecentLogin(LocalDateTime.now());
         user.setUserPassword(bCryptPasswordEncoder.encode(dto.getUserPassword()));
         user.setInterests(List.of(new Interest()));
@@ -78,7 +79,6 @@ class UserAccountControllerTest extends ControllerTestConfig{
         @Test
         void givenUserRequest_whenRegister_thenSuccess() throws Exception {
 
-            given(userAccountService.register(any(UserRequestDto.class))).willReturn(user);
 
             ResultActions actions = mockMvc.perform(
                     RestDocumentationRequestBuilders.post("/api/signup")
@@ -94,7 +94,7 @@ class UserAccountControllerTest extends ControllerTestConfig{
                                             .description("회원가입 API")
                                             .tag("UserAccount").description("회원가입 API")
                                             .requestFields(
-                                                    fieldWithPath("userId").description("유저 아이디"),
+                                                    fieldWithPath("email").description("유저 이메일"),
                                                     fieldWithPath("userPassword").description("비밀번호"),
                                                     fieldWithPath("nickname").description("닉네임"),
                                                     fieldWithPath("region").description("사는 지역"),
@@ -116,11 +116,11 @@ class UserAccountControllerTest extends ControllerTestConfig{
 
             actions.andExpect(status().isOk());
         }
-        @DisplayName("유저아이디로 인한 실패")
+        @DisplayName("이메일로 인한 실패")
         @Test
         void givenUserRequest_whenRegister_thenErrors() throws Exception {
             // Given
-            dto.setUserId("use");
+            dto.setEmail("pyasdf");
 
             ResultActions actions = mockMvc.perform(
                     RestDocumentationRequestBuilders.post("/api/signup")
@@ -128,7 +128,7 @@ class UserAccountControllerTest extends ControllerTestConfig{
                             .accept(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(dto))
             ).andDo(
-                    MockMvcRestDocumentationWrapper.document("userId로인한 예외발생",
+                    MockMvcRestDocumentationWrapper.document("email 로인한 예외발생",
                             preprocessRequest(prettyPrint()),
                             preprocessResponse(prettyPrint()),
                             resource(
@@ -136,7 +136,7 @@ class UserAccountControllerTest extends ControllerTestConfig{
                                             .description("회원가입 API")
                                             .tag("UserAccount").description("회원가입 API")
                                             .requestFields(
-                                                    fieldWithPath("userId").description("유저 아이디"),
+                                                    fieldWithPath("email").description("유저 이메일"),
                                                     fieldWithPath("userPassword").description("비밀번호"),
                                                     fieldWithPath("nickname").description("닉네임"),
                                                     fieldWithPath("region").description("사는 지역"),
@@ -150,7 +150,7 @@ class UserAccountControllerTest extends ControllerTestConfig{
                                                     fieldWithPath("status").description("응답 상태"),
                                                     fieldWithPath("message").description("응답 메시지"),
                                                     fieldWithPath("data").description("응답 데이터"),
-                                                    fieldWithPath("data.userId").description("아이디 관련 에러")
+                                                    fieldWithPath("data.email").description("이메일 관련 에러")
                                             ).responseSchema(Schema.schema("회원가입 실패 응답"))
                                             .build()
                             )
@@ -158,7 +158,7 @@ class UserAccountControllerTest extends ControllerTestConfig{
 
             );
 
-            actions.andExpect(status().isBadRequest());
+            actions.andExpect(status().is(400));
 
         }
 
@@ -166,10 +166,8 @@ class UserAccountControllerTest extends ControllerTestConfig{
         @Test
         void givenUserRequest_whenRegister_thenServerError() throws Exception {
             // Given
-            dto.setUserId("use");
-            given(userAccountService.register(any(UserRequestDto.class)))
-                    .willThrow(new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error"));
-
+            doThrow(new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error"))
+                    .when(userAccountService).register(any(UserRequestDto.class));
 
             ResultActions actions = mockMvc.perform(
                     RestDocumentationRequestBuilders.post("/api/signup")
@@ -185,7 +183,7 @@ class UserAccountControllerTest extends ControllerTestConfig{
                                             .description("회원가입 API")
                                             .tag("UserAccount").description("회원가입 API")
                                             .requestFields(
-                                                    fieldWithPath("userId").description("유저 아이디"),
+                                                    fieldWithPath("email").description("유저 이메일"),
                                                     fieldWithPath("userPassword").description("비밀번호"),
                                                     fieldWithPath("nickname").description("닉네임"),
                                                     fieldWithPath("region").description("사는 지역"),
@@ -198,8 +196,7 @@ class UserAccountControllerTest extends ControllerTestConfig{
                                                     fieldWithPath("code").description("응답 코드"),
                                                     fieldWithPath("status").description("응답 상태"),
                                                     fieldWithPath("message").description("응답 메시지"),
-                                                    fieldWithPath("data").description("응답 데이터"),
-                                                    fieldWithPath("data.userId").description("아이디 관련 에러")
+                                                    fieldWithPath("data").description("응답 데이터")
                                             ).responseSchema(Schema.schema("회원가입 실패 응답"))
                                             .build()
                             )
@@ -207,7 +204,7 @@ class UserAccountControllerTest extends ControllerTestConfig{
 
             );
 
-            actions.andExpect(status().isBadRequest());
+            actions.andExpect(status().is(500));
 
         }
     }
@@ -261,7 +258,8 @@ class UserAccountControllerTest extends ControllerTestConfig{
                                                     fieldWithPath("data.interests[].id").description("관심사 아이디"),
                                                     fieldWithPath("data.interests[].interestName").description("관심사 명"),
                                                     fieldWithPath("data.selfIntroduction").description("자기소개"),
-                                                    fieldWithPath("data.accessToken").description("AccessToken")
+                                                    fieldWithPath("data.accessToken").description("AccessToken"),
+                                                    fieldWithPath("data.profile").description("프로필")
                                             ).responseSchema(Schema.schema("로그인 성공 응답")).build()
                             )
                     )
@@ -353,31 +351,31 @@ class UserAccountControllerTest extends ControllerTestConfig{
         @Test
         void givenUserId_whenCheckUserId_thenReturnNotUsed() throws Exception {
             // Given
-            UserIdRequestDto dto = new UserIdRequestDto("userId");
-            given(userAccountService.checkUserId(dto.getUserId())).willReturn(UserResponseCode.NOT_EXIST_USER_ID);
+            UserIdRequestDto dto = new UserIdRequestDto("userId@gmail.com");
+            given(userAccountService.checkUserEmail(dto.getEmail())).willReturn(UserResponseCode.NOT_EXIST_EMAIL);
 
             ResultActions actions = mockMvc.perform(
-                    RestDocumentationRequestBuilders.post("/api/check-userId")
+                    RestDocumentationRequestBuilders.post("/api/check-email")
                             .contentType(MediaType.APPLICATION_JSON)
                             .accept(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(dto))
             ).andDo(
-                    MockMvcRestDocumentationWrapper.document("아이디 중복체크 - 없는 아이디",
+                    MockMvcRestDocumentationWrapper.document("이메일 중복체크 - 없는 이메일",
                             preprocessRequest(prettyPrint()),
                             preprocessResponse(prettyPrint()),
                             resource(
                                     ResourceSnippetParameters.builder()
-                                            .description("아이디 중복 체크")
-                                            .tag("UserAccount").description("아이디 중복 체크 API")
+                                            .description("이메일 중복 체크")
+                                            .tag("UserAccount").description("이메일 중복 체크 API")
                                             .requestFields(
-                                                    fieldWithPath("userId").description("유저 아이디")
-                                            ).requestSchema(Schema.schema("아이디 중복체크 요청"))
+                                                    fieldWithPath("email").description("유저 이메일")
+                                            ).requestSchema(Schema.schema("이메일 중복체크 요청"))
                                             .responseFields(
                                                     fieldWithPath("code").description("응답 코드"),
                                                     fieldWithPath("status").description("응답 상태"),
                                                     fieldWithPath("message").description("응답 메시지"),
                                                     fieldWithPath("data").description("응답 데이터")
-                                            ).responseSchema(Schema.schema("중복아이디 체크 응답")).build()
+                                            ).responseSchema(Schema.schema("중복 이메일 체크 응답")).build()
                             )
                     )
             );
@@ -390,31 +388,31 @@ class UserAccountControllerTest extends ControllerTestConfig{
         @Test
         void givenUserId_whenCheckUserId_thenReturnUsed() throws Exception {
             // Given
-            UserIdRequestDto dto = new UserIdRequestDto("userId");
-            given(userAccountService.checkUserId(dto.getUserId())).willReturn(UserResponseCode.EXIST_USER_ID);
+            UserIdRequestDto dto = new UserIdRequestDto("userId@gmail.com");
+            given(userAccountService.checkUserEmail(dto.getEmail())).willReturn(UserResponseCode.EXIST_EMAIL);
 
             ResultActions actions = mockMvc.perform(
-                    RestDocumentationRequestBuilders.post("/api/check-userId")
+                    RestDocumentationRequestBuilders.post("/api/check-email")
                             .contentType(MediaType.APPLICATION_JSON)
                             .accept(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(dto))
             ).andDo(
-                    MockMvcRestDocumentationWrapper.document("아이디 중복체크 - 있는 아이디",
+                    MockMvcRestDocumentationWrapper.document("이메일 중복체크 - 있는 이메일",
                             preprocessRequest(prettyPrint()),
                             preprocessResponse(prettyPrint()),
                             resource(
                                     ResourceSnippetParameters.builder()
-                                            .description("아이디 중복 체크")
-                                            .tag("UserAccount").description("아이디 중복 체크 API")
+                                            .description("이메일 중복 체크")
+                                            .tag("UserAccount").description("이메일 중복 체크 API")
                                             .requestFields(
-                                                    fieldWithPath("userId").description("유저 아이디")
-                                            ).requestSchema(Schema.schema("아이디 중복체크 요청"))
+                                                    fieldWithPath("email").description("유저 이메일")
+                                            ).requestSchema(Schema.schema("이메일 중복체크 요청"))
                                             .responseFields(
                                                     fieldWithPath("code").description("응답 코드"),
                                                     fieldWithPath("status").description("응답 상태"),
                                                     fieldWithPath("message").description("응답 메시지"),
                                                     fieldWithPath("data").description("응답 데이터")
-                                            ).responseSchema(Schema.schema("중복아이디 체크 응답")).build()
+                                            ).responseSchema(Schema.schema("중복 이메일 체크 응답")).build()
                             )
                     )
             );
@@ -425,32 +423,32 @@ class UserAccountControllerTest extends ControllerTestConfig{
         @Test
         void givenUserId_whenCheckUserId_thenReturn500() throws Exception {
             // Given
-            UserIdRequestDto dto = new UserIdRequestDto("userId");
-            given(userAccountService.checkUserId(dto.getUserId()))
+            UserIdRequestDto dto = new UserIdRequestDto("userId@gmail.com");
+            given(userAccountService.checkUserEmail(dto.getEmail()))
                     .willThrow(new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error"));
 
             ResultActions actions = mockMvc.perform(
-                    RestDocumentationRequestBuilders.post("/api/check-userId")
+                    RestDocumentationRequestBuilders.post("/api/check-email")
                             .contentType(MediaType.APPLICATION_JSON)
                             .accept(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(dto))
             ).andDo(
-                    MockMvcRestDocumentationWrapper.document("아이디 중복체크 - 서버 오류",
+                    MockMvcRestDocumentationWrapper.document("이메일 중복체크 - 서버 오류",
                             preprocessRequest(prettyPrint()),
                             preprocessResponse(prettyPrint()),
                             resource(
                                     ResourceSnippetParameters.builder()
-                                            .description("중복아이디 체크 API")
-                                            .tag("UserAccount").description("인증 관련 API")
+                                            .description("이메일 중복 체크")
+                                            .tag("UserAccount").description("이메일 중복 체크 API")
                                             .requestFields(
-                                                    fieldWithPath("userId").description("유저 아이디")
+                                                    fieldWithPath("email").description("유저 이메일")
                                             ).requestSchema(Schema.schema("아이디 중복체크 요청"))
                                             .responseFields(
                                                     fieldWithPath("code").description("응답 코드"),
                                                     fieldWithPath("status").description("응답 상태"),
                                                     fieldWithPath("message").description("응답 메시지"),
                                                     fieldWithPath("data").description("응답 데이터")
-                                            ).responseSchema(Schema.schema("중복아이디 체크 응답")).build()
+                                            ).responseSchema(Schema.schema("중복 이메일 체크 응답")).build()
                             )
                     )
             );

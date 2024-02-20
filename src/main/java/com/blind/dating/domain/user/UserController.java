@@ -6,7 +6,7 @@ import com.blind.dating.domain.user.dto.UserInfo;
 import com.blind.dating.dto.user.UserInfoDto;
 import com.blind.dating.dto.user.UserInfoWithPageInfo;
 import com.blind.dating.domain.user.dto.UserUpdateRequestDto;
-import com.blind.dating.dto.user.UserWithInterestAndQuestionDto;
+import com.blind.dating.dto.user.UserWithInterestsDto;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -70,7 +70,7 @@ public class UserController {
         //내정보 업데이트
         UserAccount user = userService.updateMyInfo(authentication, dto);
         // 업데이트 된 정보 가져오기
-        UserWithInterestAndQuestionDto userInfo = UserWithInterestAndQuestionDto.from(user);
+        UserWithInterestsDto userInfo = UserWithInterestsDto.from(user);
 
         return ResponseEntity.ok()
                 .body(Api.OK(UserResponseCode.UPDATE_USER_INFO_SUCCESS, userInfo));

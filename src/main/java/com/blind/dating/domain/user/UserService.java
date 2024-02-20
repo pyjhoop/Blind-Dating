@@ -1,21 +1,17 @@
 package com.blind.dating.domain.user;
 
 import com.blind.dating.common.code.UserResponseCode;
-import com.blind.dating.domain.UserInterest.UserInterest;
-import com.blind.dating.domain.UserInterest.UserInterestRepository;
 import com.blind.dating.domain.interest.Interest;
 import com.blind.dating.domain.user.dto.ProfileNames;
 import com.blind.dating.domain.user.dto.UserInfo;
 import com.blind.dating.dto.user.UserInfoDto;
 import com.blind.dating.domain.user.dto.UserUpdateRequestDto;
-import com.blind.dating.dto.user.UserWithInterestAndQuestionDto;
 import com.blind.dating.exception.ApiException;
 import com.blind.dating.domain.interest.InterestRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;

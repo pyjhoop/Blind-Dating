@@ -11,8 +11,8 @@ import com.blind.dating.domain.user.dto.UserInfo;
 import com.blind.dating.dto.interest.InterestDto;
 import com.blind.dating.dto.user.UserInfoDto;
 import com.blind.dating.domain.user.dto.UserUpdateRequestDto;
-import com.blind.dating.dto.user.UserWithInterestAndQuestionDto;
 import com.blind.dating.domain.user.UserAccountRedisRepository;
+import com.blind.dating.dto.user.UserWithInterestsDto;
 import com.blind.dating.exception.ApiException;
 import com.blind.dating.security.TokenProvider;
 import com.blind.dating.domain.user.UserService;
@@ -243,7 +243,7 @@ class UserControllerTest extends ControllerTestConfig{
 
             //When && Then
             ResultActions actions = mvc.perform(
-                    RestDocumentationRequestBuilders.get("/api/users")
+                    RestDocumentationRequestBuilders.get("/api/users/me")
                             .contentType(MediaType.APPLICATION_JSON)
                             .accept(MediaType.APPLICATION_JSON)
                             .header("Authorization", "Bearer "+accessToken)
@@ -291,7 +291,7 @@ class UserControllerTest extends ControllerTestConfig{
 
             //When && Then
             ResultActions actions = mvc.perform(
-                    RestDocumentationRequestBuilders.get("/api/users")
+                    RestDocumentationRequestBuilders.get("/api/users/me")
                             .contentType(MediaType.APPLICATION_JSON)
                             .accept(MediaType.APPLICATION_JSON)
                             .header("Authorization", "Bearer "+accessToken)
@@ -331,7 +331,7 @@ class UserControllerTest extends ControllerTestConfig{
 
             //When && Then
             ResultActions actions = mvc.perform(
-                    RestDocumentationRequestBuilders.get("/api/users")
+                    RestDocumentationRequestBuilders.get("/api/users/me")
                             .contentType(MediaType.APPLICATION_JSON)
                             .accept(MediaType.APPLICATION_JSON)
                             .header("Authorization", "Bearer "+accessToken)
@@ -369,9 +369,9 @@ class UserControllerTest extends ControllerTestConfig{
         @DisplayName("성공")
         @Test
         public void testUpdateMyInfoThen200() throws Exception {
-            List<String> list = List.of("놀기","게임하기");
+            List<Long> list = List.of(1L, 2L);
             UserUpdateRequestDto dto = new UserUpdateRequestDto("인천","ESTP",list,"안녕하세요");
-            UserWithInterestAndQuestionDto dto1 = UserWithInterestAndQuestionDto.of(1L,"userId1","nickname1","서울","INTP","M",interests,"안녕");
+            UserWithInterestsDto dto1 = UserWithInterestsDto.of(1L,"userId1@gmail.com","nickname1","서울","INTP","M",interests,"안녕");
 
             List<Interest> list1 = List.of(new Interest(1L, "놀기"), new Interest(2L, "게임하기"));
             user.setInterests(list1);
@@ -407,7 +407,7 @@ class UserControllerTest extends ControllerTestConfig{
                                                     fieldWithPath("message").description("응답 메시지"),
                                                     fieldWithPath("data").description("응답 데이터"),
                                                     fieldWithPath("data.id").description("유저 유니크 번호"),
-                                                    fieldWithPath("data.userId").description("유저 아이디"),
+                                                    fieldWithPath("data.email").description("유저 이메일"),
                                                     fieldWithPath("data.nickname").description("닉네임"),
                                                     fieldWithPath("data.region").description("사는 지역"),
                                                     fieldWithPath("data.mbti").description("MBTI"),
@@ -426,9 +426,9 @@ class UserControllerTest extends ControllerTestConfig{
         @DisplayName("인증 실패")
         @Test
         public void testUpdateMyInfoThen401() throws Exception {
-            List<String> list = List.of("놀기","게임하기");
+            List<Long> list = List.of(1L, 2L);
             UserUpdateRequestDto dto = new UserUpdateRequestDto("인천","ESTP",list,"안녕하세요");
-            UserWithInterestAndQuestionDto dto1 = UserWithInterestAndQuestionDto.of(1L,"userId1","nickname1","서울","INTP","M",interests,"안녕");
+            UserWithInterestsDto dto1 = UserWithInterestsDto.of(1L,"userId1","nickname1","서울","INTP","M",interests,"안녕");
 
             List<Interest> list1 = List.of(new Interest(1L, "놀기"), new Interest(2L, "게임하기"));
             user.setInterests(list1);
@@ -474,9 +474,9 @@ class UserControllerTest extends ControllerTestConfig{
         @DisplayName("서버 오류")
         @Test
         public void testUpdateMyInfoThen500() throws Exception {
-            List<String> list = List.of("놀기","게임하기");
+            List<Long> list = List.of(1L, 2L);
             UserUpdateRequestDto dto = new UserUpdateRequestDto("인천","ESTP",list,"안녕하세요");
-            UserWithInterestAndQuestionDto dto1 = UserWithInterestAndQuestionDto.of(1L,"userId1","nickname1","서울","INTP","M",interests,"안녕");
+            UserWithInterestsDto dto1 = UserWithInterestsDto.of(1L,"userId1","nickname1","서울","INTP","M",interests,"안녕");
 
             List<Interest> list1 = List.of(new Interest(1L, "놀기"), new Interest(2L, "게임하기"));
             user.setInterests(list1);

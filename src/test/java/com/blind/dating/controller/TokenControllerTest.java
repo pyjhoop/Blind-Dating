@@ -48,13 +48,13 @@ class TokenControllerTest extends ControllerTestConfig{
 
     private LogInResponse logInResponse;
     private Cookie cookie;
-    private
+
     @BeforeEach
     void setting() {
         List<InterestDto> interests = List.of(InterestDto.of(1L,"자전거 타기"),
                 InterestDto.of(2L, "놀기"), InterestDto.of(3L,"게임하기"));
 
-        logInResponse = new LogInResponse(1L, "userId","nickname","서울","INTP","M", interests,"하이요","accessToken","refreshToken");
+        logInResponse = new LogInResponse(1L, "userId","nickname","서울","INTP","M", interests,"하이요","accessToken","refreshToken","/profile");
         cookie = new Cookie("refreshToken", "refreshToken");
     }
 
@@ -98,7 +98,8 @@ class TokenControllerTest extends ControllerTestConfig{
                                                     fieldWithPath("data.interests[].id").description("관심사 아이디"),
                                                     fieldWithPath("data.interests[].interestName").description("관심사 명"),
                                                     fieldWithPath("data.selfIntroduction").description("자기소개"),
-                                                    fieldWithPath("data.accessToken").description("AccessToken")
+                                                    fieldWithPath("data.accessToken").description("AccessToken"),
+                                                    fieldWithPath("data.profile").description("프로필 이미지")
                                             ).responseSchema(Schema.schema("토큰 재발급 성공")).build()
                             )
                     )

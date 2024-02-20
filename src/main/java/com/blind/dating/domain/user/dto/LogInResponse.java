@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 public class LogInResponse {
 
     private Long id;
-    private String userId;
+    private String email;
     private String nickname;
     private String region;
     private String mbti;
@@ -26,9 +26,9 @@ public class LogInResponse {
     private String refreshToken;
     private String profile;
 
-    private LogInResponse(Long id, String userId, String nickname, String region, String mbti, String gender, List<InterestDto> interests, String selfIntroduction, String profile) {
+    public LogInResponse(Long id, String email, String nickname, String region, String mbti, String gender, List<InterestDto> interests, String selfIntroduction, String profile) {
         this.id = id;
-        this.userId = userId;
+        this.email = email;
         this.nickname = nickname;
         this.region = region;
         this.mbti = mbti;
@@ -41,7 +41,7 @@ public class LogInResponse {
     public static LogInResponse from(UserAccount user, String accessToken, String refreshToken) {
         return new LogInResponse(
                 user.getId(),
-                user.getUserId(),
+                user.getEmail(),
                 user.getNickname(),
                 user.getRegion(),
                 user.getMbti(),

@@ -10,10 +10,10 @@ import java.util.stream.Collectors;
 
 @Data
 @NoArgsConstructor
-public class UserWithInterestAndQuestionDto {
+public class UserWithInterestsDto {
 
     private Long id;
-    private String userId;
+    private String email;
     private String nickname;
     private String region;
     private String mbti;
@@ -21,9 +21,9 @@ public class UserWithInterestAndQuestionDto {
     private List<InterestDto> interests;
     private String selfIntroduction;
 
-private UserWithInterestAndQuestionDto(Long id, String userId, String nickname, String region, String mbti, String gender, List<InterestDto> interests, String selfIntroduction) {
+private UserWithInterestsDto(Long id, String email, String nickname, String region, String mbti, String gender, List<InterestDto> interests, String selfIntroduction) {
         this.id = id;
-        this.userId = userId;
+        this.email = email;
         this.nickname = nickname;
         this.region = region;
         this.mbti = mbti;
@@ -31,14 +31,14 @@ private UserWithInterestAndQuestionDto(Long id, String userId, String nickname, 
         this.interests = interests;
         this.selfIntroduction = selfIntroduction;
     }
-    public static UserWithInterestAndQuestionDto of(Long id, String userId, String nickname, String region, String mbti, String gender, List<InterestDto> interests , String selfIntroduction) {
-        return new UserWithInterestAndQuestionDto(id, userId, nickname, region, mbti, gender, interests, selfIntroduction);
+    public static UserWithInterestsDto of(Long id, String email, String nickname, String region, String mbti, String gender, List<InterestDto> interests , String selfIntroduction) {
+        return new UserWithInterestsDto(id, email, nickname, region, mbti, gender, interests, selfIntroduction);
     }
 
-    public static UserWithInterestAndQuestionDto from(UserAccount user) {
-        return new UserWithInterestAndQuestionDto(
+    public static UserWithInterestsDto from(UserAccount user) {
+        return new UserWithInterestsDto(
                 user.getId(),
-                user.getUserId(),
+                user.getEmail(),
                 user.getNickname(),
                 user.getRegion(),
                 user.getMbti(),

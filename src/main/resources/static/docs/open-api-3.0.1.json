@@ -12,6 +12,69 @@
   } ],
   "tags" : [ ],
   "paths" : {
+    "/api/check-email" : {
+      "post" : {
+        "tags" : [ "UserAccount" ],
+        "summary" : "이메일 중복 체크 API",
+        "description" : "이메일 중복 체크 API",
+        "operationId" : "이메일 중복체크 - ",
+        "requestBody" : {
+          "content" : {
+            "application/json;charset=UTF-8" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/아이디 중복체크 요청"
+              },
+              "examples" : {
+                "이메일 중복체크 - 서버 오류" : {
+                  "value" : "{\r\n  \"email\" : \"userId@gmail.com\"\r\n}"
+                },
+                "이메일 중복체크 - 없는 이메일" : {
+                  "value" : "{\r\n  \"email\" : \"userId@gmail.com\"\r\n}"
+                },
+                "이메일 중복체크 - 있는 이메일" : {
+                  "value" : "{\r\n  \"email\" : \"userId@gmail.com\"\r\n}"
+                }
+              }
+            }
+          }
+        },
+        "responses" : {
+          "500" : {
+            "description" : "500",
+            "content" : {
+              "application/json;charset=UTF-8" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/중복 이메일 체크 응답"
+                },
+                "examples" : {
+                  "이메일 중복체크 - 서버 오류" : {
+                    "value" : "{\r\n  \"code\" : 500,\r\n  \"status\" : \"Internal Server Error\",\r\n  \"message\" : \"Internal Server Error\",\r\n  \"data\" : null\r\n}"
+                  }
+                }
+              }
+            }
+          },
+          "200" : {
+            "description" : "200",
+            "content" : {
+              "application/json;charset=UTF-8" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/중복 이메일 체크 응답"
+                },
+                "examples" : {
+                  "이메일 중복체크 - 없는 이메일" : {
+                    "value" : "{\r\n  \"code\" : 200,\r\n  \"status\" : \"true\",\r\n  \"message\" : \"사용가능한 이메일입니다.\",\r\n  \"data\" : \"true\"\r\n}"
+                  },
+                  "이메일 중복체크 - 있는 이메일" : {
+                    "value" : "{\r\n  \"code\" : 200,\r\n  \"status\" : \"false\",\r\n  \"message\" : \"해당 이메일이 존재합니다.\",\r\n  \"data\" : \"false\"\r\n}"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/check-nickname" : {
       "post" : {
         "tags" : [ "UserAccount" ],
@@ -75,69 +138,6 @@
         }
       }
     },
-    "/api/check-userId" : {
-      "post" : {
-        "tags" : [ "UserAccount" ],
-        "summary" : "인증 관련 API",
-        "description" : "인증 관련 API",
-        "operationId" : "아이디 중복체크 - ",
-        "requestBody" : {
-          "content" : {
-            "application/json;charset=UTF-8" : {
-              "schema" : {
-                "$ref" : "#/components/schemas/아이디 중복체크 요청"
-              },
-              "examples" : {
-                "아이디 중복체크 - 서버 오류" : {
-                  "value" : "{\r\n  \"userId\" : \"userId\"\r\n}"
-                },
-                "아이디 중복체크 - 없는 아이디" : {
-                  "value" : "{\r\n  \"userId\" : \"userId\"\r\n}"
-                },
-                "아이디 중복체크 - 있는 아이디" : {
-                  "value" : "{\r\n  \"userId\" : \"userId\"\r\n}"
-                }
-              }
-            }
-          }
-        },
-        "responses" : {
-          "500" : {
-            "description" : "500",
-            "content" : {
-              "application/json;charset=UTF-8" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/중복아이디 체크 응답"
-                },
-                "examples" : {
-                  "아이디 중복체크 - 서버 오류" : {
-                    "value" : "{\r\n  \"code\" : 500,\r\n  \"status\" : \"Internal Server Error\",\r\n  \"message\" : \"Internal Server Error\",\r\n  \"data\" : null\r\n}"
-                  }
-                }
-              }
-            }
-          },
-          "200" : {
-            "description" : "200",
-            "content" : {
-              "application/json;charset=UTF-8" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/중복아이디 체크 응답"
-                },
-                "examples" : {
-                  "아이디 중복체크 - 없는 아이디" : {
-                    "value" : "{\r\n  \"code\" : 200,\r\n  \"status\" : \"true\",\r\n  \"message\" : \"사용가능한 아이디입니다.\",\r\n  \"data\" : \"true\"\r\n}"
-                  },
-                  "아이디 중복체크 - 있는 아이디" : {
-                    "value" : "{\r\n  \"code\" : 200,\r\n  \"status\" : \"false\",\r\n  \"message\" : \"아이디가 존재합니다.\",\r\n  \"data\" : \"false\"\r\n}"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/api/login" : {
       "post" : {
         "tags" : [ "UserAccount" ],
@@ -174,7 +174,7 @@
                 },
                 "examples" : {
                   "로그인 성공" : {
-                    "value" : "{\r\n  \"code\" : 200,\r\n  \"status\" : \"OK\",\r\n  \"message\" : \"로그인이 성공적으로 진행되었습니다.\",\r\n  \"data\" : {\r\n    \"id\" : 1,\r\n    \"userId\" : \"userId\",\r\n    \"nickname\" : \"nickname\",\r\n    \"region\" : \"서울\",\r\n    \"mbti\" : \"INTP\",\r\n    \"gender\" : \"M\",\r\n    \"interests\" : [ {\r\n      \"id\" : 1,\r\n      \"interestName\" : \"자전거 타기\"\r\n    }, {\r\n      \"id\" : 2,\r\n      \"interestName\" : \"놀기\"\r\n    }, {\r\n      \"id\" : 3,\r\n      \"interestName\" : \"게임하기\"\r\n    } ],\r\n    \"selfIntroduction\" : \"하이요\",\r\n    \"accessToken\" : \"accessToken\"\r\n  }\r\n}"
+                    "value" : "{\r\n  \"code\" : 200,\r\n  \"status\" : \"OK\",\r\n  \"message\" : \"로그인이 성공적으로 진행되었습니다.\",\r\n  \"data\" : {\r\n    \"id\" : 1,\r\n    \"userId\" : \"userId\",\r\n    \"nickname\" : \"nickname\",\r\n    \"region\" : \"서울\",\r\n    \"mbti\" : \"INTP\",\r\n    \"gender\" : \"M\",\r\n    \"interests\" : [ {\r\n      \"id\" : 1,\r\n      \"interestName\" : \"자전거 타기\"\r\n    }, {\r\n      \"id\" : 2,\r\n      \"interestName\" : \"놀기\"\r\n    }, {\r\n      \"id\" : 3,\r\n      \"interestName\" : \"게임하기\"\r\n    } ],\r\n    \"selfIntroduction\" : \"하이요\",\r\n    \"accessToken\" : \"accessToken\",\r\n    \"profile\" : \"/profile\"\r\n  }\r\n}"
                   }
                 }
               }
@@ -252,7 +252,7 @@
           "schema" : {
             "type" : "string"
           },
-          "example" : "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaXNzIjoiYmxpbmQgZGF0aW5nIHdlYiIsImlhdCI6MTcwODE1MTM3MywiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwODE1NDk3M30.WAoIa32-YZ6apM9dTqG-o9dw6XijwnI5xzz5hOmgnPY"
+          "example" : "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaXNzIjoiYmxpbmQgZGF0aW5nIHdlYiIsImlhdCI6MTcwODQxNzM2MSwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwODQyMDk2MX0.cKT38EW4UcjKDoxE2nX5lDoRfWzmYDejpH6Qwl81ZMM"
         } ],
         "responses" : {
           "500" : {
@@ -318,7 +318,7 @@
           "schema" : {
             "type" : "string"
           },
-          "example" : "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaXNzIjoiYmxpbmQgZGF0aW5nIHdlYiIsImlhdCI6MTcwODE1MTM3NCwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwODE1NDk3NH0.cfE48sheHREPvr7-KOd2rmdQTfBPNl3bvWxDRQKb7Fw"
+          "example" : "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaXNzIjoiYmxpbmQgZGF0aW5nIHdlYiIsImlhdCI6MTcwODQxNzM2MiwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwODQyMDk2Mn0.PVRVP4GCHjSuYPWG4gMIDQCFOW5W6hRCEvR1WXBW9u4"
         } ],
         "requestBody" : {
           "content" : {
@@ -406,13 +406,13 @@
           "schema" : {
             "type" : "string"
           },
-          "example" : "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaXNzIjoiYmxpbmQgZGF0aW5nIHdlYiIsImlhdCI6MTcwODE1MTM3NiwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwODE1NDk3Nn0.azujTdjT4aiDgE6_9TYeB_2ttvm1w6gm-LdvHEnR2Hg"
+          "example" : "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaXNzIjoiYmxpbmQgZGF0aW5nIHdlYiIsImlhdCI6MTcwODQxNzM2NSwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwODQyMDk2NX0.5J1Vm7Tn0QSGn8VNxDzT4WhosT4nHn7ezrU8qDtqyes"
         } ],
         "requestBody" : {
           "content" : {
             "application/json;charset=UTF-8" : {
               "schema" : {
-                "$ref" : "#/components/schemas/api-posts922381862"
+                "$ref" : "#/components/schemas/api-posts-postId922381862"
               },
               "examples" : {
                 "게시글 리스트 조회 - 서버 오류" : {
@@ -453,7 +453,7 @@
                 },
                 "examples" : {
                   "게시글 리스트 조회 - 성공" : {
-                    "value" : "{\r\n  \"code\" : 200,\r\n  \"status\" : \"OK\",\r\n  \"message\" : \"게시글이 성공적으로 조회되었습니다.\",\r\n  \"data\" : {\r\n    \"pageNumber\" : 0,\r\n    \"totalPages\" : 1,\r\n    \"posts\" : [ {\r\n      \"id\" : 1,\r\n      \"user\" : {\r\n        \"id\" : 1,\r\n        \"nickname\" : \"nickname\"\r\n      },\r\n      \"title\" : \"제목이야\",\r\n      \"content\" : \"내용이야\",\r\n      \"hit\" : 0,\r\n      \"view\" : 0,\r\n      \"createdAt\" : \"2024-02-17\"\r\n    } ]\r\n  }\r\n}"
+                    "value" : "{\r\n  \"code\" : 200,\r\n  \"status\" : \"OK\",\r\n  \"message\" : \"게시글이 성공적으로 조회되었습니다.\",\r\n  \"data\" : {\r\n    \"pageNumber\" : 0,\r\n    \"totalPages\" : 1,\r\n    \"posts\" : [ {\r\n      \"id\" : 1,\r\n      \"user\" : {\r\n        \"id\" : 1,\r\n        \"nickname\" : \"nickname\"\r\n      },\r\n      \"title\" : \"제목이야\",\r\n      \"content\" : \"내용이야\",\r\n      \"hit\" : 0,\r\n      \"view\" : 0,\r\n      \"createdAt\" : \"2024-02-20\"\r\n    } ]\r\n  }\r\n}"
                   }
                 }
               }
@@ -492,13 +492,13 @@
           "schema" : {
             "type" : "string"
           },
-          "example" : "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaXNzIjoiYmxpbmQgZGF0aW5nIHdlYiIsImlhdCI6MTcwODE1MTM3NywiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwODE1NDk3N30.5Z2d3raK4azefedQRkjrPaR1sU-oNk-GSxQmtVg7GCk"
+          "example" : "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaXNzIjoiYmxpbmQgZGF0aW5nIHdlYiIsImlhdCI6MTcwODQxNzM2NiwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwODQyMDk2Nn0.lJdVTCGZQiBT9AHgHvFH7HlqSH4KqytKaJxOPT7Vuys"
         } ],
         "requestBody" : {
           "content" : {
             "application/json;charset=UTF-8" : {
               "schema" : {
-                "$ref" : "#/components/schemas/api-posts922381862"
+                "$ref" : "#/components/schemas/api-posts-postId922381862"
               },
               "examples" : {
                 "게시글 생성 - 서버 오류" : {
@@ -539,7 +539,7 @@
                 },
                 "examples" : {
                   "게시글 생성 - 성공" : {
-                    "value" : "{\r\n  \"code\" : 200,\r\n  \"status\" : \"OK\",\r\n  \"message\" : \"게시글이 성공적으로 생성되었습니다.\",\r\n  \"data\" : {\r\n    \"id\" : 1,\r\n    \"user\" : {\r\n      \"id\" : 1,\r\n      \"nickname\" : \"nickname\"\r\n    },\r\n    \"title\" : \"제목이야\",\r\n    \"content\" : \"내용이야\",\r\n    \"hit\" : 0,\r\n    \"view\" : 0,\r\n    \"createdAt\" : \"2024-02-17\"\r\n  }\r\n}"
+                    "value" : "{\r\n  \"code\" : 200,\r\n  \"status\" : \"OK\",\r\n  \"message\" : \"게시글이 성공적으로 생성되었습니다.\",\r\n  \"data\" : {\r\n    \"id\" : 1,\r\n    \"user\" : {\r\n      \"id\" : 1,\r\n      \"nickname\" : \"nickname\"\r\n    },\r\n    \"title\" : \"제목이야\",\r\n    \"content\" : \"내용이야\",\r\n    \"hit\" : 0,\r\n    \"view\" : 0,\r\n    \"createdAt\" : \"2024-02-20\"\r\n  }\r\n}"
                   }
                 }
               }
@@ -597,7 +597,7 @@
                 },
                 "examples" : {
                   "토큰 재발급 - 성공" : {
-                    "value" : "{\r\n  \"code\" : 200,\r\n  \"status\" : \"OK\",\r\n  \"message\" : \"accessToken이 성공적으로 생성되었습니다.\",\r\n  \"data\" : {\r\n    \"id\" : 1,\r\n    \"userId\" : \"userId\",\r\n    \"nickname\" : \"nickname\",\r\n    \"region\" : \"서울\",\r\n    \"mbti\" : \"INTP\",\r\n    \"gender\" : \"M\",\r\n    \"interests\" : [ {\r\n      \"id\" : 1,\r\n      \"interestName\" : \"자전거 타기\"\r\n    }, {\r\n      \"id\" : 2,\r\n      \"interestName\" : \"놀기\"\r\n    }, {\r\n      \"id\" : 3,\r\n      \"interestName\" : \"게임하기\"\r\n    } ],\r\n    \"selfIntroduction\" : \"하이요\",\r\n    \"accessToken\" : \"accessToken\"\r\n  }\r\n}"
+                    "value" : "{\r\n  \"code\" : 200,\r\n  \"status\" : \"OK\",\r\n  \"message\" : \"accessToken이 성공적으로 생성되었습니다.\",\r\n  \"data\" : {\r\n    \"id\" : 1,\r\n    \"userId\" : \"userId\",\r\n    \"nickname\" : \"nickname\",\r\n    \"region\" : \"서울\",\r\n    \"mbti\" : \"INTP\",\r\n    \"gender\" : \"M\",\r\n    \"interests\" : [ {\r\n      \"id\" : 1,\r\n      \"interestName\" : \"자전거 타기\"\r\n    }, {\r\n      \"id\" : 2,\r\n      \"interestName\" : \"놀기\"\r\n    }, {\r\n      \"id\" : 3,\r\n      \"interestName\" : \"게임하기\"\r\n    } ],\r\n    \"selfIntroduction\" : \"하이요\",\r\n    \"accessToken\" : \"accessToken\",\r\n    \"profile\" : \"/profile\"\r\n  }\r\n}"
                   }
                 }
               }
@@ -626,7 +626,7 @@
         "tags" : [ "UserAccount" ],
         "summary" : "회원가입 API",
         "description" : "회원가입 API",
-        "operationId" : "userId로인한 예외발생회원가입 - 서버 오류회원가입-성공",
+        "operationId" : "email 로인한 예외발생회원가입 - 서버 오류회원가입-성공",
         "requestBody" : {
           "content" : {
             "application/json;charset=UTF-8" : {
@@ -634,14 +634,14 @@
                 "$ref" : "#/components/schemas/회원가입 요청"
               },
               "examples" : {
-                "userId로인한 예외발생" : {
-                  "value" : "{\r\n  \"userId\" : \"use\",\r\n  \"userPassword\" : \"userPass01\",\r\n  \"nickname\" : \"userNickname\",\r\n  \"region\" : \"서울\",\r\n  \"mbti\" : \"INFP\",\r\n  \"gender\" : \"M\",\r\n  \"interests\" : [ \"코딩하기\", \"게임하기\" ],\r\n  \"selfIntroduction\" : \"안녕하세요\"\r\n}"
+                "email 로인한 예외발생" : {
+                  "value" : "{\r\n  \"email\" : \"pyasdf\",\r\n  \"userPassword\" : \"userPass01\",\r\n  \"nickname\" : \"userNickname\",\r\n  \"region\" : \"서울\",\r\n  \"mbti\" : \"INFP\",\r\n  \"gender\" : \"M\",\r\n  \"interests\" : [ 1, 2 ],\r\n  \"selfIntroduction\" : \"안녕하세요\"\r\n}"
                 },
                 "회원가입 - 서버 오류" : {
-                  "value" : "{\r\n  \"userId\" : \"use\",\r\n  \"userPassword\" : \"userPass01\",\r\n  \"nickname\" : \"userNickname\",\r\n  \"region\" : \"서울\",\r\n  \"mbti\" : \"INFP\",\r\n  \"gender\" : \"M\",\r\n  \"interests\" : [ \"코딩하기\", \"게임하기\" ],\r\n  \"selfIntroduction\" : \"안녕하세요\"\r\n}"
+                  "value" : "{\r\n  \"email\" : \"user01@gmail.com\",\r\n  \"userPassword\" : \"userPass01\",\r\n  \"nickname\" : \"userNickname\",\r\n  \"region\" : \"서울\",\r\n  \"mbti\" : \"INFP\",\r\n  \"gender\" : \"M\",\r\n  \"interests\" : [ 1, 2 ],\r\n  \"selfIntroduction\" : \"안녕하세요\"\r\n}"
                 },
                 "회원가입-성공" : {
-                  "value" : "{\r\n  \"userId\" : \"user01\",\r\n  \"userPassword\" : \"userPass01\",\r\n  \"nickname\" : \"userNickname\",\r\n  \"region\" : \"서울\",\r\n  \"mbti\" : \"INFP\",\r\n  \"gender\" : \"M\",\r\n  \"interests\" : [ \"코딩하기\", \"게임하기\" ],\r\n  \"selfIntroduction\" : \"안녕하세요\"\r\n}"
+                  "value" : "{\r\n  \"email\" : \"user01@gmail.com\",\r\n  \"userPassword\" : \"userPass01\",\r\n  \"nickname\" : \"userNickname\",\r\n  \"region\" : \"서울\",\r\n  \"mbti\" : \"INFP\",\r\n  \"gender\" : \"M\",\r\n  \"interests\" : [ 1, 2 ],\r\n  \"selfIntroduction\" : \"안녕하세요\"\r\n}"
                 }
               }
             }
@@ -656,11 +656,23 @@
                   "$ref" : "#/components/schemas/회원가입 실패 응답"
                 },
                 "examples" : {
-                  "userId로인한 예외발생" : {
-                    "value" : "{\r\n  \"code\" : 400,\r\n  \"status\" : \"BAD REQUEST\",\r\n  \"message\" : \"회원가입에 실패했습니다.\",\r\n  \"data\" : {\r\n    \"userId\" : \"아이디는 문자, 숫자, 한글만 가능하며, 길이는 5~20사이만 가능합니다.\"\r\n  }\r\n}"
-                  },
+                  "email 로인한 예외발생" : {
+                    "value" : "{\r\n  \"code\" : 400,\r\n  \"status\" : \"BAD REQUEST\",\r\n  \"message\" : \"회원가입에 실패했습니다.\",\r\n  \"data\" : {\r\n    \"email\" : \"이메일 형식에 맞지 않습니다.\"\r\n  }\r\n}"
+                  }
+                }
+              }
+            }
+          },
+          "500" : {
+            "description" : "500",
+            "content" : {
+              "application/json;charset=UTF-8" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/회원가입 실패 응답"
+                },
+                "examples" : {
                   "회원가입 - 서버 오류" : {
-                    "value" : "{\r\n  \"code\" : 400,\r\n  \"status\" : \"BAD REQUEST\",\r\n  \"message\" : \"회원가입에 실패했습니다.\",\r\n  \"data\" : {\r\n    \"userId\" : \"아이디는 문자, 숫자, 한글만 가능하며, 길이는 5~20사이만 가능합니다.\"\r\n  }\r\n}"
+                    "value" : "{\r\n  \"code\" : 500,\r\n  \"status\" : \"Internal Server Error\",\r\n  \"message\" : \"Internal Server Error\",\r\n  \"data\" : null\r\n}"
                   }
                 }
               }
@@ -685,72 +697,6 @@
       }
     },
     "/api/users" : {
-      "get" : {
-        "tags" : [ "User" ],
-        "summary" : "내정보 조회 API",
-        "description" : "내정보 조회 API",
-        "operationId" : "내정보 조회 - ",
-        "parameters" : [ {
-          "name" : "Authorization",
-          "in" : "header",
-          "description" : "Basic auth credentials",
-          "required" : true,
-          "schema" : {
-            "type" : "string"
-          },
-          "example" : "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaXNzIjoiYmxpbmQgZGF0aW5nIHdlYiIsImlhdCI6MTcwODE1MTM4NSwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwODE1NDk4NX0.D4vn0ACBXcwrLDy6_-BDCEyDYSWwn_wv8Nh2LJPsn7E"
-        } ],
-        "responses" : {
-          "500" : {
-            "description" : "500",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/내정보 조회 실패"
-                },
-                "examples" : {
-                  "내정보 조회 - 서버 에러" : {
-                    "value" : "{\r\n  \"code\" : 500,\r\n  \"status\" : \"Internal Server Error\",\r\n  \"message\" : \"Internal Server Error\",\r\n  \"data\" : null\r\n}"
-                  }
-                }
-              }
-            }
-          },
-          "200" : {
-            "description" : "200",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/내정보 조회 성공"
-                },
-                "examples" : {
-                  "내정보 조회 - 성공" : {
-                    "value" : "{\r\n  \"code\" : 200,\r\n  \"status\" : \"OK\",\r\n  \"message\" : \"내 정보가 성공적으로 수정되었습니다.\",\r\n  \"data\" : {\r\n    \"id\" : 1,\r\n    \"nickname\" : \"nickname\",\r\n    \"region\" : \"서울\",\r\n    \"mbti\" : \"INTP\",\r\n    \"gender\" : \"M\",\r\n    \"interests\" : [ {\r\n      \"id\" : null,\r\n      \"interestName\" : null\r\n    } ],\r\n    \"selfIntroduction\" : \"안녕\",\r\n    \"profile\" : \"change\"\r\n  }\r\n}"
-                  }
-                }
-              }
-            }
-          },
-          "401" : {
-            "description" : "401",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/내정보 조회 실패"
-                },
-                "examples" : {
-                  "내정보 조회 - 인증 실패" : {
-                    "value" : "{\r\n  \"code\" : 401,\r\n  \"status\" : \"Unauthorization\",\r\n  \"message\" : \"인증에 실패했습니다.\",\r\n  \"data\" : null\r\n}"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security" : [ {
-          "bearerAuthJWT" : [ ]
-        } ]
-      },
       "put" : {
         "tags" : [ "User" ],
         "summary" : "내정보 수정 API",
@@ -764,7 +710,7 @@
           "schema" : {
             "type" : "string"
           },
-          "example" : "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaXNzIjoiYmxpbmQgZGF0aW5nIHdlYiIsImlhdCI6MTcwODE1MTM4NCwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwODE1NDk4NH0.kaSQ1skJeWzXOSaPEe4YINQz4G3R56Qj-N1ORBCYw4s"
+          "example" : "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaXNzIjoiYmxpbmQgZGF0aW5nIHdlYiIsImlhdCI6MTcwODQxNzM3NCwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwODQyMDk3NH0.OLvUkqeZM6cMVCixMgUCVVI6UdIDJxbFuBVH-3-GBb4"
         } ],
         "requestBody" : {
           "content" : {
@@ -774,13 +720,13 @@
               },
               "examples" : {
                 "내정보 수정 - 서버 오류" : {
-                  "value" : "{\r\n  \"region\" : \"인천\",\r\n  \"mbti\" : \"ESTP\",\r\n  \"interests\" : [ \"놀기\", \"게임하기\" ],\r\n  \"selfIntroduction\" : \"안녕하세요\"\r\n}"
+                  "value" : "{\r\n  \"region\" : \"인천\",\r\n  \"mbti\" : \"ESTP\",\r\n  \"interests\" : [ 1, 2 ],\r\n  \"selfIntroduction\" : \"안녕하세요\"\r\n}"
                 },
                 "내정보 수정 - 성공" : {
-                  "value" : "{\r\n  \"region\" : \"인천\",\r\n  \"mbti\" : \"ESTP\",\r\n  \"interests\" : [ \"놀기\", \"게임하기\" ],\r\n  \"selfIntroduction\" : \"안녕하세요\"\r\n}"
+                  "value" : "{\r\n  \"region\" : \"인천\",\r\n  \"mbti\" : \"ESTP\",\r\n  \"interests\" : [ 1, 2 ],\r\n  \"selfIntroduction\" : \"안녕하세요\"\r\n}"
                 },
                 "내정보 수정 - 인증 실패" : {
-                  "value" : "{\r\n  \"region\" : \"인천\",\r\n  \"mbti\" : \"ESTP\",\r\n  \"interests\" : [ \"놀기\", \"게임하기\" ],\r\n  \"selfIntroduction\" : \"안녕하세요\"\r\n}"
+                  "value" : "{\r\n  \"region\" : \"인천\",\r\n  \"mbti\" : \"ESTP\",\r\n  \"interests\" : [ 1, 2 ],\r\n  \"selfIntroduction\" : \"안녕하세요\"\r\n}"
                 }
               }
             }
@@ -811,7 +757,7 @@
                 },
                 "examples" : {
                   "내정보 수정 - 성공" : {
-                    "value" : "{\r\n  \"code\" : 200,\r\n  \"status\" : \"OK\",\r\n  \"message\" : \"내 정보가 성공적으로 수정되었습니다.\",\r\n  \"data\" : {\r\n    \"id\" : 1,\r\n    \"userId\" : \"userId\",\r\n    \"nickname\" : \"nickname\",\r\n    \"region\" : \"서울\",\r\n    \"mbti\" : \"INTP\",\r\n    \"gender\" : \"M\",\r\n    \"interests\" : [ {\r\n      \"id\" : 1,\r\n      \"interestName\" : \"놀기\"\r\n    }, {\r\n      \"id\" : 2,\r\n      \"interestName\" : \"게임하기\"\r\n    } ],\r\n    \"selfIntroduction\" : \"안녕\"\r\n  }\r\n}"
+                    "value" : "{\r\n  \"code\" : 200,\r\n  \"status\" : \"OK\",\r\n  \"message\" : \"내 정보가 성공적으로 수정되었습니다.\",\r\n  \"data\" : {\r\n    \"id\" : 1,\r\n    \"email\" : \"userId\",\r\n    \"nickname\" : \"nickname\",\r\n    \"region\" : \"서울\",\r\n    \"mbti\" : \"INTP\",\r\n    \"gender\" : \"M\",\r\n    \"interests\" : [ {\r\n      \"id\" : 1,\r\n      \"interestName\" : \"놀기\"\r\n    }, {\r\n      \"id\" : 2,\r\n      \"interestName\" : \"게임하기\"\r\n    } ],\r\n    \"selfIntroduction\" : \"안녕\"\r\n  }\r\n}"
                   }
                 }
               }
@@ -852,7 +798,7 @@
           "schema" : {
             "type" : "string"
           },
-          "example" : "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaXNzIjoiYmxpbmQgZGF0aW5nIHdlYiIsImlhdCI6MTcwODE1MTM3MywiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwODE1NDk3M30.WAoIa32-YZ6apM9dTqG-o9dw6XijwnI5xzz5hOmgnPY"
+          "example" : "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaXNzIjoiYmxpbmQgZGF0aW5nIHdlYiIsImlhdCI6MTcwODQxNzM2MSwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwODQyMDk2MX0.cKT38EW4UcjKDoxE2nX5lDoRfWzmYDejpH6Qwl81ZMM"
         } ],
         "responses" : {
           "500" : {
@@ -928,13 +874,13 @@
           "schema" : {
             "type" : "string"
           },
-          "example" : "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaXNzIjoiYmxpbmQgZGF0aW5nIHdlYiIsImlhdCI6MTcwODE1MTM3NywiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwODE1NDk3N30.5Z2d3raK4azefedQRkjrPaR1sU-oNk-GSxQmtVg7GCk"
+          "example" : "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaXNzIjoiYmxpbmQgZGF0aW5nIHdlYiIsImlhdCI6MTcwODQxNzM2NSwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwODQyMDk2NX0.5J1Vm7Tn0QSGn8VNxDzT4WhosT4nHn7ezrU8qDtqyes"
         } ],
         "requestBody" : {
           "content" : {
             "application/json;charset=UTF-8" : {
               "schema" : {
-                "$ref" : "#/components/schemas/api-posts922381862"
+                "$ref" : "#/components/schemas/api-posts-postId922381862"
               },
               "examples" : {
                 "게시글 단건 조회 - 서버 오류" : {
@@ -975,7 +921,7 @@
                 },
                 "examples" : {
                   "게시글 단건 조회 - 성공" : {
-                    "value" : "{\r\n  \"code\" : 200,\r\n  \"status\" : \"OK\",\r\n  \"message\" : \"게시글이 성공적으로 조회되었습니다.\",\r\n  \"data\" : {\r\n    \"id\" : 1,\r\n    \"user\" : {\r\n      \"id\" : 1,\r\n      \"nickname\" : \"nickname\"\r\n    },\r\n    \"title\" : \"제목이야\",\r\n    \"content\" : \"내용이야\",\r\n    \"hit\" : 0,\r\n    \"view\" : 0,\r\n    \"createdAt\" : \"2024-02-17\"\r\n  }\r\n}"
+                    "value" : "{\r\n  \"code\" : 200,\r\n  \"status\" : \"OK\",\r\n  \"message\" : \"게시글이 성공적으로 조회되었습니다.\",\r\n  \"data\" : {\r\n    \"id\" : 1,\r\n    \"user\" : {\r\n      \"id\" : 1,\r\n      \"nickname\" : \"nickname\"\r\n    },\r\n    \"title\" : \"제목이야\",\r\n    \"content\" : \"내용이야\",\r\n    \"hit\" : 0,\r\n    \"view\" : 0,\r\n    \"createdAt\" : \"2024-02-20\"\r\n  }\r\n}"
                   }
                 }
               }
@@ -1022,13 +968,13 @@
           "schema" : {
             "type" : "string"
           },
-          "example" : "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaXNzIjoiYmxpbmQgZGF0aW5nIHdlYiIsImlhdCI6MTcwODE1MTM3NywiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwODE1NDk3N30.5Z2d3raK4azefedQRkjrPaR1sU-oNk-GSxQmtVg7GCk"
+          "example" : "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaXNzIjoiYmxpbmQgZGF0aW5nIHdlYiIsImlhdCI6MTcwODQxNzM2NSwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwODQyMDk2NX0.5J1Vm7Tn0QSGn8VNxDzT4WhosT4nHn7ezrU8qDtqyes"
         } ],
         "requestBody" : {
           "content" : {
             "application/json;charset=UTF-8" : {
               "schema" : {
-                "$ref" : "#/components/schemas/api-posts922381862"
+                "$ref" : "#/components/schemas/api-posts-postId922381862"
               },
               "examples" : {
                 "게시글 수정 - 서버 오류" : {
@@ -1069,7 +1015,7 @@
                 },
                 "examples" : {
                   "게시글 수정 - 성공" : {
-                    "value" : "{\r\n  \"code\" : 200,\r\n  \"status\" : \"OK\",\r\n  \"message\" : \"게시글이 성공적으로 수정되었습니다.\",\r\n  \"data\" : {\r\n    \"id\" : 1,\r\n    \"user\" : {\r\n      \"id\" : 1,\r\n      \"nickname\" : \"nickname\"\r\n    },\r\n    \"title\" : \"제목이야\",\r\n    \"content\" : \"내용이야\",\r\n    \"hit\" : 0,\r\n    \"view\" : 0,\r\n    \"createdAt\" : \"2024-02-17\"\r\n  }\r\n}"
+                    "value" : "{\r\n  \"code\" : 200,\r\n  \"status\" : \"OK\",\r\n  \"message\" : \"게시글이 성공적으로 수정되었습니다.\",\r\n  \"data\" : {\r\n    \"id\" : 1,\r\n    \"user\" : {\r\n      \"id\" : 1,\r\n      \"nickname\" : \"nickname\"\r\n    },\r\n    \"title\" : \"제목이야\",\r\n    \"content\" : \"내용이야\",\r\n    \"hit\" : 0,\r\n    \"view\" : 0,\r\n    \"createdAt\" : \"2024-02-20\"\r\n  }\r\n}"
                   }
                 }
               }
@@ -1110,7 +1056,7 @@
           "schema" : {
             "type" : "string"
           },
-          "example" : "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaXNzIjoiYmxpbmQgZGF0aW5nIHdlYiIsImlhdCI6MTcwODE1MTM4NSwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwODE1NDk4NX0.D4vn0ACBXcwrLDy6_-BDCEyDYSWwn_wv8Nh2LJPsn7E"
+          "example" : "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaXNzIjoiYmxpbmQgZGF0aW5nIHdlYiIsImlhdCI6MTcwODQxNzM3NSwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwODQyMDk3NX0.E9e4WwTKk95Oua690sHYB4wfgo8fflK0QqUyUH4wTGg"
         } ],
         "responses" : {
           "500" : {
@@ -1164,12 +1110,12 @@
         } ]
       }
     },
-    "/api/users/female" : {
+    "/api/users/me" : {
       "get" : {
         "tags" : [ "User" ],
-        "summary" : "여성 유저조회 API",
-        "description" : "여성을 최근 로그인 한 순으로 조회한다.",
-        "operationId" : "여성 유저 조회 - ",
+        "summary" : "내정보 조회 API",
+        "description" : "내정보 조회 API",
+        "operationId" : "내정보 조회 - ",
         "parameters" : [ {
           "name" : "Authorization",
           "in" : "header",
@@ -1178,7 +1124,7 @@
           "schema" : {
             "type" : "string"
           },
-          "example" : "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaXNzIjoiYmxpbmQgZGF0aW5nIHdlYiIsImlhdCI6MTcwODE1MTM4NSwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwODE1NDk4NX0.D4vn0ACBXcwrLDy6_-BDCEyDYSWwn_wv8Nh2LJPsn7E"
+          "example" : "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaXNzIjoiYmxpbmQgZGF0aW5nIHdlYiIsImlhdCI6MTcwODQxNzM3NSwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwODQyMDk3NX0.E9e4WwTKk95Oua690sHYB4wfgo8fflK0QqUyUH4wTGg"
         } ],
         "responses" : {
           "500" : {
@@ -1186,10 +1132,10 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/유저 리스트 조회 실패"
+                  "$ref" : "#/components/schemas/내정보 조회 실패"
                 },
                 "examples" : {
-                  "여성 유저 조회 - 서버 에러" : {
+                  "내정보 조회 - 서버 에러" : {
                     "value" : "{\r\n  \"code\" : 500,\r\n  \"status\" : \"Internal Server Error\",\r\n  \"message\" : \"Internal Server Error\",\r\n  \"data\" : null\r\n}"
                   }
                 }
@@ -1201,11 +1147,11 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/유저 리스트 조회"
+                  "$ref" : "#/components/schemas/내정보 조회 성공"
                 },
                 "examples" : {
-                  "여성 유저 조회 - 성공" : {
-                    "value" : "{\r\n  \"code\" : 200,\r\n  \"status\" : \"OK\",\r\n  \"message\" : \"추천유저가 성공적으로 조회되었습니다.\",\r\n  \"data\" : {\r\n    \"pageNumber\" : 0,\r\n    \"totalPages\" : 1,\r\n    \"content\" : [ {\r\n      \"id\" : 1,\r\n      \"nickname\" : \"nickname1\",\r\n      \"region\" : \"서울\",\r\n      \"mbti\" : \"INTP\",\r\n      \"gender\" : \"W\",\r\n      \"interests\" : [ {\r\n        \"id\" : 1,\r\n        \"interestName\" : \"자전거 타기\"\r\n      }, {\r\n        \"id\" : 2,\r\n        \"interestName\" : \"놀기\"\r\n      }, {\r\n        \"id\" : 3,\r\n        \"interestName\" : \"게임하기\"\r\n      } ],\r\n      \"selfIntroduction\" : \"하이요\"\r\n    } ]\r\n  }\r\n}"
+                  "내정보 조회 - 성공" : {
+                    "value" : "{\r\n  \"code\" : 200,\r\n  \"status\" : \"OK\",\r\n  \"message\" : \"내 정보가 성공적으로 수정되었습니다.\",\r\n  \"data\" : {\r\n    \"id\" : 1,\r\n    \"nickname\" : \"nickname\",\r\n    \"region\" : \"서울\",\r\n    \"mbti\" : \"INTP\",\r\n    \"gender\" : \"M\",\r\n    \"interests\" : [ {\r\n      \"id\" : null,\r\n      \"interestName\" : null\r\n    } ],\r\n    \"selfIntroduction\" : \"안녕\",\r\n    \"profile\" : \"change\"\r\n  }\r\n}"
                   }
                 }
               }
@@ -1216,78 +1162,10 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/유저 리스트 조회 실패"
+                  "$ref" : "#/components/schemas/내정보 조회 실패"
                 },
                 "examples" : {
-                  "여성 유저 조회 - 인증 실패" : {
-                    "value" : "{\r\n  \"code\" : 401,\r\n  \"status\" : \"Unauthorization\",\r\n  \"message\" : \"인증에 실패했습니다.\",\r\n  \"data\" : null\r\n}"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security" : [ {
-          "bearerAuthJWT" : [ ]
-        } ]
-      }
-    },
-    "/api/users/male" : {
-      "get" : {
-        "tags" : [ "User" ],
-        "summary" : "남성 유저조회 API",
-        "description" : "남성을 최근 로그인 한 순으로 조회한다.",
-        "operationId" : "남성 유저 조회 - ",
-        "parameters" : [ {
-          "name" : "Authorization",
-          "in" : "header",
-          "description" : "Basic auth credentials",
-          "required" : true,
-          "schema" : {
-            "type" : "string"
-          },
-          "example" : "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaXNzIjoiYmxpbmQgZGF0aW5nIHdlYiIsImlhdCI6MTcwODE1MTM4NSwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwODE1NDk4NX0.D4vn0ACBXcwrLDy6_-BDCEyDYSWwn_wv8Nh2LJPsn7E"
-        } ],
-        "responses" : {
-          "500" : {
-            "description" : "500",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/유저 리스트 조회 실패"
-                },
-                "examples" : {
-                  "남성 유저 조회 - 서버 에러" : {
-                    "value" : "{\r\n  \"code\" : 500,\r\n  \"status\" : \"Internal Server Error\",\r\n  \"message\" : \"Internal Server Error\",\r\n  \"data\" : null\r\n}"
-                  }
-                }
-              }
-            }
-          },
-          "200" : {
-            "description" : "200",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/유저 리스트 조회"
-                },
-                "examples" : {
-                  "남성 유저 조회 - 성공" : {
-                    "value" : "{\r\n  \"code\" : 200,\r\n  \"status\" : \"OK\",\r\n  \"message\" : \"추천유저가 성공적으로 조회되었습니다.\",\r\n  \"data\" : {\r\n    \"pageNumber\" : 0,\r\n    \"totalPages\" : 1,\r\n    \"content\" : [ {\r\n      \"id\" : 1,\r\n      \"nickname\" : \"nickname1\",\r\n      \"region\" : \"서울\",\r\n      \"mbti\" : \"INTP\",\r\n      \"gender\" : \"M\",\r\n      \"interests\" : [ {\r\n        \"id\" : 1,\r\n        \"interestName\" : \"자전거 타기\"\r\n      }, {\r\n        \"id\" : 2,\r\n        \"interestName\" : \"놀기\"\r\n      }, {\r\n        \"id\" : 3,\r\n        \"interestName\" : \"게임하기\"\r\n      } ],\r\n      \"selfIntroduction\" : \"하이요\"\r\n    } ]\r\n  }\r\n}"
-                  }
-                }
-              }
-            }
-          },
-          "401" : {
-            "description" : "401",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/유저 리스트 조회 실패"
-                },
-                "examples" : {
-                  "남성 유저 조회 - 인증 실패" : {
+                  "내정보 조회 - 인증 실패" : {
                     "value" : "{\r\n  \"code\" : 401,\r\n  \"status\" : \"Unauthorization\",\r\n  \"message\" : \"인증에 실패했습니다.\",\r\n  \"data\" : null\r\n}"
                   }
                 }
@@ -1322,7 +1200,7 @@
           "schema" : {
             "type" : "string"
           },
-          "example" : "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaXNzIjoiYmxpbmQgZGF0aW5nIHdlYiIsImlhdCI6MTcwODE1MTM3NCwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwODE1NDk3NH0.cfE48sheHREPvr7-KOd2rmdQTfBPNl3bvWxDRQKb7Fw"
+          "example" : "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaXNzIjoiYmxpbmQgZGF0aW5nIHdlYiIsImlhdCI6MTcwODQxNzM2MiwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwODQyMDk2Mn0.PVRVP4GCHjSuYPWG4gMIDQCFOW5W6hRCEvR1WXBW9u4"
         } ],
         "responses" : {
           "500" : {
@@ -1398,7 +1276,7 @@
           "schema" : {
             "type" : "string"
           },
-          "example" : "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaXNzIjoiYmxpbmQgZGF0aW5nIHdlYiIsImlhdCI6MTcwODE1MTM3NCwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwODE1NDk3NH0.cfE48sheHREPvr7-KOd2rmdQTfBPNl3bvWxDRQKb7Fw"
+          "example" : "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaXNzIjoiYmxpbmQgZGF0aW5nIHdlYiIsImlhdCI6MTcwODQxNzM2MiwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwODQyMDk2Mn0.PVRVP4GCHjSuYPWG4gMIDQCFOW5W6hRCEvR1WXBW9u4"
         } ],
         "responses" : {
           "500" : {
@@ -1455,55 +1333,6 @@
   },
   "components" : {
     "schemas" : {
-      "회원가입 요청" : {
-        "title" : "회원가입 요청",
-        "type" : "object",
-        "properties" : {
-          "userPassword" : {
-            "type" : "string",
-            "description" : "비밀번호"
-          },
-          "gender" : {
-            "type" : "string",
-            "description" : "성별"
-          },
-          "nickname" : {
-            "type" : "string",
-            "description" : "닉네임"
-          },
-          "mbti" : {
-            "type" : "string",
-            "description" : "MBTI"
-          },
-          "selfIntroduction" : {
-            "type" : "string",
-            "description" : "자기소개"
-          },
-          "interests" : {
-            "type" : "array",
-            "description" : "관심사",
-            "items" : {
-              "oneOf" : [ {
-                "type" : "object"
-              }, {
-                "type" : "boolean"
-              }, {
-                "type" : "string"
-              }, {
-                "type" : "number"
-              } ]
-            }
-          },
-          "region" : {
-            "type" : "string",
-            "description" : "사는 지역"
-          },
-          "userId" : {
-            "type" : "string",
-            "description" : "유저 아이디"
-          }
-        }
-      },
       "게시글 응답" : {
         "title" : "게시글 응답",
         "type" : "object",
@@ -1511,97 +1340,6 @@
           "code" : {
             "type" : "number",
             "description" : "응답 코드"
-          },
-          "message" : {
-            "type" : "string",
-            "description" : "응답 메시지"
-          },
-          "status" : {
-            "type" : "string",
-            "description" : "응답 상태"
-          }
-        }
-      },
-      "내정보 수정 성공" : {
-        "title" : "내정보 수정 성공",
-        "type" : "object",
-        "properties" : {
-          "code" : {
-            "type" : "number",
-            "description" : "응답 코드"
-          },
-          "data" : {
-            "type" : "object",
-            "properties" : {
-              "gender" : {
-                "type" : "string",
-                "description" : "성별"
-              },
-              "nickname" : {
-                "type" : "string",
-                "description" : "닉네임"
-              },
-              "mbti" : {
-                "type" : "string",
-                "description" : "MBTI"
-              },
-              "selfIntroduction" : {
-                "type" : "string",
-                "description" : "자기소개"
-              },
-              "id" : {
-                "type" : "number",
-                "description" : "유저 유니크 번호"
-              },
-              "interests" : {
-                "type" : "array",
-                "description" : "관심사 리스트",
-                "items" : {
-                  "type" : "object",
-                  "properties" : {
-                    "id" : {
-                      "type" : "number",
-                      "description" : "관심사 아이디"
-                    },
-                    "interestName" : {
-                      "type" : "string",
-                      "description" : "관심사 명"
-                    }
-                  }
-                }
-              },
-              "region" : {
-                "type" : "string",
-                "description" : "사는 지역"
-              },
-              "userId" : {
-                "type" : "string",
-                "description" : "유저 아이디"
-              }
-            },
-            "description" : "응답 데이터"
-          },
-          "message" : {
-            "type" : "string",
-            "description" : "응답 메시지"
-          },
-          "status" : {
-            "type" : "string",
-            "description" : "응답 상태"
-          }
-        }
-      },
-      "중복아이디 체크 응답" : {
-        "title" : "중복아이디 체크 응답",
-        "type" : "object",
-        "properties" : {
-          "code" : {
-            "type" : "number",
-            "description" : "응답 코드"
-          },
-          "data" : {
-            "type" : "string",
-            "description" : "응답 데이터"
           },
           "message" : {
             "type" : "string",
@@ -1735,34 +1473,6 @@
           }
         }
       },
-      "회원가입 실패 응답" : {
-        "title" : "회원가입 실패 응답",
-        "type" : "object",
-        "properties" : {
-          "code" : {
-            "type" : "number",
-            "description" : "응답 코드"
-          },
-          "data" : {
-            "type" : "object",
-            "properties" : {
-              "userId" : {
-                "type" : "string",
-                "description" : "아이디 관련 에러"
-              }
-            },
-            "description" : "응답 데이터"
-          },
-          "message" : {
-            "type" : "string",
-            "description" : "응답 메시지"
-          },
-          "status" : {
-            "type" : "string",
-            "description" : "응답 상태"
-          }
-        }
-      },
       "내정보 수정 실패" : {
         "title" : "내정보 수정 실패",
         "type" : "object",
@@ -1778,6 +1488,65 @@
           "status" : {
             "type" : "string",
             "description" : "응답 상태"
+          }
+        }
+      },
+      "회원가입 요청" : {
+        "title" : "회원가입 요청",
+        "type" : "object",
+        "properties" : {
+          "userPassword" : {
+            "type" : "string",
+            "description" : "비밀번호"
+          },
+          "gender" : {
+            "type" : "string",
+            "description" : "성별"
+          },
+          "nickname" : {
+            "type" : "string",
+            "description" : "닉네임"
+          },
+          "mbti" : {
+            "type" : "string",
+            "description" : "MBTI"
+          },
+          "selfIntroduction" : {
+            "type" : "string",
+            "description" : "자기소개"
+          },
+          "interests" : {
+            "type" : "array",
+            "description" : "관심사",
+            "items" : {
+              "oneOf" : [ {
+                "type" : "object"
+              }, {
+                "type" : "boolean"
+              }, {
+                "type" : "string"
+              }, {
+                "type" : "number"
+              } ]
+            }
+          },
+          "region" : {
+            "type" : "string",
+            "description" : "사는 지역"
+          },
+          "email" : {
+            "type" : "string",
+            "description" : "유저 이메일"
+          }
+        }
+      },
+      "아이디 중복체크 요청" : {
+        "title" : "아이디 중복체크 요청",
+        "type" : "object",
+        "properties" : {
+          "email" : {
+            "type" : "string",
+            "description" : "유저 이메일"
           }
         }
       },
@@ -1832,13 +1601,21 @@
           }
         }
       },
-      "아이디 중복체크 요청" : {
-        "title" : "아이디 중복체크 요청",
+      "중복 이메일 체크 응답" : {
+        "title" : "중복 이메일 체크 응답",
         "type" : "object",
         "properties" : {
-          "userId" : {
+          "code" : {
+            "type" : "number",
+            "description" : "응답 코드"
+          },
+          "message" : {
             "type" : "string",
-            "description" : "유저 아이디"
+            "description" : "응답 메시지"
+          },
+          "status" : {
+            "type" : "string",
+            "description" : "응답 상태"
           }
         }
       },
@@ -1907,8 +1684,8 @@
           }
         }
       },
-      "토큰 재발급 성공" : {
-        "title" : "토큰 재발급 성공",
+      "내정보 수정 성공" : {
+        "title" : "내정보 수정 성공",
         "type" : "object",
         "properties" : {
           "code" : {
@@ -1921,6 +1698,79 @@
               "gender" : {
                 "type" : "string",
                 "description" : "성별"
+              },
+              "nickname" : {
+                "type" : "string",
+                "description" : "닉네임"
+              },
+              "mbti" : {
+                "type" : "string",
+                "description" : "MBTI"
+              },
+              "selfIntroduction" : {
+                "type" : "string",
+                "description" : "자기소개"
+              },
+              "id" : {
+                "type" : "number",
+                "description" : "유저 유니크 번호"
+              },
+              "interests" : {
+                "type" : "array",
+                "description" : "관심사 리스트",
+                "items" : {
+                  "type" : "object",
+                  "properties" : {
+                    "id" : {
+                      "type" : "number",
+                      "description" : "관심사 아이디"
+                    },
+                    "interestName" : {
+                      "type" : "string",
+                      "description" : "관심사 명"
+                    }
+                  }
+                }
+              },
+              "region" : {
+                "type" : "string",
+                "description" : "사는 지역"
+              },
+              "email" : {
+                "type" : "string",
+                "description" : "유저 이메일"
+              }
+            },
+            "description" : "응답 데이터"
+          },
+          "message" : {
+            "type" : "string",
+            "description" : "응답 메시지"
+          },
+          "status" : {
+            "type" : "string",
+            "description" : "응답 상태"
+          }
+        }
+      },
+      "로그인 성공 응답" : {
+        "title" : "로그인 성공 응답",
+        "type" : "object",
+        "properties" : {
+          "code" : {
+            "type" : "number",
+            "description" : "응답 코드"
+          },
+          "data" : {
+            "type" : "object",
+            "properties" : {
+              "gender" : {
+                "type" : "string",
+                "description" : "성별"
+              },
+              "profile" : {
+                "type" : "string",
+                "description" : "프로필"
               },
               "nickname" : {
                 "type" : "string",
@@ -1980,7 +1830,7 @@
           }
         }
       },
-      "api-posts922381862" : {
+      "api-posts-postId922381862" : {
         "type" : "object",
         "properties" : {
           "title" : {
@@ -2009,6 +1859,34 @@
       },
       "api-messages486549215" : {
         "type" : "object"
+      },
+      "회원가입 실패 응답" : {
+        "title" : "회원가입 실패 응답",
+        "type" : "object",
+        "properties" : {
+          "code" : {
+            "type" : "number",
+            "description" : "응답 코드"
+          },
+          "data" : {
+            "type" : "object",
+            "properties" : {
+              "email" : {
+                "type" : "string",
+                "description" : "이메일 관련 에러"
+              }
+            },
+            "description" : "응답 데이터"
+          },
+          "message" : {
+            "type" : "string",
+            "description" : "응답 메시지"
+          },
+          "status" : {
+            "type" : "string",
+            "description" : "응답 상태"
+          }
+        }
       },
       "내정보 조회 성공" : {
         "title" : "내정보 조회 성공",
@@ -2134,79 +2012,6 @@
           }
         }
       },
-      "로그인 성공 응답" : {
-        "title" : "로그인 성공 응답",
-        "type" : "object",
-        "properties" : {
-          "code" : {
-            "type" : "number",
-            "description" : "응답 코드"
-          },
-          "data" : {
-            "type" : "object",
-            "properties" : {
-              "gender" : {
-                "type" : "string",
-                "description" : "성별"
-              },
-              "nickname" : {
-                "type" : "string",
-                "description" : "닉네임"
-              },
-              "mbti" : {
-                "type" : "string",
-                "description" : "MBTI"
-              },
-              "selfIntroduction" : {
-                "type" : "string",
-                "description" : "자기소개"
-              },
-              "id" : {
-                "type" : "number",
-                "description" : "유저 유니크 번호"
-              },
-              "accessToken" : {
-                "type" : "string",
-                "description" : "AccessToken"
-              },
-              "interests" : {
-                "type" : "array",
-                "description" : "관심사 리스트",
-                "items" : {
-                  "type" : "object",
-                  "properties" : {
-                    "id" : {
-                      "type" : "number",
-                      "description" : "관심사 아이디"
-                    },
-                    "interestName" : {
-                      "type" : "string",
-                      "description" : "관심사 명"
-                    }
-                  }
-                }
-              },
-              "region" : {
-                "type" : "string",
-                "description" : "사는 지역"
-              },
-              "userId" : {
-                "type" : "string",
-                "description" : "유저 아이디"
-              }
-            },
-            "description" : "응답 데이터"
-          },
-          "message" : {
-            "type" : "string",
-            "description" : "응답 메시지"
-          },
-          "status" : {
-            "type" : "string",
-            "description" : "응답 상태"
-          }
-        }
-      },
       "토큰 재발급 실패" : {
         "title" : "토큰 재발급 실패",
         "type" : "object",
@@ -2268,6 +2073,83 @@
           "code" : {
             "type" : "number",
             "description" : "응답 코드"
+          },
+          "message" : {
+            "type" : "string",
+            "description" : "응답 메시지"
+          },
+          "status" : {
+            "type" : "string",
+            "description" : "응답 상태"
+          }
+        }
+      },
+      "토큰 재발급 성공" : {
+        "title" : "토큰 재발급 성공",
+        "type" : "object",
+        "properties" : {
+          "code" : {
+            "type" : "number",
+            "description" : "응답 코드"
+          },
+          "data" : {
+            "type" : "object",
+            "properties" : {
+              "gender" : {
+                "type" : "string",
+                "description" : "성별"
+              },
+              "profile" : {
+                "type" : "string",
+                "description" : "프로필 이미지"
+              },
+              "nickname" : {
+                "type" : "string",
+                "description" : "닉네임"
+              },
+              "mbti" : {
+                "type" : "string",
+                "description" : "MBTI"
+              },
+              "selfIntroduction" : {
+                "type" : "string",
+                "description" : "자기소개"
+              },
+              "id" : {
+                "type" : "number",
+                "description" : "유저 유니크 번호"
+              },
+              "accessToken" : {
+                "type" : "string",
+                "description" : "AccessToken"
+              },
+              "interests" : {
+                "type" : "array",
+                "description" : "관심사 리스트",
+                "items" : {
+                  "type" : "object",
+                  "properties" : {
+                    "id" : {
+                      "type" : "number",
+                      "description" : "관심사 아이디"
+                    },
+                    "interestName" : {
+                      "type" : "string",
+                      "description" : "관심사 명"
+                    }
+                  }
+                }
+              },
+              "region" : {
+                "type" : "string",
+                "description" : "사는 지역"
+              },
+              "userId" : {
+                "type" : "string",
+                "description" : "유저 아이디"
+              }
+            },
+            "description" : "응답 데이터"
           },
           "message" : {
             "type" : "string",

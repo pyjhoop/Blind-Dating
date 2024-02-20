@@ -3,6 +3,7 @@ package com.blind.dating.domain.user.dto;
 import com.blind.dating.domain.user.Role;
 import com.blind.dating.domain.user.UserAccount;
 import com.blind.dating.dto.user.UserAccountDto;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.Data;
@@ -16,8 +17,8 @@ import java.util.List;
 public class UserRequestDto {
 
     @NotNull(message = "아이디는 필수 입력 값입니다.")
-    @Pattern(regexp = "^[A-Za-z0-9가-힣]{5,20}$", message = "아이디는 문자, 숫자, 한글만 가능하며, 길이는 5~20사이만 가능합니다.")
-    private String userId;
+    @Email(message = "이메일 형식에 맞지 않습니다.")
+    private String email;
 
     @NotNull(message = "비밀번호는 필수 입력 값입니다.")
     @Pattern(regexp = "^[A-Za-z0-9가-힣]{8,20}$", message = "패스워드는 문자, 숫자, 한글만 가능하며, 길이는 8~20사이만 가능합니다.")
@@ -37,13 +38,13 @@ public class UserRequestDto {
     private String gender;
 
     @NotNull(message = "관심사는 필수 입력 값입니다.")
-    private List<String> interests;
+    private List<Long> interests;
 
     @NotNull(message = "자기소개는 필수 입력 값입니다.")
     private String selfIntroduction;
 
-    private UserRequestDto(String userId, String userPassword, String nickname, String region, String mbti, String gender, String selfIntroduction) {
-        this.userId = userId;
+    private UserRequestDto(String email, String userPassword, String nickname, String region, String mbti, String gender, String selfIntroduction) {
+        this.email = email;
         this.userPassword = userPassword;
         this.nickname = nickname;
         this.region = region;
@@ -52,13 +53,13 @@ public class UserRequestDto {
         this.selfIntroduction = selfIntroduction;
     }
 
-    public static UserRequestDto of(String userId, String userPassword, String nickname, String region, String mbti, String gender, String selfIntroduction) {
-        return new UserRequestDto(userId,userPassword, nickname, region, mbti,gender, selfIntroduction);
+    public static UserRequestDto of(String email, String userPassword, String nickname, String region, String mbti, String gender, String selfIntroduction) {
+        return new UserRequestDto(email,userPassword, nickname, region, mbti,gender, selfIntroduction);
     }
 
     public static UserAccountDto from(UserAccount entity){
         return new UserAccountDto(
-                entity.getUserId(),
+                entity.getEmail(),
                 entity.getUserPassword(),
                 entity.getNickname(),
                 entity.getRegion(),
@@ -71,7 +72,7 @@ public class UserRequestDto {
 
     public UserAccount toEntity(){
         return UserAccount.of(
-                userId,
+                email,
                 userPassword,
                 nickname,
                 region,
@@ -83,7 +84,7 @@ public class UserRequestDto {
 
     public UserAccount toRegisterEntity(String password){
         return UserAccount.of(
-                userId,
+                email,
                 password,
                 nickname,
                 region,

@@ -11,8 +11,8 @@ import com.blind.dating.domain.user.dto.UserInfo;
 import com.blind.dating.dto.interest.InterestDto;
 import com.blind.dating.dto.user.UserInfoDto;
 import com.blind.dating.domain.user.dto.UserUpdateRequestDto;
-import com.blind.dating.dto.user.UserWithInterestAndQuestionDto;
 import com.blind.dating.domain.user.UserAccountRedisRepository;
+import com.blind.dating.dto.user.UserWithInterestsDto;
 import com.blind.dating.exception.ApiException;
 import com.blind.dating.security.TokenProvider;
 import com.blind.dating.domain.user.UserService;
@@ -109,7 +109,7 @@ class UserControllerTest extends ControllerTestConfig{
             Pageable pageable = PageRequest.of(0, 1);
             Page<UserInfoDto> page = new PageImpl<>(List.of(dto), pageable,1L);
 
-            when(userService.getMaleAndFemaleUsers(any(Pageable.class), any(Authentication.class))).thenReturn(page);
+            when(userService.getMaleAndFemaleUsers(any(Pageable.class))).thenReturn(page);
 
             ResultActions actions = mvc.perform(
                     RestDocumentationRequestBuilders.get("/api/users/all")
@@ -158,7 +158,7 @@ class UserControllerTest extends ControllerTestConfig{
         void testGetMaileAndFemaleUsersThenReturn401() throws Exception {
             // Given
             Pageable pageable = PageRequest.of(0, 1);
-            given(userService.getMaleAndFemaleUsers(any(Pageable.class), any(Authentication.class)))
+            given(userService.getMaleAndFemaleUsers(any(Pageable.class)))
                     .willThrow(new ApiException(UserResponseCode.AUTHORIZE_FAIL));
 
             ResultActions actions = mvc.perform(
@@ -197,7 +197,7 @@ class UserControllerTest extends ControllerTestConfig{
             // Given
             Pageable pageable = PageRequest.of(0, 1);
 
-            given(userService.getMaleAndFemaleUsers(any(Pageable.class), any(Authentication.class)))
+            given(userService.getMaleAndFemaleUsers(any(Pageable.class)))
                     .willThrow(new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error"));
 
             ResultActions actions = mvc.perform(
@@ -232,273 +232,6 @@ class UserControllerTest extends ControllerTestConfig{
     }
 
     @Nested
-    @DisplayName("남성 유저 조회")
-    class MaleUser {
-        @DisplayName("조회 성공")
-        @Test
-        @WithMockUser(username = "1", password = "", roles = "USER")
-        void testGetMaileUsersThenReturn200() throws Exception {
-            // Given
-            Pageable pageable = PageRequest.of(0, 1);
-            Page<UserInfoDto> page = new PageImpl<>(List.of(dto), pageable,1L);
-
-            given(userService.getMaleUsers(any(Pageable.class), any(Authentication.class))).willReturn(page);
-
-
-            ResultActions actions = mvc.perform(
-                    RestDocumentationRequestBuilders.get("/api/users/male")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .accept(MediaType.APPLICATION_JSON)
-                            .header("Authorization", "Bearer "+accessToken)
-            ).andDo(
-                    MockMvcRestDocumentationWrapper.document("남성 유저 조회 - 성공",
-                            preprocessRequest(prettyPrint()),
-                            preprocessResponse(prettyPrint()),
-                            resource(
-                                    ResourceSnippetParameters.builder()
-                                            .description("남성을 최근 로그인 한 순으로 조회한다.")
-                                            .tag("User").summary("남성 유저조회 API")
-                                            .requestFields()
-                                            .requestHeaders(
-                                                    headerWithName("Authorization").description("Basic auth credentials")
-                                            )
-                                            .responseFields(
-                                                    fieldWithPath("code").description("응답 코드"),
-                                                    fieldWithPath("status").description("응답 상태"),
-                                                    fieldWithPath("message").description("응답 메시지"),
-                                                    fieldWithPath("data").description("응답 데이터"),
-                                                    fieldWithPath("data.pageNumber").description("페이지 번호"),
-                                                    fieldWithPath("data.totalPages").description("총 페이지 수"),
-                                                    fieldWithPath("data.content").description("유저정보"),
-                                                    fieldWithPath("data.content[].id").description("유저 유니크 아이디"),
-                                                    fieldWithPath("data.content[].nickname").description("닉네임"),
-                                                    fieldWithPath("data.content[].region").description("사는 지역"),
-                                                    fieldWithPath("data.content[].mbti").description("MBTI"),
-                                                    fieldWithPath("data.content[].gender").description("성별"),
-                                                    fieldWithPath("data.content[].interests").description("관심사 리스트"),
-                                                    fieldWithPath("data.content[].interests[].id").description("관심사 아이디"),
-                                                    fieldWithPath("data.content[].interests[].interestName").description("관심사 명"),
-                                                    fieldWithPath("data.content[].selfIntroduction").description("자기소개")
-                                            ).responseSchema(Schema.schema("유저 리스트 조회")).build()
-                            )
-                    )
-            );
-            actions.andExpect(status().isOk());
-        }
-
-        @DisplayName("인증 실패")
-        @Test
-        void testGetMaileUsersThenReturn401() throws Exception {
-            // Given
-            Pageable pageable = PageRequest.of(0, 1);
-
-            given(userService.getMaleUsers(any(Pageable.class), any(Authentication.class)))
-                    .willThrow(new ApiException(UserResponseCode.AUTHORIZE_FAIL));
-
-
-            ResultActions actions = mvc.perform(
-                    RestDocumentationRequestBuilders.get("/api/users/male")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .accept(MediaType.APPLICATION_JSON)
-                            .header("Authorization", "Bearer "+accessToken)
-            ).andDo(
-                    MockMvcRestDocumentationWrapper.document("남성 유저 조회 - 인증 실패",
-                            preprocessRequest(prettyPrint()),
-                            preprocessResponse(prettyPrint()),
-                            resource(
-                                    ResourceSnippetParameters.builder()
-                                            .description("남성을 최근 로그인 한 순으로 조회한다.")
-                                            .tag("User").summary("남성 유저조회 API")
-                                            .requestFields()
-                                            .requestHeaders(
-                                                    headerWithName("Authorization").description("Basic auth credentials")
-                                            )
-                                            .responseFields(
-                                                    fieldWithPath("code").description("응답 코드"),
-                                                    fieldWithPath("status").description("응답 상태"),
-                                                    fieldWithPath("message").description("응답 메시지"),
-                                                    fieldWithPath("data").description("응답 데이터")
-                                            ).responseSchema(Schema.schema("유저 리스트 조회 실패")).build()
-                            )
-                    )
-            );
-            actions.andExpect(status().is(401));
-        }
-
-        @DisplayName("서버 에러")
-        @Test
-        @WithMockUser(username = "1", password = "", roles = "USER")
-        void testGetMaileUsersThenReturn500() throws Exception {
-            // Given
-            given(userService.getMaleUsers(any(Pageable.class), any(Authentication.class)))
-                    .willThrow(new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error"));
-
-            ResultActions actions = mvc.perform(
-                    RestDocumentationRequestBuilders.get("/api/users/male")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .accept(MediaType.APPLICATION_JSON)
-                            .header("Authorization", "Bearer "+accessToken)
-            ).andDo(
-                    MockMvcRestDocumentationWrapper.document("남성 유저 조회 - 서버 에러",
-                            preprocessRequest(prettyPrint()),
-                            preprocessResponse(prettyPrint()),
-                            resource(
-                                    ResourceSnippetParameters.builder()
-                                            .description("남성을 최근 로그인 한 순으로 조회한다.")
-                                            .tag("User").summary("남성 유저조회 API")
-                                            .requestFields()
-                                            .requestHeaders(
-                                                    headerWithName("Authorization").description("Basic auth credentials")
-                                            )
-                                            .responseFields(
-                                                    fieldWithPath("code").description("응답 코드"),
-                                                    fieldWithPath("status").description("응답 상태"),
-                                                    fieldWithPath("message").description("응답 메시지"),
-                                                    fieldWithPath("data").description("응답 데이터")
-                                            ).responseSchema(Schema.schema("유저 리스트 조회 실패")).build()
-                            )
-                    )
-            );
-            actions.andExpect(status().is(500));
-        }
-
-
-    }
-
-    @Nested
-    @DisplayName("여성 유저 조회")
-    class FemaleUser {
-        @DisplayName("조회 성공")
-        @Test
-        void testGetFemaleUsersThen200() throws Exception {
-            // Given
-            Pageable pageable = PageRequest.of(0, 1);
-            dto.setGender("W");
-            Page<UserInfoDto> page = new PageImpl<>(List.of(dto), pageable,1L);
-
-            given(userService.getFemaleUsers(any(Pageable.class), any(Authentication.class))).willReturn(page);
-
-            ResultActions actions = mvc.perform(
-                    RestDocumentationRequestBuilders.get("/api/users/female")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .accept(MediaType.APPLICATION_JSON)
-                            .header("Authorization", "Bearer "+accessToken)
-            ).andDo(
-                    MockMvcRestDocumentationWrapper.document("여성 유저 조회 - 성공",
-                            preprocessRequest(prettyPrint()),
-                            preprocessResponse(prettyPrint()),
-                            resource(
-                                    ResourceSnippetParameters.builder()
-                                            .description("여성을 최근 로그인 한 순으로 조회한다.")
-                                            .tag("User").summary("여성 유저조회 API")
-                                            .requestFields()
-                                            .requestHeaders(
-                                                    headerWithName("Authorization").description("Basic auth credentials")
-                                            )
-                                            .responseFields(
-                                                    fieldWithPath("code").description("응답 코드"),
-                                                    fieldWithPath("status").description("응답 상태"),
-                                                    fieldWithPath("message").description("응답 메시지"),
-                                                    fieldWithPath("data").description("응답 데이터"),
-                                                    fieldWithPath("data.pageNumber").description("페이지 번호"),
-                                                    fieldWithPath("data.totalPages").description("총 페이지 수"),
-                                                    fieldWithPath("data.content").description("유저정보"),
-                                                    fieldWithPath("data.content[].id").description("유저 유니크 아이디"),
-                                                    fieldWithPath("data.content[].nickname").description("닉네임"),
-                                                    fieldWithPath("data.content[].region").description("사는 지역"),
-                                                    fieldWithPath("data.content[].mbti").description("MBTI"),
-                                                    fieldWithPath("data.content[].gender").description("성별"),
-                                                    fieldWithPath("data.content[].interests").description("관심사 리스트"),
-                                                    fieldWithPath("data.content[].interests[].id").description("관심사 아이디"),
-                                                    fieldWithPath("data.content[].interests[].interestName").description("관심사 명"),
-                                                    fieldWithPath("data.content[].selfIntroduction").description("자기소개")
-                                            ).responseSchema(Schema.schema("유저 리스트 조회")).build()
-                            )
-                    )
-            );
-            actions.andExpect(status().isOk());
-        }
-
-        @DisplayName("인증 실패")
-        @Test
-        void testGetFemaleUsersThen401() throws Exception {
-            // Given
-            dto.setGender("W");
-            Pageable pageable = PageRequest.of(0, 1);
-            Page<UserInfoDto> page = new PageImpl<>(List.of(dto), pageable,1L);
-
-            given(userService.getFemaleUsers(any(Pageable.class), any(Authentication.class)))
-                    .willThrow(new ApiException(UserResponseCode.AUTHORIZE_FAIL));
-
-            ResultActions actions = mvc.perform(
-                    RestDocumentationRequestBuilders.get("/api/users/female")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .accept(MediaType.APPLICATION_JSON)
-                            .header("Authorization", "Bearer "+accessToken)
-            ).andDo(
-                    MockMvcRestDocumentationWrapper.document("여성 유저 조회 - 인증 실패",
-                            preprocessRequest(prettyPrint()),
-                            preprocessResponse(prettyPrint()),
-                            resource(
-                                    ResourceSnippetParameters.builder()
-                                            .description("여성을 최근 로그인 한 순으로 조회한다.")
-                                            .tag("User").summary("여성 유저조회 API")
-                                            .requestFields()
-                                            .requestHeaders(
-                                                    headerWithName("Authorization").description("Basic auth credentials")
-                                            )
-                                            .responseFields(
-                                                    fieldWithPath("code").description("응답 코드"),
-                                                    fieldWithPath("status").description("응답 상태"),
-                                                    fieldWithPath("message").description("응답 메시지"),
-                                                    fieldWithPath("data").description("응답 데이터")
-                                            ).responseSchema(Schema.schema("유저 리스트 조회 실패")).build()
-                            )
-                    )
-            );
-            actions.andExpect(status().is(401));
-        }
-        @DisplayName("서버 에러")
-        @Test
-        void testGetFemaleUsersThenReturn500() throws Exception {
-            // Given
-            given(userService.getFemaleUsers(any(Pageable.class), any(Authentication.class)))
-                    .willThrow(new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error"));
-
-            ResultActions actions = mvc.perform(
-                    RestDocumentationRequestBuilders.get("/api/users/female")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .accept(MediaType.APPLICATION_JSON)
-                            .header("Authorization", "Bearer "+accessToken)
-            ).andDo(
-                    MockMvcRestDocumentationWrapper.document("여성 유저 조회 - 서버 에러",
-                            preprocessRequest(prettyPrint()),
-                            preprocessResponse(prettyPrint()),
-                            resource(
-                                    ResourceSnippetParameters.builder()
-                                            .description("여성을 최근 로그인 한 순으로 조회한다.")
-                                            .tag("User").summary("여성 유저조회 API")
-                                            .requestFields()
-                                            .requestHeaders(
-                                                    headerWithName("Authorization").description("Basic auth credentials")
-                                            )
-                                            .responseFields(
-                                                    fieldWithPath("code").description("응답 코드"),
-                                                    fieldWithPath("status").description("응답 상태"),
-                                                    fieldWithPath("message").description("응답 메시지"),
-                                                    fieldWithPath("data").description("응답 데이터")
-                                            ).responseSchema(Schema.schema("유저 리스트 조회 실패")).build()
-                            )
-                    )
-            );
-            actions.andExpect(status().is(500));
-        }
-    }
-
-
-    
-
-    @Nested
     @DisplayName("내정보 조회")
     class GetMyInfo{
         @DisplayName("성공")
@@ -510,7 +243,7 @@ class UserControllerTest extends ControllerTestConfig{
 
             //When && Then
             ResultActions actions = mvc.perform(
-                    RestDocumentationRequestBuilders.get("/api/users")
+                    RestDocumentationRequestBuilders.get("/api/users/me")
                             .contentType(MediaType.APPLICATION_JSON)
                             .accept(MediaType.APPLICATION_JSON)
                             .header("Authorization", "Bearer "+accessToken)
@@ -558,7 +291,7 @@ class UserControllerTest extends ControllerTestConfig{
 
             //When && Then
             ResultActions actions = mvc.perform(
-                    RestDocumentationRequestBuilders.get("/api/users")
+                    RestDocumentationRequestBuilders.get("/api/users/me")
                             .contentType(MediaType.APPLICATION_JSON)
                             .accept(MediaType.APPLICATION_JSON)
                             .header("Authorization", "Bearer "+accessToken)
@@ -598,7 +331,7 @@ class UserControllerTest extends ControllerTestConfig{
 
             //When && Then
             ResultActions actions = mvc.perform(
-                    RestDocumentationRequestBuilders.get("/api/users")
+                    RestDocumentationRequestBuilders.get("/api/users/me")
                             .contentType(MediaType.APPLICATION_JSON)
                             .accept(MediaType.APPLICATION_JSON)
                             .header("Authorization", "Bearer "+accessToken)
@@ -636,11 +369,11 @@ class UserControllerTest extends ControllerTestConfig{
         @DisplayName("성공")
         @Test
         public void testUpdateMyInfoThen200() throws Exception {
-            List<String> list = List.of("놀기","게임하기");
+            List<Long> list = List.of(1L, 2L);
             UserUpdateRequestDto dto = new UserUpdateRequestDto("인천","ESTP",list,"안녕하세요");
-            UserWithInterestAndQuestionDto dto1 = UserWithInterestAndQuestionDto.of(1L,"userId1","nickname1","서울","INTP","M",interests,"안녕");
+            UserWithInterestsDto dto1 = UserWithInterestsDto.of(1L,"userId1@gmail.com","nickname1","서울","INTP","M",interests,"안녕");
 
-            List<Interest> list1 = List.of(new Interest(1L, user, "놀기"), new Interest(2L, user, "게임하기"));
+            List<Interest> list1 = List.of(new Interest(1L, "놀기"), new Interest(2L, "게임하기"));
             user.setInterests(list1);
             given(userService.updateMyInfo(any(Authentication.class), eq(dto))).willReturn(user);
 
@@ -674,7 +407,7 @@ class UserControllerTest extends ControllerTestConfig{
                                                     fieldWithPath("message").description("응답 메시지"),
                                                     fieldWithPath("data").description("응답 데이터"),
                                                     fieldWithPath("data.id").description("유저 유니크 번호"),
-                                                    fieldWithPath("data.userId").description("유저 아이디"),
+                                                    fieldWithPath("data.email").description("유저 이메일"),
                                                     fieldWithPath("data.nickname").description("닉네임"),
                                                     fieldWithPath("data.region").description("사는 지역"),
                                                     fieldWithPath("data.mbti").description("MBTI"),
@@ -693,11 +426,11 @@ class UserControllerTest extends ControllerTestConfig{
         @DisplayName("인증 실패")
         @Test
         public void testUpdateMyInfoThen401() throws Exception {
-            List<String> list = List.of("놀기","게임하기");
+            List<Long> list = List.of(1L, 2L);
             UserUpdateRequestDto dto = new UserUpdateRequestDto("인천","ESTP",list,"안녕하세요");
-            UserWithInterestAndQuestionDto dto1 = UserWithInterestAndQuestionDto.of(1L,"userId1","nickname1","서울","INTP","M",interests,"안녕");
+            UserWithInterestsDto dto1 = UserWithInterestsDto.of(1L,"userId1","nickname1","서울","INTP","M",interests,"안녕");
 
-            List<Interest> list1 = List.of(new Interest(1L, user, "놀기"), new Interest(2L, user, "게임하기"));
+            List<Interest> list1 = List.of(new Interest(1L, "놀기"), new Interest(2L, "게임하기"));
             user.setInterests(list1);
             given(userService.updateMyInfo(any(Authentication.class), eq(dto)))
                     .willThrow(new ApiException(UserResponseCode.AUTHORIZE_FAIL));
@@ -741,11 +474,11 @@ class UserControllerTest extends ControllerTestConfig{
         @DisplayName("서버 오류")
         @Test
         public void testUpdateMyInfoThen500() throws Exception {
-            List<String> list = List.of("놀기","게임하기");
+            List<Long> list = List.of(1L, 2L);
             UserUpdateRequestDto dto = new UserUpdateRequestDto("인천","ESTP",list,"안녕하세요");
-            UserWithInterestAndQuestionDto dto1 = UserWithInterestAndQuestionDto.of(1L,"userId1","nickname1","서울","INTP","M",interests,"안녕");
+            UserWithInterestsDto dto1 = UserWithInterestsDto.of(1L,"userId1","nickname1","서울","INTP","M",interests,"안녕");
 
-            List<Interest> list1 = List.of(new Interest(1L, user, "놀기"), new Interest(2L, user, "게임하기"));
+            List<Interest> list1 = List.of(new Interest(1L, "놀기"), new Interest(2L, "게임하기"));
             user.setInterests(list1);
             given(userService.updateMyInfo(any(Authentication.class), eq(dto)))
                     .willThrow(new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error"));

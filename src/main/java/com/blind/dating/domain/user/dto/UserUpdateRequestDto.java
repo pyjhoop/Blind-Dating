@@ -12,6 +12,6 @@ import java.util.List;
 public class UserUpdateRequestDto {
         private String region;
         private String mbti;
-        private List<String> interests;
+        private List<Long> interests;
         private String selfIntroduction;
 }

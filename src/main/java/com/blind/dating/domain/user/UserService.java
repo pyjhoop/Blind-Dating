@@ -6,14 +6,12 @@ import com.blind.dating.domain.user.dto.ProfileNames;
 import com.blind.dating.domain.user.dto.UserInfo;
 import com.blind.dating.dto.user.UserInfoDto;
 import com.blind.dating.domain.user.dto.UserUpdateRequestDto;
-import com.blind.dating.dto.user.UserWithInterestAndQuestionDto;
 import com.blind.dating.exception.ApiException;
 import com.blind.dating.domain.interest.InterestRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
@@ -38,33 +36,28 @@ public class UserService {
     // 최근 로그인 순으로 나를 제외한 전체 유저 30명 조회
     @Transactional(readOnly = true)
     public Page<UserInfoDto> getMaleAndFemaleUsers(
-            Pageable pageable,
-            Authentication authentication
+            Pageable pageable
     ){
-        Long userId = Long.valueOf((String) authentication.getPrincipal());
-        Page<UserAccount> users = userAccountRepository.findAllByIdNot(userId, pageable);
+        Page<UserAccount> users = userAccountRepository.findAllByDeleted(pageable, false);
         return users.map(UserInfoDto::From);
     }
-    // 최근 로그인 순으로 나를 제외한 남성 유저 30명 조회
+
     @Transactional(readOnly = true)
-    public Page<UserInfoDto> getMaleUsers(
-            Pageable pageable,
-            Authentication authentication
-    ){
+    public Page<UserInfoDto> getRecommendUsers(Pageable pageable, Authentication authentication) {
+        // 내정보 조회후 관심사 조회
         Long userId = Long.valueOf((String) authentication.getPrincipal());
-        Page<UserAccount> users = userAccountRepository.findAllByIdNotAndGender(userId, "M" ,pageable);
+        UserAccount myEntity = userAccountRepository.findById(userId)
+                .orElseThrow(()-> new ApiException(UserResponseCode.GET_USER_INFO_FAIL));
+
+        List<Interest> interests = myEntity.getInterests();
+
+        // 나와 관심사가 비슷한 사람들 조회
+        String gender = (myEntity.getGender().equals("M"))? "W":"M";
+
+        Page<UserAccount> users = userAccountRepository.findAllByGenderAndInterestsInAndDeleted(gender, interests, pageable, false);
         return users.map(UserInfoDto::From);
     }
-    // 최근 로그인 순으로 나를 제외한 여성 유저 30명 조회
-    @Transactional(readOnly = true)
-    public Page<UserInfoDto> getFemaleUsers(
-            Pageable pageable,
-            Authentication authentication
-    ){
-        Long userId = Long.valueOf((String) authentication.getPrincipal());
-        Page<UserAccount> users = userAccountRepository.findAllByIdNotAndGender(userId, "W" ,pageable);
-        return users.map(UserInfoDto::From);
-    }
+
 
 
     @Transactional(readOnly = true)
@@ -81,23 +74,31 @@ public class UserService {
     public UserAccount updateMyInfo(Authentication authentication, UserUpdateRequestDto dto){
 
         String userId = (String) authentication.getPrincipal();
-
         UserAccount user = userAccountRepository.findById(Long.valueOf(userId))
                 .orElseThrow(() -> new ApiException(UserResponseCode.UPDATE_USER_INFO_FAIL));
-        // 유저 정보 저장하기
+
         user.setRegion(dto.getRegion());
         user.setMbti(dto.getMbti());
         user.setSelfIntroduction(dto.getSelfIntroduction());
 
-        interestRepository.deleteAllByUserAccount(user);
 
         List<Interest> interests = new ArrayList<>();
-        for(String s: dto.getInterests()){
-            interests.add(Interest.of(user,s));
+        for(Long s: dto.getInterests()){
+            interests.add(Interest.of(s));
         }
         user.setInterests(interests);
 
         return user;
+    }
+
+    @Transactional
+    public void deleteMe(Authentication authentication) {
+        Long userId = Long.valueOf((String) authentication.getPrincipal());
+
+        UserAccount user = userAccountRepository.findById(userId)
+                .orElseThrow(()-> new ApiException(UserResponseCode.GET_USER_INFO_FAIL));
+
+        user.setDeleted(true);
     }
 
     @Transactional(readOnly = true)
@@ -143,4 +144,7 @@ public class UserService {
 
         return new ProfileNames(originName, saveName);
     }
+
+
+
 }

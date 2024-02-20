@@ -3,7 +3,7 @@ package com.blind.dating.service;
 import com.blind.dating.common.code.ResponseCode;
 import com.blind.dating.common.code.UserResponseCode;
 import com.blind.dating.domain.interest.Interest;
-import com.blind.dating.domain.interest.InterestService;
+import com.blind.dating.domain.interest.InterestRepository;
 import com.blind.dating.domain.user.UserAccount;
 import com.blind.dating.domain.user.UserAccountService;
 import com.blind.dating.domain.user.dto.LogInResponse;
@@ -32,8 +32,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 @DisplayName("유저 조회 서비스")
 @ExtendWith(MockitoExtension.class)
@@ -46,7 +45,7 @@ class UserAccountServiceTest {
     @Mock private TokenProvider tokenProvider;
     @Mock private UserAccountRedisRepository userAccountRedisRepository;
     @Mock private RefreshTokenRepository refreshTokenRepository;
-    @Mock private InterestService interestService;
+    @Mock private InterestRepository interestRepository;
     @Mock private Errors errors;
 
     private UserRequestDto dto;
@@ -54,8 +53,8 @@ class UserAccountServiceTest {
 
     @BeforeEach
     void setting(){
-        dto = UserRequestDto.of("userId","userPass01","userNickname","서울","INFP","M","안녕하세요");
-        dto.setInterests(List.of("자전거타기","놀기","게임하기"));
+        dto = UserRequestDto.of("userId@gmail.com","userPass01","userNickname","서울","INFP","M","안녕하세요");
+        dto.setInterests(List.of(1L, 2L));
         user = dto.toEntity();
         user.setRecentLogin(LocalDateTime.now());
         user.setDeleted(false);
@@ -73,17 +72,16 @@ class UserAccountServiceTest {
         String password = "hashPass";
         List<Interest> list1 = List.of();
 
-        given(userAccountRepository.existsByUserId(dto.getUserId())).willReturn(false);// 존재 x
+        given(userAccountRepository.existsByEmail(dto.getEmail())).willReturn(false);// 존재 x
         given(bCryptPasswordEncoder.encode(dto.getUserPassword())).willReturn(password);
         given(userAccountRepository.save(user)).willReturn(user);
-        given(interestService.saveInterest(user, dto.getInterests())).willReturn(list1);
+        given(interestRepository.findAllByIdIn(dto.getInterests())).willReturn(list1);
 
         //when
-        UserAccount info = userAccountService.register(dto);
+        userAccountService.register(dto);
 
         //then
-        assertThat(info).isNotNull()
-                .hasFieldOrPropertyWithValue("id",info.getId());
+        verify(userAccountRepository, times(1)).existsByEmail(dto.getEmail());
 
     }
 
@@ -91,19 +89,15 @@ class UserAccountServiceTest {
     @Test
     void givenUserRequestDto_whenRegister_thenThrowException(){
         //given
-        String accessToken = "asdffqwerqwerdfgscvASDF";
-        String password = "hashPass";
-        List<Interest> list1 = List.of();
-
-        given(userAccountRepository.existsByUserId(dto.getUserId())).willReturn(true);// 존재 x
+        given(userAccountRepository.existsByEmail(dto.getEmail())).willReturn(true);// 존재 x
 
         //when
         ApiException exception = assertThrows(ApiException.class, ()-> {
-            UserAccount info = userAccountService.register(dto);
+            userAccountService.register(dto);
         });
 
         //then
-        assertThat(exception.getResponseCode()).isEqualTo(UserResponseCode.EXIST_USER_ID);
+        assertThat(exception.getResponseCode()).isEqualTo(UserResponseCode.EXIST_EMAIL);
 
     }
 
@@ -117,26 +111,25 @@ class UserAccountServiceTest {
         String password = "userPass01";
         LogInResponse response = LogInResponse.from(user,"accessToken","refreshToken");
 
-        given(userAccountRepository.findByUserId(userId)).willReturn(Optional.of(user));
+        given(userAccountRepository.findByEmail(userId)).willReturn(Optional.of(user));
         // When
         LogInResponse user1 = userAccountService.getLoginInfo(userId, password);
 
         // Then
-        assertThat(user1.getUserId()).isEqualTo(userId);
+        assertThat(user1.getEmail()).isEqualTo(dto.getEmail());
     }
 
     @DisplayName("로그인 서비스실패 후 예외 - 테스트")
     @Test
     void givenLoginInfo_whenLogin_thenReturnLogInThrowException(){
         //given
-        String userId = "userId";
         String password = "userPass01";
         LogInResponse response = LogInResponse.from(user,"accessToken","refreshToken");
 
-        given(userAccountRepository.findByUserId(userId)).willReturn(Optional.empty());
+        given(userAccountRepository.findByEmail(dto.getEmail())).willReturn(Optional.empty());
         // When
         ApiException exception = assertThrows(ApiException.class, ()->{
-            LogInResponse user1 = userAccountService.getLoginInfo(userId, password);
+            LogInResponse user1 = userAccountService.getLoginInfo(dto.getEmail(), password);
         });
 
         // Then
@@ -148,15 +141,14 @@ class UserAccountServiceTest {
     @Test
     void givenLoginInfo_whenLogin_thenReturnLogInPasswordMismatch(){
         //given
-        String userId = "userId";
         String password = "userPass01";
         LogInResponse response = LogInResponse.from(user,"accessToken","refreshToken");
 
-        given(userAccountRepository.findByUserId(userId)).willReturn(Optional.of(user));
+        given(userAccountRepository.findByEmail(dto.getEmail())).willReturn(Optional.of(user));
         given(bCryptPasswordEncoder.matches(password, user.getUserPassword())).willReturn(false);
         // When
         ApiException exception = assertThrows(ApiException.class, ()->{
-            LogInResponse user1 = userAccountService.getLoginInfo(userId, password);
+            LogInResponse user1 = userAccountService.getLoginInfo(dto.getEmail(), password);
         });
 
         // Then
@@ -167,7 +159,7 @@ class UserAccountServiceTest {
     @Test
     void givenLoginInfo_whenLoginFail_thenReturnLogInThrowException() {
         // Given
-        given(userAccountRepository.findByUserId(anyString())).willReturn(Optional.empty());
+        given(userAccountRepository.findByEmail(anyString())).willReturn(Optional.empty());
 
         // When
         ApiException exception = assertThrows(ApiException.class, ()-> {
@@ -188,15 +180,13 @@ class UserAccountServiceTest {
     @Test
     void givenUserId_whenCheckUserId_thenReturnTrue(){
         //given
-        String userId = "userId";
-        UserAccount user = UserAccount.of(userId,"asdfdf", "nick1","asdf","asdf","M","하이요");
-        given(userAccountRepository.existsByUserId(userId)).willReturn(false);
+        given(userAccountRepository.existsByEmail(dto.getEmail())).willReturn(false);
 
         //when
-        ResponseCode result = userAccountService.checkUserId(userId);
+        ResponseCode result = userAccountService.checkUserEmail(dto.getEmail());
 
         //then
-        assertThat(result).isEqualTo(UserResponseCode.NOT_EXIST_USER_ID);
+        assertThat(result).isEqualTo(UserResponseCode.NOT_EXIST_EMAIL);
 
     }
 
@@ -204,16 +194,14 @@ class UserAccountServiceTest {
     @Test
     void givenUserId_whenCheckUserId_thenReturnFalse(){
         //given
-        String userId = "userId";
-        UserAccount user = UserAccount.of(userId,"asdfdf", "nick1","asdf","asdf","M","하이요");
-        given(userAccountRepository.existsByUserId(userId)).willReturn(true);
+        given(userAccountRepository.existsByEmail(dto.getEmail())).willReturn(true);
 
 
-        ResponseCode result = userAccountService.checkUserId(userId);
+        ResponseCode result = userAccountService.checkUserEmail(dto.getEmail());
 
 
         //then
-        assertThat(result).isEqualTo(UserResponseCode.EXIST_USER_ID);
+        assertThat(result).isEqualTo(UserResponseCode.EXIST_EMAIL);
 
     }
 

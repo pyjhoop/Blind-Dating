@@ -7,13 +7,11 @@ import com.blind.dating.domain.user.UserService;
 import com.blind.dating.domain.user.dto.UserInfo;
 import com.blind.dating.dto.user.UserInfoDto;
 import com.blind.dating.domain.user.dto.UserUpdateRequestDto;
-import com.blind.dating.dto.user.UserWithInterestAndQuestionDto;
 import com.blind.dating.exception.ApiException;
 import com.blind.dating.domain.interest.InterestRepository;
 import com.blind.dating.domain.user.UserAccountRedisRepository;
 import com.blind.dating.domain.user.UserAccountRepository;
 import jakarta.servlet.ServletContext;
-import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -24,13 +22,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,7 +33,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 
 @DisplayName("UserService 테스트")
@@ -59,7 +53,7 @@ public class UserServiceTest {
 
     @BeforeEach
     void setUp(){
-        user = UserAccount.of("user01","pass01", "nickname1","서울","intp","M","하이요");
+        user = UserAccount.of("user01@gmail.com","pass01", "nickname1","서울","intp","M","하이요");
         user.setInterests(List.of(new Interest()));
         user2 = UserAccount.of("user02","pass02", "nickname2","서울","intp","W","하이요");
         user2.setInterests(List.of(new Interest()));
@@ -74,49 +68,16 @@ public class UserServiceTest {
         Long id = 1L;
         Pageable pageable = Pageable.ofSize(2);
         Page<UserAccount> page = new PageImpl<>(List.of(user,user2));
-        given(userAccountRepository.findAllByIdNot(id, pageable)).willReturn(page);
+        given(userAccountRepository.findAllByDeleted(pageable, false)).willReturn(page);
 
         // When
-        Page<UserInfoDto> result = userService.getMaleAndFemaleUsers(pageable, authentication);
+        Page<UserInfoDto> result = userService.getMaleAndFemaleUsers(pageable);
 
         // Then
         assertThat(result.getContent().get(0)).hasFieldOrPropertyWithValue("nickname",user.getNickname());
         assertThat(result.getContent().get(1)).hasFieldOrPropertyWithValue("nickname",user2.getNickname());
     }
 
-    @DisplayName("남성 유저 조회")
-    @Test
-    @WithMockUser(username = "1")
-    void givenId_whenGetMaleUsers_thenReturnUsers() {
-        // Given
-        Long id = 1L;
-        Pageable pageable = Pageable.ofSize(1);
-        Page<UserAccount> page = new PageImpl<>(List.of(user));
-        given(userAccountRepository.findAllByIdNotAndGender(id,"M" ,pageable)).willReturn(page);
-
-        // When
-        Page<UserInfoDto> result = userService.getMaleUsers(pageable, authentication);
-
-        // Then
-        assertThat(result.getContent().get(0)).hasFieldOrPropertyWithValue("nickname",user.getNickname());
-    }
-
-    @DisplayName("여성 유저 조회")
-    @Test
-    @WithMockUser(username = "1")
-    void givenId_whenGetFemaleUsers_thenReturnUsers() {
-        // Given
-        Long id = 1L;
-        Pageable pageable = Pageable.ofSize(1);
-        Page<UserAccount> page = new PageImpl<>(List.of(user2));
-        given(userAccountRepository.findAllByIdNotAndGender(id, "W",pageable)).willReturn(page);
-
-        // When
-        Page<UserInfoDto> result = userService.getFemaleUsers(pageable, authentication);
-
-        // Then
-        assertThat(result.getContent().get(0)).hasFieldOrPropertyWithValue("nickname",user2.getNickname());
-    }
 
     @DisplayName("내정보 조회 성공")
     @Test
@@ -156,9 +117,7 @@ public class UserServiceTest {
     void givenUser_whenUpdateMyInfo_thenReturnUserInfo(){
         //Given
         Optional<UserAccount> opUser = Optional.of(user);
-        List<String> list = new ArrayList<>();
-        list.add("놀기");
-        list.add("피하기");
+        List<Long> list = List.of(1L, 2L);
         UserUpdateRequestDto dto = UserUpdateRequestDto.builder()
                 .region("인천")
                 .mbti("MBTI")
@@ -172,7 +131,7 @@ public class UserServiceTest {
 
         //Then
         assertThat(result).isNotNull();
-        assertThat(result).hasFieldOrPropertyWithValue("userId","user01");
+        assertThat(result).hasFieldOrPropertyWithValue("email",user.getEmail());
     }
 
     @DisplayName("내 정보 수정시 예외발생")
@@ -206,39 +165,10 @@ public class UserServiceTest {
 
         //Then
         assertThat(result).isNotNull();
-        assertThat(result.get()).hasFieldOrPropertyWithValue("userId","user01");
+        assertThat(result.get()).hasFieldOrPropertyWithValue("email",user.getEmail());
     }
 
-    @DisplayName("프로필 이미지 수정")
-    @Test
-    @WithMockUser(username = "1")
-    void givenUploadFile_whenUpdateProfile_thenSuccess() {
-        //Given
-        Long userId = 1L;
-        MultipartFile uploadFile = new MockMultipartFile("file", "filename.txt", "text/plain", "some xml".getBytes());
-        HttpServletRequest request = mock(HttpServletRequest.class);
-        UserAccount mockUser = user; // UserAccount는 실제 사용자 계정 클래스의 이름으로 대체해야 합니다.
-        when(request.getServletContext()).thenReturn(servletContext);
-        when(servletContext.getRealPath("/upload")).thenReturn("/path/to/upload");
 
-        when(userAccountRepository.findById(userId)).thenReturn(Optional.of(mockUser));
 
-        userService.updateProfile(userId, uploadFile, request);
 
-    }
-
-    @Test
-    public void updateProfile_UserDoesNotExist_ThrowsApiException() {
-        Long userId = 2L;
-        MultipartFile uploadFile = new MockMultipartFile("file", "filename.txt", "text/plain", "some xml".getBytes());
-        HttpServletRequest request = mock(HttpServletRequest.class);
-        when(request.getServletContext()).thenReturn(servletContext);
-        when(servletContext.getRealPath("/upload")).thenReturn("/path/to/upload");
-
-        when(userAccountRepository.findById(userId)).thenReturn(Optional.empty());
-
-        assertThrows(ApiException.class, () -> {
-            userService.updateProfile(userId, uploadFile, request);
-        });
-    }
 }

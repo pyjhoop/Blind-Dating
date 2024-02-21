@@ -25,4 +25,5 @@ public interface UserAccountRepository extends JpaRepository<UserAccount, Long> 
 
     Page<UserAccount> findAllByGenderAndInterestsInAndDeleted(String gender, List<Interest> interests, Pageable pageable, Boolean status);
 
+
 }

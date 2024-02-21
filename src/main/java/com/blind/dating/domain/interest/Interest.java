@@ -15,9 +15,7 @@ import java.util.Objects;
 public class Interest {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "interestId")
     private Long id;
-
 
     @Setter
     @Column(nullable = false, length = 50)

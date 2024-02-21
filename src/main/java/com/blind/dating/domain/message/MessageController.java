@@ -41,7 +41,6 @@ public class MessageController {
                 .body(Api.OK(MessageResponseCode.ACCEPT_MESSAGE_SUCCESS));
     }
 
-    //TODO 메시지 거절하기
     @PatchMapping("/messages/{messageId}/reject")
     public ResponseEntity<?> rejectMessage(
             @PathVariable Long messageId,
@@ -52,7 +51,6 @@ public class MessageController {
                 .body(Api.OK(MessageResponseCode.REJECT_MESSAGE_SUCCESS));
     }
 
-    //TODO 내게온 메시지 조회하기 wait인 상태만 조회하는거야
     @GetMapping("/messages/me")
     public ResponseEntity<?> getMessageToMe(
             Authentication authentication
@@ -63,7 +61,6 @@ public class MessageController {
                 .body(Api.OK(MessageResponseCode.GET_MESSAGE_TOME_SUCCESS, list));
     }
 
-    // TODO 내가 보낸 메시지 조회하기 얘는 내가 삭제하기 전까진 그대로 남기고
     @GetMapping("/messages")
     public ResponseEntity<?> getMessageFromMe(
             Authentication authentication

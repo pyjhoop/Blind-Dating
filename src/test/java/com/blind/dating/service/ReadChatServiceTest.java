@@ -5,7 +5,6 @@ import com.blind.dating.domain.readChat.ReadChat;
 import com.blind.dating.domain.chatRoom.ChattingRoomRepository;
 import com.blind.dating.domain.readChat.ReadChatService;
 import com.blind.dating.domain.readChat.ReadChatRepository;
-import com.blind.dating.config.socket.WebSocketSessionManager;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -30,7 +29,6 @@ import static org.mockito.Mockito.*;
 class ReadChatServiceTest {
 
     @Mock private ReadChatRepository readChatRepository;
-    @Mock private WebSocketSessionManager websocketSessionManager;
     @Mock private ChattingRoomRepository chattingRoomRepository;
     @InjectMocks private ReadChatService readChatService;
 

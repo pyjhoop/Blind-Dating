@@ -1,22 +1,19 @@
-package com.blind.dating.handler;
+package com.blind.dating.config.socket;
 
-import com.blind.dating.dto.user.UserSession;
 import org.springframework.stereotype.Component;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
-public class SessionHandler {
+public class SessionManager {
     private final ConcurrentHashMap<String, ConcurrentHashMap<String, String>> sessions = new ConcurrentHashMap<>();
 
 
-    public void addSession(UserSession userSession) {
-        String roomId = userSession.getRoomId();
+    public void addSession(String userId, String roomId) {
         sessions.putIfAbsent(roomId, new ConcurrentHashMap<>());
-        sessions.get(roomId).put(userSession.getUserId(), userSession.getUserId());
+        sessions.get(roomId).put(userId, userId);
     }
 
-    public void removeSession(String roomId, String userId) {
-
+    public void removeSession(String userId, String roomId) {
         ConcurrentHashMap<String, String> userSessions = sessions.get(roomId);
         if(userSessions != null){
             userSessions.remove(userId);

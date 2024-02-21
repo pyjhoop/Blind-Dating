@@ -17,6 +17,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -41,24 +42,20 @@ public class ChattingRoomController {
 
     @GetMapping("/chatroom/{roomId}")
     public ResponseEntity<Api<ChatListWithOtherUserInfo>> enterRoom(
-            @PathVariable String roomId,
+            @PathVariable Long roomId,
             @PageableDefault(size = 30, sort = "id", direction = Sort.Direction.DESC)
             Pageable pageable,
             Authentication authentication
     ){
         Long userId = Long.valueOf((String)authentication.getPrincipal());
 
-        ChatRoom chatRoom = chattingRoomService.getRoom(roomId)
-                .orElseThrow(() -> new RuntimeException("채팅목록 조회시 예외가 발생했습니다."));
-
-        //다른 유저 정보 조회하기.
-        UserAccount otherUser = chatRoom.getReceiver();
+        ChatRoomDto chatRoomDto = chattingRoomService.getRoom(userId, roomId);
 
         //존재할경우 채팅 메세지 30개를 id 오름차순으로 가져오기
-        List<ChatDto> chatList = chatService.selectChatList(chatRoom, pageable)
+        List<ChatDto> chatList = chatService.selectChatList(chatRoomDto, pageable)
                 .getContent().stream().map(ChatDto::from).toList();
 
-        ChatListWithOtherUserInfo chatListWithOtherUserInfo = ChatListWithOtherUserInfo.of(otherUser.getId(), otherUser.getNickname(),chatRoom.getStatus(), chatList);
+        ChatListWithOtherUserInfo chatListWithOtherUserInfo = ChatListWithOtherUserInfo.of(chatRoomDto.getOtherUserId(), chatRoomDto.getOtherUserNickname(), chatList);
 
         return ResponseEntity.ok()
                 .body(Api.OK(ChattingRoomResponseCode.GET_CHATS_SUCCESS, chatListWithOtherUserInfo));

@@ -1,20 +1,16 @@
 package com.blind.dating.dto.chat;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 public class ChatRequestDto {
     private String chatRoomId;
     private String writerId;
     private String message;
-    private String status;
-
-    public ChatRequestDto(String chatRoomId, String writerId, String message) {
-        this.chatRoomId = chatRoomId;
-        this.writerId = writerId;
-        this.message = message;
-    }
+    private String receiverId;
 
 }

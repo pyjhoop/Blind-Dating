@@ -3,15 +3,15 @@ package com.blind.dating.domain.message;
 import com.blind.dating.common.code.MessageResponseCode;
 import com.blind.dating.common.code.UserResponseCode;
 import com.blind.dating.domain.chatRoom.ChatRoom;
+import com.blind.dating.domain.chatRoom.ChatRoomUserAccount;
+import com.blind.dating.domain.chatRoom.ChatRoomUserAccountRepository;
 import com.blind.dating.domain.user.UserAccount;
-import com.blind.dating.domain.userChatRoom.UserChatRoom;
 import com.blind.dating.dto.message.MessageRequestDto;
 import com.blind.dating.dto.message.MessageResponseDto;
 import com.blind.dating.dto.message.MessageStatus;
 import com.blind.dating.exception.ApiException;
 import com.blind.dating.domain.chatRoom.ChattingRoomRepository;
 import com.blind.dating.domain.user.UserAccountRepository;
-import com.blind.dating.domain.userChatRoom.UserChatRoomRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
@@ -28,7 +28,7 @@ public class MessageService {
     private final UserAccountRepository userAccountRepository;
     private final MessageRepository messageRepository;
     private final ChattingRoomRepository chattingRoomRepository;
-    private final UserChatRoomRepository userChatRoomRepository;
+    private final ChatRoomUserAccountRepository chatRoomUserAccountRepository;
     @Transactional
     public void postMessage(Authentication authentication, MessageRequestDto dto) {
         Long userId = Long.valueOf((String) authentication.getPrincipal());
@@ -54,14 +54,13 @@ public class MessageService {
         // 채팅룸 생성
         UserAccount receiver = userAccountRepository.findById(message.getReceiverId())
                 .orElseThrow(()->new ApiException(MessageResponseCode.MESSAGE_NOT_FOUNT));
+        UserAccount sender = message.getUserAccount();
 
-        ChatRoom chatRoom = new ChatRoom(receiver,true, "채팅방이 생성되었습니다.");
+        ChatRoom chatRoom = new ChatRoom(true, "채팅방이 생성되었습니다.");
         ChatRoom chatRoomEntity = chattingRoomRepository.save(chatRoom);
+        chatRoomUserAccountRepository.save(new ChatRoomUserAccount(receiver, chatRoomEntity));
+        chatRoomUserAccountRepository.save(new ChatRoomUserAccount(sender, chatRoomEntity));
 
-
-        UserChatRoom userChatRoom1 = new UserChatRoom(message.getUserAccount(), chatRoomEntity);
-        UserChatRoom userChatRoom2 = new UserChatRoom(receiver, chatRoomEntity);
-        userChatRoomRepository.saveAll(List.of(userChatRoom1, userChatRoom2));
     }
 
     @Transactional

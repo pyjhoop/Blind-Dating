@@ -5,6 +5,7 @@ import com.blind.dating.domain.user.UserAccount;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
 import java.util.Objects;
 
 @NoArgsConstructor
@@ -16,11 +17,7 @@ public class ChatRoom extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "chatRoomId")
     private Long id;
-
-    @ManyToOne
-    private UserAccount receiver;
 
     @Setter
     private Boolean status;
@@ -28,8 +25,7 @@ public class ChatRoom extends BaseEntity {
     @Setter
     private String recentMessage;
 
-    public ChatRoom(UserAccount receiver, Boolean status, String recentMessage) {
-        this.receiver = receiver;
+    public ChatRoom(Boolean status, String recentMessage) {
         this.status = status;
         this.recentMessage = recentMessage;
     }

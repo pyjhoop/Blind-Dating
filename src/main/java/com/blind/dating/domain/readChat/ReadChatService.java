@@ -1,7 +1,6 @@
 package com.blind.dating.domain.readChat;
 
 import com.blind.dating.domain.chatRoom.ChattingRoomRepository;
-import com.blind.dating.config.socket.WebSocketSessionManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -10,7 +9,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class ReadChatService {
     private final ReadChatRepository readChatRepository;
-    private final WebSocketSessionManager websocketSessionManager;
     private final ChattingRoomRepository chattingRoomRepository;
 
     @Transactional

@@ -29,6 +29,14 @@ public class ChatRoomDto {
         this.unReadCount = unReadCount;
     }
 
+    public ChatRoomDto(Long roomId, LocalDateTime updatedAt, Long otherUserid, String otherUserNickname, String recentMessage) {
+        this.roomId = roomId;
+        this.updatedAt = updatedAt;
+        this.otherUserId = otherUserid;
+        this.otherUserNickname = otherUserNickname;
+        this.recentMessage = recentMessage;
+    }
+
     public static ChatRoomDto From(UserAccount other, ChatRoom room, Long unReadCount) {
         return new ChatRoomDto(room.getId(), room.getUpdatedAt(), other.getId(), other.getNickname(), room.getRecentMessage(),unReadCount);
 

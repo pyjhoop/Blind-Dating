@@ -32,7 +32,7 @@ class ChatServiceTest {
     @DisplayName("챗 저장 - 테스트")
     @Test
     void givenChatRequestDto_whenSaveChat_thenReturnChat(){
-        ChatRequestDto dto = new ChatRequestDto("1","1","hi");
+        ChatRequestDto dto = new ChatRequestDto("1","1","hi","2");
         ChatRoom chatRoom = new ChatRoom();
         Chat chat = new Chat(chatRoom, 1L,"hi");
         Optional<ChatRoom> optional = Optional.of(chatRoom);

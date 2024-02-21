@@ -1,28 +1,28 @@
-package com.blind.dating.domain.userChatRoom;
+package com.blind.dating.domain.chatRoom;
 
-import com.blind.dating.domain.chatRoom.ChatRoom;
 import com.blind.dating.domain.user.UserAccount;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Getter
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@IdClass(UserChatRoomId.class)
-public class UserChatRoom {
-
+public class ChatRoomUserAccount {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     @ManyToOne
     @JoinColumn(name = "userAccountId")
     private UserAccount userAccount;
 
-    @Id
     @ManyToOne
     @JoinColumn(name = "chatRoomId")
     private ChatRoom chatRoom;
 
-
+    public ChatRoomUserAccount(UserAccount userAccount, ChatRoom chatRoom) {
+        this.userAccount = userAccount;
+        this.chatRoom = chatRoom;
+    }
 }

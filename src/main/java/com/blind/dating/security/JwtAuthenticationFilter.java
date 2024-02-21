@@ -30,7 +30,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final TokenProvider tokenProvider;
 
-    String[] noAuthenticationUrlList = {"/all","/uploads","/room","/rooms","/api/signup","/api/login", "/api/check-email","/api/check-nickname","/swagger-ui","/api/test","/docs","/actuator"};
+    String[] noAuthenticationUrlList = {"/uploads","/room","/rooms","/api/signup","/api/login", "/api/check-email","/api/check-nickname","/swagger-ui","/api/test","/docs","/actuator"};
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException, ServletException {

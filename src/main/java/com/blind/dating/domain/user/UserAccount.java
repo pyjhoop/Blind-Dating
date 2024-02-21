@@ -1,6 +1,7 @@
 package com.blind.dating.domain.user;
 
 import com.blind.dating.domain.BaseEntity;
+import com.blind.dating.domain.chatRoom.ChatRoom;
 import com.blind.dating.domain.interest.Interest;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -23,7 +24,6 @@ public class UserAccount extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "userAccountId")
     private Long id;
 
     @Setter
@@ -72,6 +72,7 @@ public class UserAccount extends BaseEntity {
 
     @ManyToMany @Setter
     private List<Interest> interests;
+
 
 
 

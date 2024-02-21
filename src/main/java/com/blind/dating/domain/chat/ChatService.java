@@ -1,8 +1,10 @@
 package com.blind.dating.domain.chat;
 
 import com.blind.dating.common.code.ChatResponseCode;
+import com.blind.dating.common.code.ChattingRoomResponseCode;
 import com.blind.dating.domain.chatRoom.ChatRoom;
 import com.blind.dating.dto.chat.ChatRequestDto;
+import com.blind.dating.dto.chat.ChatRoomDto;
 import com.blind.dating.exception.ApiException;
 import com.blind.dating.domain.chatRoom.ChattingRoomRepository;
 import com.blind.dating.domain.readChat.ReadChatRepository;
@@ -22,7 +24,9 @@ public class ChatService {
 
 
     @Transactional(readOnly = true)
-    public Page<Chat> selectChatList(ChatRoom chatRoom, Pageable pageable){
+    public Page<Chat> selectChatList(ChatRoomDto chatRoomDto, Pageable pageable){
+        ChatRoom chatRoom = chattingRoomRepository.findById(chatRoomDto.getRoomId())
+                .orElseThrow(()-> new ApiException(ChattingRoomResponseCode.GET_ROOMS_FAIL));
         return chatRepository.findAllByChatRoom(chatRoom, pageable);
     }
 

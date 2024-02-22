@@ -1,6 +1,8 @@
 package com.blind.dating.domain.chatRoom;
 
 import com.blind.dating.common.code.ChattingRoomResponseCode;
+import com.blind.dating.domain.readChat.ReadChat;
+import com.blind.dating.domain.readChat.ReadChatService;
 import com.blind.dating.domain.user.UserAccount;
 import com.blind.dating.dto.chat.ChatDto;
 import com.blind.dating.dto.chat.ChatListWithOtherUserInfo;
@@ -27,6 +29,7 @@ public class ChattingRoomController {
     private final ChattingRoomService chattingRoomService;
     private final ChatService chatService;
     private final UserService userService;
+    private final ReadChatService readChatService;
 
     @GetMapping("/chatroom")
     public ResponseEntity<Api<List<ChatRoomDto>>> getMyMessageList(
@@ -41,23 +44,22 @@ public class ChattingRoomController {
     }
 
     @GetMapping("/chatroom/{roomId}")
-    public ResponseEntity<Api<ChatListWithOtherUserInfo>> enterRoom(
+    public ResponseEntity<?> enterRoom(
             @PathVariable Long roomId,
             @PageableDefault(size = 30, sort = "id", direction = Sort.Direction.DESC)
             Pageable pageable,
             Authentication authentication
     ){
         Long userId = Long.valueOf((String)authentication.getPrincipal());
-
         ChatRoomDto chatRoomDto = chattingRoomService.getRoom(userId, roomId);
+
+        readChatService.updateReadChat(roomId, userId);
 
         //존재할경우 채팅 메세지 30개를 id 오름차순으로 가져오기
         List<ChatDto> chatList = chatService.selectChatList(chatRoomDto, pageable)
                 .getContent().stream().map(ChatDto::from).toList();
 
-        ChatListWithOtherUserInfo chatListWithOtherUserInfo = ChatListWithOtherUserInfo.of(chatRoomDto.getOtherUserId(), chatRoomDto.getOtherUserNickname(), chatList);
-
         return ResponseEntity.ok()
-                .body(Api.OK(ChattingRoomResponseCode.GET_CHATS_SUCCESS, chatListWithOtherUserInfo));
+                .body(Api.OK(ChattingRoomResponseCode.GET_CHATS_SUCCESS, chatList));
     }
 }

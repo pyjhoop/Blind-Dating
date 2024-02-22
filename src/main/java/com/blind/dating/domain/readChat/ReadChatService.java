@@ -1,29 +1,35 @@
 package com.blind.dating.domain.readChat;
 
+import com.blind.dating.common.code.ChatResponseCode;
+import com.blind.dating.config.socket.SessionManager;
+import com.blind.dating.domain.chat.Chat;
+import com.blind.dating.domain.chat.ChatRepository;
 import com.blind.dating.domain.chatRoom.ChattingRoomRepository;
+import com.blind.dating.exception.ApiException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.concurrent.ConcurrentHashMap;
 
 @RequiredArgsConstructor
 @Service
 public class ReadChatService {
     private final ReadChatRepository readChatRepository;
     private final ChattingRoomRepository chattingRoomRepository;
+    private final ChatRepository chatRepository;
 
     @Transactional
-    public void updateReadChat(String roomId, Long chatId){
+    public void updateReadChat(Long roomId, Long userId){
+        // chat을 가져와 최근꺼 1나만
+        // readchet 을 수정해
 
-//        Set<String> users = sessionRedisRepository.getUsers(roomId);
-//        ChatRoom chatRoom = chattingRoomRepository.findById(Long.valueOf(roomId))
-//                .orElseThrow(()-> new RuntimeException("메세지 전송시 예외가 발생했습니다."));
-//
-//        for(String u: users){
-//            // 있는지 확인부터 없으면 생성해주고 있으면 업데이트 해준다.
-//            ReadChat readChat = readChatRepository.findByChatRoomAndUserId(chatRoom, Long.valueOf(u))
-//                    .orElse(readChatRepository.save(ReadChat.of(chatRoom, Long.valueOf(u), chatId)));
-//            readChat.setChatId(chatId);
-//        }
+        Chat chat = chatRepository.findFirstByChatRoomIdOrderByCreatedAtDesc(roomId)
+                .orElseThrow(()-> new ApiException(ChatResponseCode.CHAT_NOT_FOUND));
 
+        ReadChat readChat = readChatRepository.findByChatRoomIdAndUserId(roomId, userId)
+                .orElseThrow(()-> new ApiException(ChatResponseCode.CHAT_NOT_FOUND));
+
+        readChat.setChatId(chat.getId());
     }
 }

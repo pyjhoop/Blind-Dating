@@ -10,5 +10,6 @@ public interface ReadChatRepository extends JpaRepository<ReadChat, Long> {
 
     Optional<ReadChat> findByChatRoomAndUserId(ChatRoom chatRoom, Long userId);
 
+    Optional<ReadChat> findByChatRoomIdAndUserId(Long chatRoomId, Long userId);
 
 }

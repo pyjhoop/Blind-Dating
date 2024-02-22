@@ -1,12 +1,12 @@
 package com.blind.dating.domain.post;
 
 import com.blind.dating.domain.BaseEntity;
+import com.blind.dating.domain.comment.Comment;
 import com.blind.dating.domain.user.UserAccount;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+
+import java.util.List;
 
 @Getter
 @AllArgsConstructor
@@ -29,6 +29,10 @@ public class Post extends BaseEntity {
     private Long hit;
 
     private Long view;
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @ToString.Exclude
+    private List<Comment> comments;
 
     public void increaseHit() {
         this.hit++;

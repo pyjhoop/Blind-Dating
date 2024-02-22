@@ -4,7 +4,6 @@ import com.blind.dating.common.code.PostResponseCode;
 import com.blind.dating.domain.user.UserAccount;
 import com.blind.dating.dto.post.PageInfoWithPosts;
 import com.blind.dating.dto.post.PostRequestDto;
-import com.blind.dating.dto.post.PostResponseDto;
 import com.blind.dating.exception.ApiException;
 import com.blind.dating.domain.user.UserAccountRepository;
 import lombok.RequiredArgsConstructor;
@@ -42,12 +41,12 @@ public class PostService {
     }
 
     @Transactional
-    public PostResponseDto getPost(Long postId) {
+    public PostResponseWithCommentDto getPost(Long postId) {
         Post post = postRepository.findPost(postId)
                 .orElseThrow(()-> new ApiException(PostResponseCode.POST_NOT_FOUNT));
         // view 증가
         post.increaseView();
-        return PostResponseDto.From(post);
+        return PostResponseWithCommentDto.From(post);
     }
 
     @Transactional(readOnly = true)

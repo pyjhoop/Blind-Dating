@@ -4,7 +4,6 @@ import com.blind.dating.common.Api;
 import com.blind.dating.common.code.PostResponseCode;
 import com.blind.dating.dto.post.PageInfoWithPosts;
 import com.blind.dating.dto.post.PostRequestDto;
-import com.blind.dating.dto.post.PostResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -19,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
 public class PostController {
     private final PostService postService;
 
-    // post 생성
     @PostMapping("/posts")
     public ResponseEntity<?> createPost
     (
@@ -27,11 +25,9 @@ public class PostController {
         @RequestBody PostRequestDto request
     ) {
         PostResponseDto result = postService.createPost(authentication, request);
-        System.out.println(result);
         return ResponseEntity.ok()
                 .body(Api.OK(PostResponseCode.CREATE_POST_SUCCESS, result));
     }
-    // post 수정
     @PatchMapping("/posts/{postId}")
     public ResponseEntity<?> updatePost
     (
@@ -49,7 +45,7 @@ public class PostController {
     (
         @PathVariable Long postId
     ) {
-        PostResponseDto result = postService.getPost(postId);
+        PostResponseWithCommentDto result = postService.getPost(postId);
 
         return ResponseEntity.ok()
                 .body(Api.OK(PostResponseCode.GET_POST_SUCCESS, result));
@@ -65,6 +61,14 @@ public class PostController {
         return ResponseEntity.ok()
                 .body(Api.OK(PostResponseCode.GET_POST_SUCCESS, result));
     }
+
+    @DeleteMapping("/posts/{postId}")
+    public ResponseEntity<?> deletePosts(
+            @PathVariable Long postId
+    ) {
+        return null;
+    }
+
 
 
 }

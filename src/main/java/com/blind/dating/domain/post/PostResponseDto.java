@@ -1,11 +1,13 @@
-package com.blind.dating.dto.post;
+package com.blind.dating.domain.post;
 
-import com.blind.dating.domain.post.Post;
+import com.blind.dating.domain.comment.CommentDto;
+import com.blind.dating.dto.post.UserInfo;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -24,6 +26,7 @@ public class PostResponseDto {
 
     private Long view;
     private LocalDate createdAt;
+
 
 
 

@@ -1,15 +1,13 @@
 package com.blind.dating.service;
 
 import com.blind.dating.common.code.PostResponseCode;
-import com.blind.dating.domain.post.Post;
+import com.blind.dating.domain.comment.Comment;
+import com.blind.dating.domain.post.*;
 import com.blind.dating.domain.user.Role;
-import com.blind.dating.domain.post.PostService;
 import com.blind.dating.domain.user.UserAccount;
 import com.blind.dating.dto.post.PageInfoWithPosts;
 import com.blind.dating.dto.post.PostRequestDto;
-import com.blind.dating.dto.post.PostResponseDto;
 import com.blind.dating.exception.ApiException;
-import com.blind.dating.domain.post.PostRepository;
 import com.blind.dating.domain.user.UserAccountRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -48,12 +46,14 @@ class PostServiceTest {
     private UserAccount user;
     private Post post;
     private Authentication authentication;
+    private Comment comment;
 
     @BeforeEach
     void setting() {
         request = new PostRequestDto("제목이야", "내용이야");
         user = new UserAccount(1L, "userId","password","nickname","서울","INTP","M",false,"하이요",null, Role.USER,"K","origin", "change", null);
-        post = new Post(1L, user, "제목이야", "내용이야", 0L, 0L);
+        comment = new Comment(1L, "댓글1",true, user, post);
+        post = new Post(1L, user, "제목이야", "내용이야", 0L, 0L, List.of(comment));
         post.setCreatedAt(LocalDateTime.now());
         authentication = new UsernamePasswordAuthenticationToken("1","");
     }
@@ -125,7 +125,7 @@ class PostServiceTest {
         // Given
         given(postRepository.findPost(postId)).willReturn(Optional.of(post));
         // When
-        PostResponseDto result = postService.getPost(postId);
+        PostResponseWithCommentDto result = postService.getPost(postId);
 
         // Then
         assertThat(result).hasFieldOrPropertyWithValue("id", 1L);
@@ -142,7 +142,7 @@ class PostServiceTest {
         given(postRepository.findPost(postId)).willReturn(Optional.empty());
         // When
         ApiException exception = assertThrows(ApiException.class, ()->{
-            PostResponseDto result = postService.getPost(postId);
+            PostResponseWithCommentDto result = postService.getPost(postId);
         });
 
         // Then

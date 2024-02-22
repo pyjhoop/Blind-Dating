@@ -2,6 +2,7 @@ package com.blind.dating.domain.chatRoom;
 
 import com.blind.dating.common.code.ChattingRoomResponseCode;
 import com.blind.dating.domain.chat.ChatService;
+import com.blind.dating.domain.readChat.ReadChat;
 import com.blind.dating.domain.user.UserAccount;
 import com.blind.dating.dto.chat.ChatRoomDto;
 import com.blind.dating.exception.ApiException;
@@ -13,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -28,26 +30,17 @@ public class ChattingRoomService {
 
     @Transactional
     public List<ChatRoomDto> getRooms(Long userId){
-        return chatRoomUserAccountRepository.findChatRoomsAndUsersByUserId(userId);
+         List<ChatRoomDto> rooms = chatRoomUserAccountRepository.findChatRoomsAndUsersByUserId(userId);
 
-//        UserAccount user = userAccountRepository.findById(userId)
-//                .orElseThrow(()-> new ApiException(ChattingRoomResponseCode.GET_ROOMS_FAIL));
-//
-//        // userId로 chatRoom을 조회해야지
-//
-//        List<ChatRoom> chatRooms = chattingRoomRepository.findChatRoomsByUserIdOrderByUpdatedDateDesc(userId);
-//
-//        return chatRooms.stream().map(chatRoom -> {
-//            UserAccount other = user;
-//
-////            for(UserAccount u : chatRoom.getUserAccounts()) {
-////                if(user != u){
-////                    other = u;
-////                }
-////            }
-//
-//            return ChatRoomDto.From(other, chatRoom, 0L);
-//        }).toList();
+         // readChat의 chatId 부터 개수를 새는거야
+        List<ChatRoomDto> newRooms = rooms.stream().map(chatRoomDto -> {
+
+            Long count = chatService.unreadChat(userId, chatRoomDto.getRoomId());
+            chatRoomDto.setUnReadCount(count-1);
+            return chatRoomDto;
+        }).toList();
+
+        return newRooms;
     }
 
     public ChatRoomDto getRoom(Long userId, Long roomId){

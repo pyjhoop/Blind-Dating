@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import javax.swing.text.html.Option;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,6 +20,8 @@ public interface ChatRepository extends JpaRepository<Chat,Long> {
 
 
     List<Chat> findByChatRoomAndIdLessThanEqualOrderByIdDesc(ChatRoom chatRoom, Long chatId);
+    Long countAllByChatRoomIdAndIdGreaterThanEqual(Long chatRoomId, Long chatId);
+
 
 
 }

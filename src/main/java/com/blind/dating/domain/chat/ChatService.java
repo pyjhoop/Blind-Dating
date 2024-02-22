@@ -2,7 +2,9 @@ package com.blind.dating.domain.chat;
 
 import com.blind.dating.common.code.ChatResponseCode;
 import com.blind.dating.common.code.ChattingRoomResponseCode;
+import com.blind.dating.config.socket.SessionManager;
 import com.blind.dating.domain.chatRoom.ChatRoom;
+import com.blind.dating.domain.readChat.ReadChat;
 import com.blind.dating.dto.chat.ChatRequestDto;
 import com.blind.dating.dto.chat.ChatRoomDto;
 import com.blind.dating.exception.ApiException;
@@ -14,6 +16,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.concurrent.ConcurrentHashMap;
+
 @RequiredArgsConstructor
 @Service
 public class ChatService {
@@ -21,6 +25,7 @@ public class ChatService {
     private final ChatRepository chatRepository;
     private final ChattingRoomRepository chattingRoomRepository;
     private final ReadChatRepository readChatRepository;
+    private final SessionManager sessionManager;
 
 
     @Transactional(readOnly = true)
@@ -36,23 +41,36 @@ public class ChatService {
         ChatRoom room = chattingRoomRepository.findById(Long.valueOf(dto.getChatRoomId()))
                         .orElseThrow(()-> new ApiException(ChatResponseCode.CHAT_NOT_FOUND));
         room.setRecentMessage(dto.getMessage());
-        return chatRepository.save(Chat.of(room,Long.valueOf(dto.getWriterId()),dto.getMessage()));
+
+        // readChat도 여기서 설정해줘야해. -> 채팅방이 생기면 readChat도 생겨야해.
+        // 첫번째 채팅으로 Chat도 생겨야함.
+        Chat newChat = chatRepository.save(Chat.of(room,Long.valueOf(dto.getWriterId()),dto.getMessage()));
+
+        ConcurrentHashMap<String, String> users = sessionManager.getUsers(String.valueOf(dto.getChatRoomId()));
+
+        if(users.size() < 2) {
+            ReadChat writerReadChat = readChatRepository.findByChatRoomAndUserId(room, Long.valueOf(dto.getWriterId()))
+                    .orElseThrow(()-> new ApiException(ChatResponseCode.CHAT_SEND_FAIL));
+            writerReadChat.setChatId(newChat.getId());
+        }else {
+            ReadChat writerReadChat = readChatRepository.findByChatRoomAndUserId(room, Long.valueOf(dto.getWriterId()))
+                    .orElseThrow(()-> new ApiException(ChatResponseCode.CHAT_SEND_FAIL));
+            writerReadChat.setChatId(newChat.getId());
+
+            ReadChat recieverReadChat = readChatRepository.findByChatRoomAndUserId(room, Long.valueOf(dto.getReceiverId()))
+                    .orElseThrow(()-> new ApiException(ChatResponseCode.CHAT_SEND_FAIL));
+            recieverReadChat.setChatId(newChat.getId());
+        }
+
+        return newChat;
     }
 
-//    @Transactional(readOnly = true)
-//    public Long unreadChat(Long userId, ChatRoom chatRoom){
-//
-//        List<Chat> list = chatRepository.findAllByChatRoomOrderByIdDesc(chatRoom);
-//        Long listSize = (long) list.size();
-//
-//        ReadChat readChat = readChatRepository.findByChatRoomAndUserId(chatRoom, userId)
-//                .orElseThrow(()-> new ApiException(ChatResponseCode.READ_CHAT_NOT_FOUND));
-//
-//        if(readChat.getChatId() == 0){
-//            return listSize;
-//        }else{
-//            return chatRepository.countByIdBetween(readChat.getChatId(), list.get(0).getId()) -1;
-//        }
-//
-//    }
+    @Transactional(readOnly = true)
+    public Long unreadChat(Long userId, Long chatRoomId){
+        ReadChat readChat = readChatRepository.findByChatRoomIdAndUserId(chatRoomId, userId)
+                .orElseThrow(()-> new ApiException(ChatResponseCode.CHAT_SEND_FAIL));
+
+        // readChat의 chatId 부터 개수를 새는거야
+        return chatRepository.countAllByChatRoomIdAndIdGreaterThanEqual(chatRoomId, readChat.getChatId());
+    }
 }

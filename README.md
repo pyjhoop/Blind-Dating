@@ -7,8 +7,6 @@
  - 이성을 소개해주는 블라인드 데이팅을 이용해주세요!    
 
 👉🏻[블라인드 데이팅 이용해보기 Click](https://fe-zeta.vercel.app)   
-👉🏻[API 문서 상세보기](http://blind-dating.site/docs/swagger)   
-API 문서는 Swagger를 통해 작성되었습니다.
 
 
 
@@ -40,22 +38,22 @@ API 문서는 Swagger를 통해 작성되었습니다.
 ## 🪧DB 설계
 👉🏻[DB 상세페이지로 이동](https://www.erdcloud.com/d/FveRbu3AKcJ2Zd3ko)
    
-![image](https://github.com/Blind-Dating/Blind-Dating-BE/assets/59335316/346b2553-ffc7-472b-9cdd-fae6a350bbdb)
-
-
-## 💡담당 업무
- - Github Action을 도입하여 CI/CD를 구현했습니다.
- - 엑세스 토큰과 리프레시 토큰을 기반으로 한 인증/인가 시스템을 구현했습니다.
- - 실시간 채팅 기능 구현을 위해 웹소켓을 활용하고 메세지 브로커로 Redis를 도입했습니다.
- - 채팅방 리스트에서 웹소켓 연결을 통해 새로운 메세지가 도착할 때마다 최신 메세지 내용이 갱신되도록 했습니다.
- - Swagger를 이용하여 REST API 문서화를 진행하여 협업의 효율성을 높였습니다.
+<img width="626" alt="image" src="https://github.com/pyjhoop/Blind-Dating/assets/59335316/d2c5e987-f632-481c-90ed-07853c0e19c5">
 
 ## 💡주요 기능
-1. 회원가입
-2. 로그인
-3. 이성 추천 리스트
-4. 좋아요 기능
-5. 실시간 채팅
+1. 일반 로그인 / 회원가입
+2. 이성 추천 및 좋아요 기능
+3. 실시간 채팅
+4. 게시글 CRUD
+
+## 💡담당 업무
+ - Jenkins와 Nginx로 CI/CD와 무중단 배포 구현
+ - 엑세스 토큰과 리프레시 토큰을 기반으로 한 인증/인가 시스템을 구현했습니다.
+ - 실시간 채팅 기능 구현을 위해 웹소켓을 활용하고 메세지 브로커로 STOMP 적용했습니다.
+ - 채팅방 리스트에서 웹소켓 연결을 통해 새로운 메세지가 도착할 때마다 최신 메세지 내용이 갱신되도록 했습니다.
+ - 신뢰도 있는 API를 제공하기 위해 Restdocs를 작성하였고, 테스트를 위해 OpenAPI로 사양 변경 후 SWAGGER와 연동했습니다.
+
+
 
 ## :rocket: 개발 이슈
 ### 비관적 락을 이용한 동시성 이슈 해결
@@ -71,13 +69,6 @@ JPA의 락 중에 비관적 락을 이용해 동시성 문제를 해결했습니
 BatchSize를 적용했습니다. 기본적으로 추천 유저는 페이지네이션 처리를 하였고, 한 페이지당 10명을 조회하기에 BatchSize는 10으로 정해서 MultipleBagFetchException과 N+1 문제를 해결했습니다.   
 👉🏻[MultipleBagFetchException 해결](https://laohcoding.tistory.com/entry/JPA-cannot-simultaneously-fetch-multiple-bags-%EC%98%A4%EB%A5%98)
 
-### Jacoco 도입후 코드 커버리지 100%  
-기존 controller와 service에 대한 테스트 코드를 성공 케이스에 대해서만 작성을 했었습니다. 좀더 좋은 가독성과 성능을 위해 리팩토링 후에 배포를 진행했는데 예상치 못한 곳에서
-여러번 원하는 대로 기능이 동작하지 않았었고, 이를 통해 테스트 코드와 테스트의 자동화의 중요성을 인식하였습니다. 이런 경험을 통해 안정적인 시스템을 구축하고자 테스트코드가
-프로턱션 코드를 검증 할 수 있도록 Jacoco를 도입한 후 Controller, Service에 대해 100%의 커버리지를 달성했습니다. 
-            
-![image](https://github.com/Blind-Dating/Blind-Dating-BE/assets/59335316/726fe6c8-824b-4d5b-accb-590ac85f3680)
-
 ### Redis를 이용한 AccessToken 재발급 속도 17% 향상
 기존에 RDB에 RefreshToken을 저장한 뒤 AccessToken 재발급시에 사용했습니다. AccessToken의 만료시간이 1시간이고 프론트쪽에서 새로고침하면 토큰을 초기화시켜서 재요청 한다고 하셔서 추후에 
 RDB의 사용량이 증가할때 토큰 재발급의 속도가 느려질거라 생각했습니다. 이를 해결하기 위해 조회 속도가 빠르고 RDB와는 다른 DB를 찾게되었고, 결국 인메모리 방식의 DB인 Redis를 적용했습니다.
@@ -87,7 +78,6 @@ RDB 평균응답 속도는 34ms, Redis 평균응답 속도는 29ms로 측정되�
 AWS에서 발생한 만원 이상의 요금을 조사하기 위해 요금 명세서를 확인해 보았습니다. 결과적으로 Redis를 위한 ElastiCache에서 요금이 발생한 것을 확인할 수 있었습니다. 
 해당 서비스의 구성을 확인해 본 결과 노드의 수가 3개로 설정되어있었고, 이 3개의 노드가 24시간 동안 작동하여 기본 제공량인 750시간을 초과하면서 요금이 발생한 것을 파악했습니다.
 이에 따른 과금 문제를 해결하기 위해 노드의 수를 3개에서 1개로 줄여서 문제를 해결하였습니다.
-
 
 ### Post/Patch 테스트 코드 동작시 403 Forbidden 발생    
 Get 테스트 코드는 잘 실행되는데 Post, Patch, Delete 테스트 코드 실행 시 csrfToken이 요청 시 주어지지 않아 403 Forbidden이 발생하는 것을 확인하였습니다.

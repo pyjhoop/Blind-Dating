@@ -38,7 +38,8 @@
 ## 🪧DB 설계
 👉🏻[DB 상세페이지로 이동](https://www.erdcloud.com/d/FveRbu3AKcJ2Zd3ko)
    
-<img width="626" alt="image" src="https://github.com/pyjhoop/Blind-Dating/assets/59335316/d2c5e987-f632-481c-90ed-07853c0e19c5">
+<img width="604" alt="image" src="https://github.com/pyjhoop/Blind-Dating/assets/59335316/c077cb5c-3fe5-4d86-b415-973efaba3509">
+
 
 ## 💡주요 기능
 1. 일반 로그인 / 회원가입
